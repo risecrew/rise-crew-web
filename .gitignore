@@ -1,0 +1,46 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# build
+build/
+dist/
+*.tsbuildinfo
+
+# env — never commit secrets (only .env.example is tracked)
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Vercel
+.vercel/
+
+# testing
+coverage/
+playwright-report/
+test-results/
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Claude Code personal settings (shared settings go in .claude/settings.json)
+.claude/settings.local.json
