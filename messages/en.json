@@ -59,11 +59,11 @@
     "partner": "Partner with us",
     "passLabel": "BOARDING PASS",
     "route": "FROM SKKU → TO THE WORLD",
-    "gate": "GATE"
+    "gate": "GATE",
+    "routeShort": "SKKU → WORLD"
   },
   "Home": {
     "cover": {
-      "issuer": "SUNGKYUNKWAN UNIVERSITY · 성균관대학교",
       "subline": "The official startup club of the SKKU ANCHOR Division."
     },
     "identity": {
@@ -76,11 +76,7 @@
     "route": {
       "title": "From campus to the world, in three stages",
       "body": "Build the basics on campus, prove the business at home, then expand abroad.",
-      "globalNote": "Overseas stamps are collected below"
-    },
-    "global": {
-      "title": "We only stamp places we have actually been",
-      "body": "Dashed stamps are events that have not happened yet or are still being confirmed."
+      "stampNote": "Dashed stamps are events that have not happened yet or are still being confirmed."
     },
     "network": {
       "title": "{count} mentors on board",

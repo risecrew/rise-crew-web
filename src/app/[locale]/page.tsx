@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { FinalCta } from '@/components/home/final-cta';
-import { GlobalSection } from '@/components/home/global-section';
 import { IdentitySection } from '@/components/home/identity-section';
 import { NetworkPreview } from '@/components/home/network-preview';
 import { PassportCover } from '@/components/home/passport-cover';
@@ -56,7 +55,6 @@ export default async function HomePage({ params }: Props) {
       <PassportCover locale={locale} stats={stats} cta={cta} />
       <IdentitySection />
       <RouteSection locale={locale} stamps={stamps} programs={programs} today={today} />
-      <GlobalSection locale={locale} stamps={stamps} today={today} />
       <NetworkPreview
         locale={locale}
         mentorCount={mentorCount}

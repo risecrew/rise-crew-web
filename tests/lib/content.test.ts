@@ -9,6 +9,7 @@ const planned = (date?: string): Stamp => ({
   city: L('서울', 'Seoul'),
   country: 'KR',
   title: L('행사', 'Event'),
+  label: L('행사', 'Event'),
   stage: 'domestic',
   status: 'planned',
   evidence: [],

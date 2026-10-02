@@ -4,6 +4,7 @@ import { DataField, DataPage } from '@/components/passport/data-page';
 import { FIELD } from '@/components/passport/labels';
 import { Stamp } from '@/components/passport/stamp';
 import { getStampLabels } from '@/components/passport/stamp-labels';
+import { StampLedger } from '@/components/passport/stamp-ledger';
 import { StampTrail } from '@/components/passport/stamp-trail';
 import { PageCover } from '@/components/site/page-cover';
 import { SectionHeading } from '@/components/site/section-heading';
@@ -71,7 +72,7 @@ export default async function AboutPage({ params }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="supporter-title" className="bg-white">
+      <section aria-labelledby="supporter-title" className="border-t border-paper-edge bg-paper">
         <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-2">
           <SectionHeading
             id="supporter-title"
@@ -117,7 +118,7 @@ export default async function AboutPage({ params }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="programs-title" className="bg-white">
+      <section aria-labelledby="programs-title" className="border-t border-paper-edge bg-paper">
         <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
           <SectionHeading id="programs-title" title={t('programs.title')} />
           <ul className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
@@ -168,20 +169,28 @@ export default async function AboutPage({ params }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="history-title" className="bg-white">
+      <section aria-labelledby="history-title" className="border-t border-paper-edge bg-paper">
         <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
           <SectionHeading id="history-title" title={t('history.title')} />
-          <StampTrail className="mt-12 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+          <StampTrail className="mt-12 flex flex-wrap items-center px-2 py-2">
             {stamps.map((stamp) => (
-              <Stamp
-                key={stamp.id}
-                stamp={stamp}
-                state={stampState(stamp, today)}
-                locale={locale}
-                labels={labels}
-              />
+              <div key={stamp.id} className="-mx-2 my-1">
+                <Stamp
+                  stamp={stamp}
+                  state={stampState(stamp, today)}
+                  locale={locale}
+                  labels={labels}
+                />
+              </div>
             ))}
           </StampTrail>
+          <StampLedger
+            stamps={stamps}
+            locale={locale}
+            labels={labels}
+            today={today}
+            className="mt-8"
+          />
         </div>
       </section>
     </main>

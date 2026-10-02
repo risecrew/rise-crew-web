@@ -1,34 +1,33 @@
 import type { Locale } from '@/i18n/locales';
 
-type GuillocheOptions = {
-  cx: number;
-  cy: number;
-  radius: number;
+type WaveLineOptions = {
+  y: number;
   amplitude: number;
-  petals: number;
-  steps: number;
+  periods: number;
+  width: number;
+  step: number;
   phase?: number;
 };
 
-export function guillochePath({
-  cx,
-  cy,
-  radius,
+// One hairline of the security-paper weave. A whole number of periods across the tile
+// width makes the line end at the height it starts, so the tile repeats without a seam.
+export function waveLinePath({
+  y,
   amplitude,
-  petals,
-  steps,
+  periods,
+  width,
+  step,
   phase = 0,
-}: GuillocheOptions): string {
-  if (steps < 3) throw new RangeError('steps must be at least 3');
-  let d = '';
-  for (let i = 0; i < steps; i++) {
-    const theta = (i / steps) * Math.PI * 2;
-    const r = radius + amplitude * Math.sin(petals * theta + phase);
-    const x = cx + r * Math.cos(theta);
-    const y = cy + r * Math.sin(theta);
-    d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+}: WaveLineOptions): string {
+  if (!Number.isInteger(periods) || periods < 1) {
+    throw new RangeError('periods must be a positive whole number');
   }
-  return `${d}Z`;
+  let d = '';
+  for (let x = 0; x <= width; x += step) {
+    const yy = y + amplitude * Math.sin((x / width) * periods * Math.PI * 2 + phase);
+    d += `${x === 0 ? 'M' : 'L'}${x} ${yy.toFixed(2)}`;
+  }
+  return d;
 }
 
 export function toMrz(fields: readonly string[], width = 44): string {
@@ -46,10 +45,27 @@ export function toMrz(fields: readonly string[], width = 44): string {
   return encoded.length >= width ? encoded.slice(0, width) : encoded.padEnd(width, '<');
 }
 
-export function stampRotation(id: string): number {
+function hashId(id: string): number {
   let hash = 0;
   for (const ch of id) hash = (hash * 31 + ch.charCodeAt(0)) | 0;
-  return (Math.abs(hash) % 11) - 5;
+  return Math.abs(hash);
+}
+
+export function stampRotation(id: string): number {
+  return (hashId(id) % 11) - 5;
+}
+
+export const STAMP_SHAPES = ['circle', 'oval', 'rect', 'hexagon'] as const;
+export type StampShape = (typeof STAMP_SHAPES)[number];
+
+export function stampShape(id: string): StampShape {
+  return STAMP_SHAPES[Math.floor(hashId(id) / 11) % STAMP_SHAPES.length];
+}
+
+export type StampScale = 'sm' | 'md' | 'lg';
+
+export function stampScale(id: string): StampScale {
+  return (['sm', 'md', 'lg'] as const)[Math.floor(hashId(id) / 44) % 3];
 }
 
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];

@@ -59,11 +59,11 @@
     "partner": "제휴 문의",
     "passLabel": "BOARDING PASS · 탑승권",
     "route": "FROM SKKU → TO THE WORLD",
-    "gate": "GATE"
+    "gate": "GATE",
+    "routeShort": "SKKU → WORLD"
   },
   "Home": {
     "cover": {
-      "issuer": "성균관대학교 · SUNGKYUNKWAN UNIVERSITY",
       "subline": "비전에 도달하고, 아이디어에 불을 붙이며, 영향력을 확장하고, 미래를 끌어올려라!"
     },
     "identity": {
@@ -76,11 +76,7 @@
     "route": {
       "title": "캠퍼스에서 세계까지, 세 단계",
       "body": "교내에서 기초를 다지고, 국내에서 사업화를 검증하고, 해외로 확장합니다.",
-      "globalNote": "해외 도장은 아래에 모았습니다"
-    },
-    "global": {
-      "title": "실제로 다녀온 곳에만 도장을 찍습니다",
-      "body": "점선 도장은 아직 열리지 않았거나 진행 여부를 확인 중인 일정입니다."
+      "stampNote": "점선 도장은 아직 열리지 않았거나 진행 여부를 확인 중인 일정입니다."
     },
     "network": {
       "title": "멘토 {count}명이 함께합니다",

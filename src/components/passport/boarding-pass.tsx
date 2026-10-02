@@ -17,8 +17,9 @@ export async function BoardingPass({ cta, className }: { cta: ApplyCta; classNam
           {t('passLabel')}
         </span>
         <span className="font-display text-2xl leading-tight font-[850] text-cobalt">{label}</span>
-        <span className="font-mono text-[11px] tracking-[0.2em] text-ink-soft uppercase">
-          {t('route')}
+        <span className="font-mono text-[11px] tracking-[0.2em] whitespace-nowrap text-ink-soft uppercase">
+          <span className="sm:hidden">{t('routeShort')}</span>
+          <span className="hidden sm:inline">{t('route')}</span>
         </span>
       </span>
       <span

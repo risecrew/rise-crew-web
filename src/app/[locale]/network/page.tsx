@@ -64,7 +64,7 @@ export default async function NetworkPage({ params }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="partners-title" className="bg-white">
+      <section aria-labelledby="partners-title" className="border-t border-paper-edge bg-paper">
         <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
           <SectionHeading id="partners-title" title={t('partners.title')} />
           <dl className="mt-12 grid gap-10 md:grid-cols-2">

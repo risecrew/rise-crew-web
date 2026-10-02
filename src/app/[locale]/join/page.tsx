@@ -62,7 +62,7 @@ export default async function JoinPage({ params }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="eligibility-title" className="bg-white">
+      <section aria-labelledby="eligibility-title" className="border-t border-paper-edge bg-paper">
         <div className="mx-auto grid max-w-7xl gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-2">
           <SectionHeading id="eligibility-title" title={t('eligibility.title')} />
           <ul className="flex flex-col divide-y divide-paper-edge border-y border-paper-edge">
@@ -91,7 +91,7 @@ export default async function JoinPage({ params }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="faq-title" className="bg-white">
+      <section aria-labelledby="faq-title" className="border-t border-paper-edge bg-paper">
         <div className="mx-auto max-w-4xl px-5 py-20 md:px-10 md:py-28">
           <SectionHeading id="faq-title" title={t('faq.title')} />
           <ul className="mt-10 divide-y divide-paper-edge border-y border-paper-edge">

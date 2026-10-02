@@ -1,5 +1,5 @@
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
-import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { BoardingPass } from '@/components/passport/boarding-pass';
 import { DataField, DataPage } from '@/components/passport/data-page';
 import { Guilloche } from '@/components/passport/guilloche';
@@ -37,10 +37,26 @@ export async function PassportCover({ locale, stats, cta }: Props) {
         <Guilloche palette="white" className="h-full w-full" />
       </div>
       <div className="mx-auto flex min-h-svh max-w-7xl flex-col items-center px-5 pt-24 text-center md:px-10 md:pt-28">
-        <p className="text-[11px] font-semibold tracking-[0.35em] text-white/80 uppercase sm:text-xs">
-          {t('issuer')}
-        </p>
-        <RiseSymbol className="emboss mt-6 h-16 w-auto text-white/90 md:h-20 lg:h-24" />
+        {/* Issuing-authority lockup, printed bilingual like a passport cover in both locales. */}
+        <div className="flex flex-col items-center">
+          <p lang="ko" className="font-display text-xl font-[700] tracking-[0.32em] md:text-2xl">
+            성균관대학교
+          </p>
+          <p
+            lang="en"
+            className="mt-1 text-xs font-medium tracking-[0.34em] text-white/80 md:text-sm"
+          >
+            SUNGKYUNKWAN UNIVERSITY
+          </p>
+          <Image
+            src="/brand/rise-crew-emblem-emboss.png"
+            alt=""
+            width={501}
+            height={528}
+            priority
+            className="mt-4 h-24 w-auto md:h-28"
+          />
+        </div>
         <h1
           id="cover-title"
           lang="en"

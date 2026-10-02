@@ -5,6 +5,8 @@ const id = z.string().regex(/^[a-z0-9-]+$/, 'ids are lowercase kebab-case');
 const isoDate = z.string().regex(/^\d{4}(-\d{2}(-\d{2})?)?$/, 'use YYYY, YYYY-MM or YYYY-MM-DD');
 
 export const localizedSchema = z.object({ ko: text, en: text });
+const shortText = text.max(24, 'keep stamp labels to 24 characters');
+const shortLocalizedSchema = z.object({ ko: shortText, en: shortText });
 export type Localized = z.infer<typeof localizedSchema>;
 
 export const stageSchema = z.enum(['campus', 'domestic', 'global']);
@@ -31,6 +33,7 @@ export const stampSchema = z
     city: localizedSchema,
     country: z.string().regex(/^[A-Z]{2}$/, 'ISO 3166-1 alpha-2'),
     title: localizedSchema,
+    label: shortLocalizedSchema,
     stage: stageSchema,
     status: z.enum(['done', 'planned']),
     evidence: z.array(evidenceSchema),

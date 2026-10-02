@@ -1,20 +1,49 @@
 import { describe, expect, it } from 'vitest';
-import { formatStampDate, guillochePath, stampRotation, toMrz } from '@/lib/passport';
+import { stamps } from '@/content/data/stamps';
+import {
+  formatStampDate,
+  STAMP_SHAPES,
+  stampRotation,
+  stampScale,
+  stampShape,
+  toMrz,
+  waveLinePath,
+} from '@/lib/passport';
 
-describe('guillochePath', () => {
-  const opts = { cx: 500, cy: 500, radius: 200, amplitude: 20, petals: 12, steps: 120 };
+const yAt = (d: string, which: 'first' | 'last') => {
+  const points = [...d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)];
+  const point = which === 'first' ? points[0] : points[points.length - 1];
+  return { x: Number(point[1]), y: Number(point[2]) };
+};
 
-  it('is a closed path with one point per step', () => {
-    const d = guillochePath(opts);
-    expect(d.startsWith('M')).toBe(true);
-    expect(d.endsWith('Z')).toBe(true);
-    expect(d.match(/[ML]/g)).toHaveLength(120);
+describe('waveLinePath', () => {
+  const opts = { y: 30, amplitude: 4, periods: 2, width: 240, step: 4 };
+
+  it('spans the tile from x=0 to x=width', () => {
+    const d = waveLinePath(opts);
+    expect(yAt(d, 'first').x).toBe(0);
+    expect(yAt(d, 'last').x).toBe(240);
   });
-  it('is deterministic', () => {
-    expect(guillochePath(opts)).toBe(guillochePath(opts));
+  it('ends at the height it starts so the tile repeats seamlessly', () => {
+    for (const phase of [0, 0.7, Math.PI]) {
+      const d = waveLinePath({ ...opts, phase });
+      expect(yAt(d, 'last').y).toBeCloseTo(yAt(d, 'first').y, 1);
+    }
   });
-  it('rejects fewer than 3 steps', () => {
-    expect(() => guillochePath({ ...opts, steps: 2 })).toThrow(RangeError);
+  it('rejects a fractional number of periods, which would break the seam', () => {
+    expect(() => waveLinePath({ ...opts, periods: 1.5 })).toThrow(RangeError);
+  });
+});
+
+describe('stampShape and stampScale', () => {
+  it('is stable for the same id', () => {
+    expect(stampShape('aix-contest')).toBe(stampShape('aix-contest'));
+    expect(stampScale('aix-contest')).toBe(stampScale('aix-contest'));
+  });
+  it('varies the shapes across the real stamps', () => {
+    const shapes = new Set(stamps.map((s) => stampShape(s.id)));
+    expect(shapes.size).toBeGreaterThanOrEqual(3);
+    for (const shape of shapes) expect(STAMP_SHAPES).toContain(shape);
   });
 });
 

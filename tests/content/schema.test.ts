@@ -15,6 +15,7 @@ const baseStamp = {
   city: L('서울', 'Seoul'),
   country: 'KR',
   title: L('대회', 'Contest'),
+  label: L('AI+X 경진대회', 'AI+X Competition'),
   stage: 'global',
 };
 
@@ -65,6 +66,23 @@ describe('stampSchema', () => {
       evidence: [{ kind: 'document', label: L('소개서', 'Brochure') }],
     });
     expect(r.success).toBe(true);
+  });
+
+  it('requires a short label for the stamp face', () => {
+    const { label: _label, ...noLabel } = baseStamp;
+    void _label;
+    const r = stampSchema.safeParse({ ...noLabel, status: 'planned', evidence: [] });
+    expect(r.success).toBe(false);
+  });
+
+  it('rejects a stamp label longer than 24 characters', () => {
+    const r = stampSchema.safeParse({
+      ...baseStamp,
+      label: L('짧은 라벨', 'A label that is far too long for a stamp face'),
+      status: 'planned',
+      evidence: [],
+    });
+    expect(r.success).toBe(false);
   });
 
   it('rejects a malformed date', () => {
