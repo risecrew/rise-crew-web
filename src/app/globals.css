@@ -97,3 +97,26 @@ html {
     background-image: url(/patterns/green.svg);
   }
 }
+
+/* Browser surfaces carry the palette too. */
+html {
+  accent-color: var(--color-cobalt);
+  caret-color: var(--color-cobalt);
+  scrollbar-color: color-mix(in oklab, var(--color-cobalt) 45%, transparent) transparent;
+}
+::selection {
+  background: var(--color-lime);
+  color: var(--color-cobalt);
+}
+/* currentColor keeps the ring visible on both the cobalt cover and the paper pages. */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+a {
+  text-underline-offset: 0.2em;
+}
+dd,
+time {
+  font-variant-numeric: tabular-nums;
+}
