@@ -7,3 +7,4 @@ public/brand
 playwright-report
 test-results
 **/*.md
+.superpowers
