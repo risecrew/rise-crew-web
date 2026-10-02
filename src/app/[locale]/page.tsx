@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { PageCover } from '@/components/site/page-cover';
 import { asLocale } from '@/i18n/as-locale';
 import { localizedAlternates } from '@/lib/metadata';
 
@@ -21,7 +22,7 @@ export default async function HomePage({ params }: Props) {
   const t = await getTranslations('Home');
   return (
     <main id="main">
-      <h1>{t('cover.issuer')}</h1>
+      <PageCover title={t('cover.issuer')} lead={t('cover.subline')} />
     </main>
   );
 }

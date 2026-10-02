@@ -3,6 +3,8 @@ import { JetBrains_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import { SiteFooter } from '@/components/site/site-footer';
+import { SiteHeader } from '@/components/site/site-header';
 import { asLocale } from '@/i18n/as-locale';
 import { routing } from '@/i18n/routing';
 import { FONT_STYLESHEETS } from '@/lib/fonts';
@@ -32,7 +34,11 @@ export default async function LocaleLayout({ children, params }: Props) {
         ))}
       </head>
       <body className="bg-paper text-ink font-sans antialiased">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

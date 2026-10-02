@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { PageCover } from '@/components/site/page-cover';
 import { asLocale } from '@/i18n/as-locale';
 import { localizedAlternates } from '@/lib/metadata';
 
@@ -21,7 +22,7 @@ export default async function NetworkPage({ params }: Props) {
   const t = await getTranslations('Network');
   return (
     <main id="main">
-      <h1>{t('title', { count: 33 })}</h1>
+      <PageCover title={t('title', { count: 33 })} lead={t('lead')} />
     </main>
   );
 }
