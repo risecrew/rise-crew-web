@@ -9,7 +9,7 @@ export function PartnerMark({ partner, locale }: { partner: Partner; locale: Loc
     partner.logo && partner.logoApproved ? (
       <img src={partner.logo} alt={name} className="h-8 w-auto" />
     ) : (
-      <span className="text-cobalt font-semibold break-keep">{name}</span>
+      <span className="font-semibold break-keep text-cobalt">{name}</span>
     );
   return partner.url ? (
     <a

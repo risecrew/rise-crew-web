@@ -5,7 +5,7 @@ export function MrzLine({ value, className }: { value: string; className?: strin
     <p
       aria-hidden
       className={cn(
-        'text-ink-soft overflow-hidden font-mono text-[clamp(9px,2.4vw,13px)] tracking-[0.2em] whitespace-nowrap',
+        'overflow-hidden font-mono text-[clamp(9px,2.4vw,13px)] tracking-[0.2em] whitespace-nowrap text-ink-soft',
         className,
       )}
     >

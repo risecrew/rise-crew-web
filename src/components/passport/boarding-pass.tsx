@@ -13,20 +13,20 @@ export async function BoardingPass({ cta, className }: { cta: ApplyCta; classNam
   const inner = (
     <>
       <span className="flex flex-col gap-1 px-5 py-4">
-        <span className="text-ink-soft text-[10px] font-semibold tracking-[0.25em] uppercase">
+        <span className="text-[10px] font-semibold tracking-[0.25em] text-ink-soft uppercase">
           {t('passLabel')}
         </span>
-        <span className="font-display text-cobalt text-2xl leading-tight font-[850]">{label}</span>
-        <span className="text-ink-soft font-mono text-[11px] tracking-[0.2em] uppercase">
+        <span className="font-display text-2xl leading-tight font-[850] text-cobalt">{label}</span>
+        <span className="font-mono text-[11px] tracking-[0.2em] text-ink-soft uppercase">
           {t('route')}
         </span>
       </span>
       <span
         aria-hidden
-        className="border-paper-edge text-ink-soft flex flex-col items-center justify-center border-l-2 border-dashed px-4 font-mono text-[10px] tracking-[0.2em] uppercase"
+        className="flex flex-col items-center justify-center border-l-2 border-dashed border-paper-edge px-4 font-mono text-[10px] tracking-[0.2em] text-ink-soft uppercase"
       >
         {t('gate')}
-        <span className="font-display text-cobalt text-xl font-[800]">50322</span>
+        <span className="font-display text-xl font-[800] text-cobalt">50322</span>
       </span>
     </>
   );

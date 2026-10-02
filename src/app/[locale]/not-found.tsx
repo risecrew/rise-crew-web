@@ -9,7 +9,7 @@ export default async function NotFound() {
       <PageCover title={t('title')} lead={t('body')}>
         <Link
           href="/"
-          className="text-cobalt mt-8 inline-block rounded bg-white px-5 py-3 font-semibold"
+          className="mt-8 inline-block rounded bg-white px-5 py-3 font-semibold text-cobalt"
         >
           {t('home')}
         </Link>

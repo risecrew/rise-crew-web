@@ -19,7 +19,7 @@ export async function SiteHeader() {
     <header className="absolute inset-x-0 top-0 z-30">
       <a
         href="#main"
-        className="focus:text-cobalt sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:rounded focus:bg-white focus:px-3 focus:py-2"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:text-cobalt"
       >
         {t('skip')}
       </a>
@@ -37,7 +37,7 @@ export async function SiteHeader() {
           <LocaleSwitch />
           <Link
             href="/join"
-            className="text-cobalt rounded bg-white px-4 py-2 font-semibold transition-transform duration-150 ease-out active:scale-[0.97]"
+            className="rounded bg-white px-4 py-2 font-semibold text-cobalt transition-transform duration-150 ease-out active:scale-[0.97]"
           >
             {t('join')}
           </Link>

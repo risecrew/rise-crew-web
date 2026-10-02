@@ -29,20 +29,20 @@ export function MobileNav({
       </summary>
       <nav
         aria-label={menuLabel}
-        className="bg-paper text-ink absolute right-0 mt-3 w-64 rounded-lg p-3 shadow-xl"
+        className="absolute right-0 mt-3 w-64 rounded-lg bg-paper p-3 text-ink shadow-xl"
       >
         <ul className="flex flex-col">
           {items.map((item) => (
             <li key={item.href}>
-              <Link href={item.href} className="hover:bg-paper-edge block rounded px-3 py-3">
+              <Link href={item.href} className="block rounded px-3 py-3 hover:bg-paper-edge">
                 {item.label}
               </Link>
             </li>
           ))}
         </ul>
-        <div className="border-paper-edge mt-2 flex items-center justify-between border-t px-3 pt-3">
+        <div className="mt-2 flex items-center justify-between border-t border-paper-edge px-3 pt-3">
           <LocaleSwitch tone="ink" />
-          <Link href="/join" className="bg-cobalt rounded px-4 py-2 font-semibold text-white">
+          <Link href="/join" className="rounded bg-cobalt px-4 py-2 font-semibold text-white">
             {joinLabel}
           </Link>
         </div>

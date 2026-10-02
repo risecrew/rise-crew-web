@@ -12,7 +12,7 @@ export async function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.4fr_1fr_1fr] md:px-10">
         <div>
           <RiseSymbol className="h-10 w-auto" />
-          <p className="font-display mt-4 text-2xl font-[800]">RISE CREW</p>
+          <p className="mt-4 font-display text-2xl font-[800]">RISE CREW</p>
           <p className="mt-2 text-white/85">{t('tagline')}</p>
           <p className="mt-1 text-sm break-keep text-white/75">{t('supportedBy')}</p>
         </div>

@@ -36,6 +36,16 @@ html {
 .stamp {
   transform: rotate(var(--stamp-rot, 0deg));
 }
+/* Inked stamps carry a second, inner rule like a rubber stamp. */
+.stamp[data-state='done']::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid;
+  border-color: inherit;
+  border-radius: calc(1rem - 5px);
+  pointer-events: none;
+}
 .stamp[data-armed] {
   opacity: 0;
   transform: rotate(var(--stamp-rot, 0deg)) scale(1.12);

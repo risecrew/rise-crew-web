@@ -4,26 +4,27 @@ import { Guilloche } from './guilloche';
 import type { FieldLabel } from './labels';
 import { MrzLine } from './mrz-line';
 
-export function DataPage({
-  children,
-  className,
-  mrz,
-}: {
-  children: ReactNode;
-  className?: string;
-  mrz?: string;
-}) {
+type DataPageProps = { children: ReactNode; className?: string; mrz?: string; columns?: 2 | 3 };
+
+export function DataPage({ children, className, mrz, columns = 2 }: DataPageProps) {
   return (
     <div
       className={cn(
-        'border-paper-edge bg-paper text-ink relative isolate overflow-hidden rounded-lg border',
+        'relative isolate overflow-hidden rounded-lg border border-paper-edge bg-paper text-ink',
         className,
       )}
     >
       <Guilloche palette="blue" className="absolute inset-0 -z-10 opacity-40" />
-      <dl className="grid gap-x-8 gap-y-5 p-6 sm:grid-cols-2 md:p-8">{children}</dl>
+      <dl
+        className={cn(
+          'grid gap-x-8 gap-y-5 p-6 md:p-8',
+          columns === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2',
+        )}
+      >
+        {children}
+      </dl>
       {mrz ? (
-        <MrzLine value={mrz} className="border-paper-edge border-t px-6 py-3 md:px-8" />
+        <MrzLine value={mrz} className="border-t border-paper-edge px-6 py-3 md:px-8" />
       ) : null}
     </div>
   );
@@ -40,10 +41,10 @@ export function DataField({
 }) {
   return (
     <div className={cn('min-w-0', wide && 'sm:col-span-2')}>
-      <dt className="text-ink-soft text-[11px] font-medium tracking-[0.14em] uppercase">
+      <dt className="text-[11px] font-medium tracking-[0.14em] text-ink-soft uppercase">
         <span lang="ko">{label.ko}</span> / <span lang="en">{label.en}</span>
       </dt>
-      <dd className="text-cobalt mt-1 text-lg font-semibold break-keep">{children}</dd>
+      <dd className="mt-1 text-lg font-semibold break-keep text-cobalt">{children}</dd>
     </div>
   );
 }

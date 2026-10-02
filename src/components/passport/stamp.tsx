@@ -40,10 +40,10 @@ export function Stamp({ stamp, state, locale, labels }: Props) {
       data-state={state}
       style={{ '--stamp-rot': `${stampRotation(stamp.id)}deg` } as CSSProperties}
       className={cn(
-        'stamp flex min-h-40 flex-col justify-center gap-2 rounded-2xl border-[3px] bg-white/70 p-5 text-center',
+        'stamp relative flex min-h-40 flex-col justify-center gap-2 rounded-2xl border-2 bg-paper/80 p-5 text-center',
         state === 'done'
           ? cn(BORDER[stamp.stage], 'text-cobalt')
-          : 'border-ink-soft/60 text-ink-soft border-dashed',
+          : 'border-dashed border-ink-soft/60 text-ink-soft',
       )}
     >
       {source?.url ? (
@@ -51,7 +51,7 @@ export function Stamp({ stamp, state, locale, labels }: Props) {
           href={source.url}
           target="_blank"
           rel="noreferrer"
-          className="focus-visible:outline-ocean flex flex-col gap-2 rounded focus-visible:outline-2 focus-visible:outline-offset-4"
+          className="flex flex-col gap-2 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ocean"
         >
           {content}
           <span className="sr-only">{labels.source}</span>
