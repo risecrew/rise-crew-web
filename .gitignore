@@ -59,3 +59,8 @@ Thumbs.db
 /성균관대학교 앵커사업단 로고/
 /카카오모빌리티 로고/
 /대표 사진 모음/
+
+# impeccable review screenshots (regenerated per review)
+.impeccable/review/
+.impeccable/build/
+.impeccable/questions/

@@ -11,7 +11,7 @@
 ## 스택
 
 - Next.js (App Router) + TypeScript
-- Tailwind CSS + shadcn/ui (Base UI)
+- Tailwind CSS. shadcn/ui (Base UI)는 2단계 관리자 화면에서 도입한다
 - Supabase (Postgres, Auth, Storage)
 - Vercel
 - Node.js 24 (`.nvmrc`), pnpm
