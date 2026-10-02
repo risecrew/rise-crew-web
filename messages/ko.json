@@ -1,0 +1,186 @@
+{
+  "Meta": {
+    "home": {
+      "title": "RISE CREW | 성균관대학교 창업 동아리",
+      "description": "성균관대학교 ANCHOR 사업단 공식 창업 동아리 RISE CREW. 캠퍼스에서 세계로, 실행하는 창업가를 키웁니다."
+    },
+    "about": {
+      "title": "소개 | RISE CREW",
+      "description": "RISE CREW의 비전, 육성 플랜, 프로그램, 운영진, 연혁."
+    },
+    "network": {
+      "title": "네트워크 | RISE CREW",
+      "description": "RISE CREW와 함께하는 멘토와 협력 기관."
+    },
+    "contact": { "title": "문의 | RISE CREW", "description": "RISE CREW 연락처와 제휴 문의." },
+    "join": {
+      "title": "지원하기 | RISE CREW",
+      "description": "RISE CREW 모집 안내, 지원 자격, 혜택, 자주 묻는 질문."
+    },
+    "notFound": { "title": "페이지를 찾을 수 없습니다 | RISE CREW" }
+  },
+  "Nav": {
+    "primary": "주 메뉴",
+    "footer": "사이트 메뉴",
+    "home": "홈",
+    "about": "소개",
+    "network": "네트워크",
+    "contact": "문의",
+    "join": "지원하기",
+    "menu": "메뉴",
+    "skip": "본문으로 건너뛰기",
+    "switchTo": "English"
+  },
+  "Footer": {
+    "tagline": "캠퍼스에서 세계로.",
+    "supportedBy": "성균관대학교 ANCHOR 사업단 공식 창업 동아리",
+    "address": "서울 종로구 성균관로 25-2 호암관 50322호",
+    "rights": "© {year} RISE CREW"
+  },
+  "Common": {
+    "upcoming": "예정",
+    "unconfirmed": "확인 중",
+    "dateTbc": "날짜 확인 중",
+    "source": "출처 보기",
+    "stage": {
+      "campus": "Campus · 교내 역량",
+      "domestic": "Domestic · 국내 사업화",
+      "global": "Global · 해외 진출"
+    }
+  },
+  "Cta": {
+    "apply": "지원하기",
+    "notice": "모집 안내 보기",
+    "partner": "제휴 문의",
+    "passLabel": "BOARDING PASS · 탑승권",
+    "route": "FROM SKKU → TO THE WORLD",
+    "gate": "GATE"
+  },
+  "Home": {
+    "cover": {
+      "issuer": "성균관대학교 · SUNGKYUNKWAN UNIVERSITY",
+      "subline": "비전에 도달하고, 아이디어에 불을 붙이며, 영향력을 확장하고, 미래를 끌어올려라!"
+    },
+    "identity": {
+      "kicker": "IDENTITY",
+      "title": "학교가 공식으로 지원하는 실행형 창업 동아리",
+      "body": "RISE CREW는 성균관대학교 ANCHOR 사업단과 함께하는 공식 창업 동아리입니다. 아이디어에서 멈추지 않고 시장에 나가는 팀을 만듭니다.",
+      "affiliation": "성균관대학교 ANCHOR 사업단 공식 창업 동아리",
+      "supporter": "성균관대학교 ANCHOR 사업단",
+      "mou": "카카오모빌리티 업무협약(MOU) · 2025.11.28 · ANCHOR 사업단 체결"
+    },
+    "route": {
+      "kicker": "ROUTE",
+      "title": "캠퍼스에서 세계까지, 세 단계",
+      "body": "교내에서 기초를 다지고, 국내에서 사업화를 검증하고, 해외로 확장합니다.",
+      "globalNote": "해외 도장은 아래에 모았습니다"
+    },
+    "global": {
+      "kicker": "VISAS",
+      "title": "실제로 다녀온 곳에만 도장을 찍습니다",
+      "body": "점선 도장은 아직 열리지 않았거나 진행 여부를 확인 중인 일정입니다."
+    },
+    "network": {
+      "kicker": "ENDORSEMENTS",
+      "title": "멘토 {count}명이 함께합니다",
+      "body": "카카오모빌리티, VC, 액셀러레이터, 교수진의 현직 전문가가 아이디어부터 투자와 해외 진출까지 함께합니다.",
+      "partners": "함께하는 기관",
+      "cta": "네트워크 전체 보기"
+    },
+    "press": { "kicker": "PRESS", "title": "언론 보도" },
+    "final": {
+      "title": "다음 출국편에 탑승하세요",
+      "body": "창업팀, 1인 창업자, 팀이 없는 개인 모두 지원할 수 있습니다."
+    }
+  },
+  "About": {
+    "kicker": "ABOUT",
+    "title": "아이디어를 실행으로, 캠퍼스를 세계로",
+    "lead": "RISE CREW는 성균관대학교 ANCHOR 사업단과 함께하는 공식 창업 동아리입니다. 교육, 실습, 글로벌 경험으로 실행력을 갖춘 창업 인재를 키웁니다.",
+    "rise": {
+      "kicker": "R·I·S·E",
+      "title": "이름에 담은 네 가지 약속",
+      "r": "Reach · 비전에 도달한다",
+      "i": "Ignite · 아이디어에 불을 붙인다",
+      "s": "Scale up · 영향력을 확장한다",
+      "e": "Elevate · 미래를 끌어올린다",
+      "born": "Born to Global: 사업자 등록과 동시에 해외 시장을 겨냥하는 창업을 목표로 합니다."
+    },
+    "supporter": {
+      "kicker": "SUPPORTED BY",
+      "title": "성균관대학교 ANCHOR 사업단",
+      "body": "ANCHOR 사업단은 RISE CREW를 지원하는 기관입니다. 서울시와 교육부의 RISE(지역혁신중심 대학지원체계) 사업에 참여하는 성균관대학교 사업단으로, 2025년 6월부터 2030년 2월까지 운영됩니다.",
+      "kpiFunding": "창업팀 누적 펀딩 유치 24억 원",
+      "kpiGlobal": "Born to Global 사업자 등록 창업팀 10개",
+      "kpiLabel": "사업단 5개년 목표"
+    },
+    "steps": {
+      "kicker": "GROWTH PLAN",
+      "title": "5단계 육성 플랜",
+      "body": "VCC 강연, 전문 멘토단 1:1 멘토링, 동아리방이 모든 단계를 받칩니다."
+    },
+    "programs": { "kicker": "PROGRAMS", "title": "프로그램" },
+    "crew": {
+      "kicker": "CREW",
+      "title": "운영진",
+      "advisor": "지도교수",
+      "pending": "운영진의 이름과 사진은 게시 동의를 받은 뒤 공개합니다."
+    },
+    "history": { "kicker": "HISTORY", "title": "연혁" }
+  },
+  "Network": {
+    "kicker": "NETWORK",
+    "title": "멘토 {count}명과 협력 기관",
+    "lead": "현직 전문가와 기관이 RISE CREW 팀의 성장을 받칩니다.",
+    "mentors": {
+      "title": "멘토",
+      "note": "전체 멘토 {total}명 중 이름이 공개된 {listed}명을 소개합니다."
+    },
+    "partners": {
+      "title": "협력 기관",
+      "kind": {
+        "supporter": "지원 기관",
+        "company": "기업",
+        "university": "대학",
+        "program": "협력 프로그램"
+      }
+    },
+    "mou": {
+      "kicker": "MOU",
+      "title": "카카오모빌리티 업무협약",
+      "date": "2025년 11월 28일 · 성균관대학교 ANCHOR 사업단 체결",
+      "crew": "RISE CREW와 성창재 창업팀 멘토링·성장 지원",
+      "vcc": "VCC 커리큘럼 공동 개발과 운영",
+      "contest": "글로벌 대학생 창업경진대회 공동 기획과 운영"
+    }
+  },
+  "Contact": {
+    "kicker": "CONTACT",
+    "title": "제휴와 협업을 기다립니다",
+    "lead": "기업, 기관, 멘토, 언론 문의는 이메일로 보내주세요.",
+    "partnerTitle": "제휴 문의",
+    "partnerBody": "메일 제목에 [제휴 문의]가 미리 들어갑니다. 소속, 담당자, 제안 내용을 적어주세요.",
+    "partnerSubject": "[제휴 문의] ",
+    "room": "호암관 50322호 (동아리방)"
+  },
+  "Join": {
+    "kicker": "JOIN",
+    "title": "RISE CREW에 탑승하세요",
+    "lead": "창업팀, 1인 창업자, 팀이 없는 개인 모두 지원할 수 있습니다.",
+    "status": { "open": "모집 중", "closed": "모집 기간이 아닙니다" },
+    "eligibility": {
+      "title": "지원 자격",
+      "campus": "성균관대학교 인문사회과학캠퍼스와 자연과학캠퍼스 학생",
+      "types": "창업팀, 1인 창업자, 팀이 없는 개인",
+      "others": "타교생과 졸업생도 가입할 수 있습니다. 개인 혜택은 수료자에게만 제공됩니다."
+    },
+    "benefits": { "title": "받을 수 있는 것" },
+    "faq": { "title": "자주 묻는 질문" }
+  },
+  "NotFound": {
+    "kicker": "404",
+    "title": "페이지를 찾을 수 없습니다",
+    "body": "주소가 바뀌었거나 아직 열리지 않은 페이지입니다.",
+    "home": "홈으로"
+  }
+}

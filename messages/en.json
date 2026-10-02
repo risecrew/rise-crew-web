@@ -1,0 +1,189 @@
+{
+  "Meta": {
+    "home": {
+      "title": "RISE CREW | Sungkyunkwan University startup club",
+      "description": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We grow founders who execute, from campus to the world."
+    },
+    "about": {
+      "title": "About | RISE CREW",
+      "description": "RISE CREW's vision, growth plan, programs, crew and history."
+    },
+    "network": {
+      "title": "Network | RISE CREW",
+      "description": "Mentors and partners who work with RISE CREW."
+    },
+    "contact": {
+      "title": "Contact | RISE CREW",
+      "description": "Contact RISE CREW and send partnership inquiries."
+    },
+    "join": {
+      "title": "Join | RISE CREW",
+      "description": "RISE CREW recruitment, eligibility, benefits and FAQ."
+    },
+    "notFound": { "title": "Page not found | RISE CREW" }
+  },
+  "Nav": {
+    "primary": "Main menu",
+    "footer": "Site menu",
+    "home": "Home",
+    "about": "About",
+    "network": "Network",
+    "contact": "Contact",
+    "join": "Join",
+    "menu": "Menu",
+    "skip": "Skip to content",
+    "switchTo": "한국어"
+  },
+  "Footer": {
+    "tagline": "From campus to the world.",
+    "supportedBy": "Official startup club of the SKKU ANCHOR Division",
+    "address": "Room 50322, Hoam Hall, 25-2 Sungkyunkwan-ro, Jongno-gu, Seoul",
+    "rights": "© {year} RISE CREW"
+  },
+  "Common": {
+    "upcoming": "Upcoming",
+    "unconfirmed": "Unconfirmed",
+    "dateTbc": "Date TBC",
+    "source": "View source",
+    "stage": {
+      "campus": "Campus · Build the basics",
+      "domestic": "Domestic · Prove the business",
+      "global": "Global · Go abroad"
+    }
+  },
+  "Cta": {
+    "apply": "Apply",
+    "notice": "See recruitment",
+    "partner": "Partner with us",
+    "passLabel": "BOARDING PASS",
+    "route": "FROM SKKU → TO THE WORLD",
+    "gate": "GATE"
+  },
+  "Home": {
+    "cover": {
+      "issuer": "SUNGKYUNKWAN UNIVERSITY · 성균관대학교",
+      "subline": "The official startup club of the SKKU ANCHOR Division."
+    },
+    "identity": {
+      "kicker": "IDENTITY",
+      "title": "A university-backed club that builds real ventures",
+      "body": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We do not stop at ideas; we build teams that go to market.",
+      "affiliation": "Official startup club, SKKU ANCHOR Division",
+      "supporter": "SKKU ANCHOR Division",
+      "mou": "MOU with Kakao Mobility · Nov 28, 2025 · signed by the ANCHOR Division"
+    },
+    "route": {
+      "kicker": "ROUTE",
+      "title": "From campus to the world, in three stages",
+      "body": "Build the basics on campus, prove the business at home, then expand abroad.",
+      "globalNote": "Overseas stamps are collected below"
+    },
+    "global": {
+      "kicker": "VISAS",
+      "title": "We only stamp places we have actually been",
+      "body": "Dashed stamps are events that have not happened yet or are still being confirmed."
+    },
+    "network": {
+      "kicker": "ENDORSEMENTS",
+      "title": "{count} mentors on board",
+      "body": "Experts from Kakao Mobility, venture capital, accelerators and faculty support teams from idea to fundraising and global expansion.",
+      "partners": "Partners",
+      "cta": "See the full network"
+    },
+    "press": { "kicker": "PRESS", "title": "In the press" },
+    "final": {
+      "title": "Board the next departure",
+      "body": "Startup teams, solo founders and individuals without a team can all apply."
+    }
+  },
+  "About": {
+    "kicker": "ABOUT",
+    "title": "Ideas into action, campus into the world",
+    "lead": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We grow founders who can execute through education, practice and global experience.",
+    "rise": {
+      "kicker": "R·I·S·E",
+      "title": "Four promises in our name",
+      "r": "Reach your vision",
+      "i": "Ignite your idea",
+      "s": "Scale up your impact",
+      "e": "Elevate your future",
+      "born": "Born to Global: we aim for ventures that target overseas markets from the day they register."
+    },
+    "supporter": {
+      "kicker": "SUPPORTED BY",
+      "title": "SKKU ANCHOR Division",
+      "body": "The ANCHOR Division supports RISE CREW. It is Sungkyunkwan University's division in the Seoul RISE (Regional Innovation System & Education) program, running from June 2025 to February 2030.",
+      "kpiFunding": "KRW 2.4 billion in cumulative startup funding",
+      "kpiGlobal": "10 registered Born to Global startups",
+      "kpiLabel": "Division five-year goals"
+    },
+    "steps": {
+      "kicker": "GROWTH PLAN",
+      "title": "Five-step growth plan",
+      "body": "VCC lectures, 1:1 expert mentoring and a club room support every step."
+    },
+    "programs": { "kicker": "PROGRAMS", "title": "Programs" },
+    "crew": {
+      "kicker": "CREW",
+      "title": "Crew",
+      "advisor": "Faculty advisor",
+      "pending": "Crew names and photos will be published once each member consents."
+    },
+    "history": { "kicker": "HISTORY", "title": "History" }
+  },
+  "Network": {
+    "kicker": "NETWORK",
+    "title": "{count} mentors and our partners",
+    "lead": "Working experts and institutions back every RISE CREW team.",
+    "mentors": {
+      "title": "Mentors",
+      "note": "{listed} of our {total} mentors are listed by name."
+    },
+    "partners": {
+      "title": "Partners",
+      "kind": {
+        "supporter": "Supporter",
+        "company": "Company",
+        "university": "University",
+        "program": "Partner program"
+      }
+    },
+    "mou": {
+      "kicker": "MOU",
+      "title": "Partnership with Kakao Mobility",
+      "date": "November 28, 2025 · signed by the SKKU ANCHOR Division",
+      "crew": "Mentoring and growth support for RISE CREW and Seongchangjae teams",
+      "vcc": "Co-developing and running the VCC curriculum",
+      "contest": "Co-planning and running a global university startup competition"
+    }
+  },
+  "Contact": {
+    "kicker": "CONTACT",
+    "title": "Let's work together",
+    "lead": "Companies, institutions, mentors and press: please reach us by email.",
+    "partnerTitle": "Partnership inquiry",
+    "partnerBody": "The subject line starts with [Partnership]. Please include your organization, contact person and proposal.",
+    "partnerSubject": "[Partnership] ",
+    "room": "Room 50322, Hoam Hall (club room)"
+  },
+  "Join": {
+    "kicker": "JOIN",
+    "title": "Board RISE CREW",
+    "lead": "Startup teams, solo founders and individuals without a team can all apply.",
+    "status": { "open": "Recruiting now", "closed": "Not recruiting right now" },
+    "eligibility": {
+      "title": "Who can apply",
+      "campus": "Students at SKKU's Humanities and Social Sciences Campus and Natural Sciences Campus",
+      "types": "Startup teams, solo founders and individuals without a team",
+      "others": "Students from other universities and graduates can join. Individual benefits are limited to members who complete the program."
+    },
+    "benefits": { "title": "What you get" },
+    "faq": { "title": "FAQ" }
+  },
+  "NotFound": {
+    "kicker": "404",
+    "title": "Page not found",
+    "body": "The address may have changed, or the page is not open yet.",
+    "home": "Go home"
+  }
+}
