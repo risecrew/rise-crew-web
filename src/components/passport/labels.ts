@@ -20,4 +20,5 @@ export const FIELD = {
   period: { ko: '기간', en: 'Period' },
   goal: { ko: '목표', en: 'Goal' },
   brand: { ko: '사업 브랜드', en: 'Program brand' },
+  notice: { ko: '안내', en: 'Notice' },
 } as const satisfies Record<string, FieldLabel>;
