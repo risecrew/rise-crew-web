@@ -1,5 +1,7 @@
 # RISE CREW Web
 
+@AGENTS.md
+
 성균관대학교 창업 동아리 **RISE CREW**의 공식 홈페이지.
 
 - **RISE CREW**: 동아리 이름이자 이 사이트의 주인공.
