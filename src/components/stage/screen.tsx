@@ -3,8 +3,9 @@ import { slideCounter } from '@/lib/stage';
 import { cn } from '@/lib/utils';
 
 type Props = {
-  index: number;
-  total: number;
+  /** Slide position in the deck; omitted on inner pages, where the screen shows a photo. */
+  index?: number;
+  total?: number;
   children: ReactNode;
   className?: string;
   tone?: 'dark' | 'cobalt';
@@ -28,7 +29,9 @@ export function Screen({ index, total, children, className, tone = 'dark' }: Pro
         className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-center justify-between px-[clamp(12px,3cqw,40px)] py-[clamp(8px,1.8cqw,22px)] text-[clamp(10px,1.2cqw,14px)] font-semibold tracking-[0.18em] text-white/70"
       >
         <span>RISE CREW</span>
-        <span className="font-mono tracking-normal">{slideCounter(index, total)}</span>
+        {index && total ? (
+          <span className="font-mono tracking-normal">{slideCounter(index, total)}</span>
+        ) : null}
       </div>
     </div>
   );

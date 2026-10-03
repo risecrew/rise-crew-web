@@ -7,9 +7,9 @@ export function PartnerMark({ partner, locale }: { partner: Partner; locale: Loc
   const name = pick(partner.name, locale);
   const mark =
     partner.logo && partner.logoApproved ? (
-      <img src={partner.logo} alt={name} className="h-8 w-auto" />
+      <img src={partner.logo} alt={name} className="h-8 w-auto rounded bg-white p-1" />
     ) : (
-      <span className="font-semibold break-keep text-cobalt">{name}</span>
+      <span className="font-semibold break-keep text-white">{name}</span>
     );
   return partner.url ? (
     <a

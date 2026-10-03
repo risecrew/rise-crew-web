@@ -11,7 +11,7 @@ import type { Mentor, Partner, Photo, Press, Program, Stamp, Stat } from '@/cont
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
 import { pick, stampState, type ApplyCta } from '@/lib/content';
-import { formatStampDate } from '@/lib/passport';
+import { formatStampDate } from '@/lib/format';
 
 const SLOGAN = [
   ['R', 'each your vision,'],

@@ -33,7 +33,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <link key={href} rel="stylesheet" href={href} precedence="default" />
         ))}
       </head>
-      <body className="bg-paper font-sans text-ink antialiased">
+      <body className="bg-stage font-sans text-white antialiased">
         <NextIntlClientProvider>
           <SiteHeader />
           {children}

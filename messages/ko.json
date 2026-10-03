@@ -56,11 +56,7 @@
   "Cta": {
     "apply": "지원하기",
     "notice": "모집 안내 보기",
-    "partner": "제휴 문의",
-    "passLabel": "BOARDING PASS · 탑승권",
-    "route": "FROM SKKU → TO THE WORLD",
-    "gate": "GATE",
-    "routeShort": "SKKU → WORLD"
+    "partner": "제휴 문의"
   },
   "Home": {
     "deck": {

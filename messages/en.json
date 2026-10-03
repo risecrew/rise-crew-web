@@ -56,11 +56,7 @@
   "Cta": {
     "apply": "Apply",
     "notice": "See recruitment",
-    "partner": "Partner with us",
-    "passLabel": "BOARDING PASS",
-    "route": "FROM SKKU → TO THE WORLD",
-    "gate": "GATE",
-    "routeShort": "SKKU → WORLD"
+    "partner": "Partner with us"
   },
   "Home": {
     "deck": {
