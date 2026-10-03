@@ -1,16 +1,12 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { FinalCta } from '@/components/home/final-cta';
-import { IdentitySection } from '@/components/home/identity-section';
-import { NetworkPreview } from '@/components/home/network-preview';
-import { PassportCover } from '@/components/home/passport-cover';
-import { PressSection } from '@/components/home/press-section';
-import { RouteSection } from '@/components/home/route-section';
+import { Deck } from '@/components/home/deck';
 import { asLocale } from '@/i18n/as-locale';
 import {
   applyCta,
   getMentors,
   getPartners,
+  getPhotos,
   getPress,
   getPrograms,
   getRecruitment,
@@ -37,32 +33,32 @@ export default async function HomePage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
 
-  const [stats, stamps, programs, mentors, partners, press, recruitment] = await Promise.all([
-    getStats(),
-    getStamps(),
-    getPrograms(),
-    getMentors(),
-    getPartners(),
-    getPress(),
-    getRecruitment(),
-  ]);
-  const cta = applyCta(recruitment);
-  const today = new Date();
-  const mentorCount = stats.find((s) => s.id === 'mentors')?.value ?? String(mentors.length);
+  const [stats, stamps, photos, programs, mentors, partners, press, recruitment] =
+    await Promise.all([
+      getStats(),
+      getStamps(),
+      getPhotos(),
+      getPrograms(),
+      getMentors(),
+      getPartners(),
+      getPress(),
+      getRecruitment(),
+    ]);
 
   return (
-    <main id="main">
-      <PassportCover locale={locale} stats={stats} cta={cta} />
-      <IdentitySection />
-      <RouteSection locale={locale} stamps={stamps} programs={programs} today={today} />
-      <NetworkPreview
+    <main id="main" className="bg-stage">
+      <Deck
         locale={locale}
-        mentorCount={mentorCount}
+        stats={stats}
+        stamps={stamps}
+        photos={photos}
+        programs={programs}
         mentors={mentors}
         partners={partners}
+        press={press}
+        cta={applyCta(recruitment)}
+        today={new Date()}
       />
-      <PressSection locale={locale} press={press} />
-      <FinalCta cta={cta} />
     </main>
   );
 }

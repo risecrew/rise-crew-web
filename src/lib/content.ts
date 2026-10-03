@@ -3,6 +3,7 @@ import { benefits } from '@/content/data/benefits';
 import { faqs } from '@/content/data/faq';
 import { mentors } from '@/content/data/mentors';
 import { officers } from '@/content/data/officers';
+import { photos } from '@/content/data/photos';
 import { partners } from '@/content/data/partners';
 import { press } from '@/content/data/press';
 import { programs } from '@/content/data/programs';
@@ -17,6 +18,7 @@ import {
   mentorSchema,
   officerSchema,
   partnerSchema,
+  photoSchema,
   pressSchema,
   programSchema,
   recruitmentSchema,
@@ -41,6 +43,7 @@ const data = {
   faqs: z.array(faqSchema).parse(faqs),
   benefits: z.array(benefitSchema).parse(benefits),
   recruitment: recruitmentSchema.parse(recruitment),
+  photos: z.array(photoSchema).parse(photos),
 };
 
 export function pick(text: Localized, locale: Locale): string {
@@ -109,4 +112,10 @@ export async function getBenefits() {
 }
 export async function getRecruitment() {
   return data.recruitment;
+}
+export async function getPhotos() {
+  return data.photos;
+}
+export async function getPhoto(id: string) {
+  return data.photos.find((p) => p.id === id);
 }

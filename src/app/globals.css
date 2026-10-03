@@ -11,6 +11,8 @@
   --color-paper-edge: #dbe9e4;
   --color-ink: #13203a;
   --color-ink-soft: #46546d;
+  /* Neutral auditorium dark for the Demo Day stage; the hue comes from the cobalt stage light. */
+  --color-stage: #07090f;
 
   --font-sans: 'Pretendard Variable', Pretendard, system-ui, -apple-system, sans-serif;
   --font-display: 'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif;

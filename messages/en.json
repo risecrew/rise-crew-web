@@ -63,20 +63,38 @@
     "routeShort": "SKKU → WORLD"
   },
   "Home": {
-    "cover": {
-      "subline": "The official startup club of the SKKU ANCHOR Division."
+    "deck": {
+      "label": "RISE CREW Demo Day deck",
+      "temporary": "Temporary photo",
+      "progress": "Deck progress"
     },
-    "identity": {
-      "title": "A university-backed club that builds real ventures",
-      "body": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We do not stop at ideas; we build teams that go to market.",
-      "affiliation": "Official startup club, SKKU ANCHOR Division",
-      "supporter": "SKKU ANCHOR Division",
-      "mou": "MOU with Kakao Mobility · Nov 28, 2025 · signed by the ANCHOR Division"
+    "cover": {
+      "subline": "The official startup club of the SKKU ANCHOR Division.",
+      "scroll": "Scroll to run the deck"
+    },
+    "traction": {
+      "title": "RISE CREW in numbers"
+    },
+    "backing": {
+      "title": "Backed by the university and industry",
+      "anchor": "Official startup club of the SKKU ANCHOR Division",
+      "mou": "MOU with Kakao Mobility",
+      "mouDate": "Nov 28, 2025 · signed by the ANCHOR Division",
+      "seed": "Seongchangjae funding for selected teams",
+      "seedValue": "KRW 5M per team",
+      "reported": "In the press"
     },
     "route": {
       "title": "From campus to the world, in three stages",
-      "body": "Build the basics on campus, prove the business at home, then expand abroad.",
-      "stampNote": "Dashed stamps are events that have not happened yet or are still being confirmed."
+      "body": "Build the basics on campus, prove the business at home, then expand abroad."
+    },
+    "global": {
+      "tag": "On the ground"
+    },
+    "contest": {
+      "title": "We co-hosted the AI+X Global Startup Competition",
+      "body": "Co-hosted with the Seoul RISE Center, the ANCHOR Division and Kakao Mobility, with university teams from across Asia pitching in English.",
+      "reported": "In the press"
     },
     "network": {
       "title": "{count} mentors on board",
@@ -84,12 +102,10 @@
       "partners": "Partners",
       "cta": "See the full network"
     },
-    "press": {
-      "title": "In the press"
-    },
-    "final": {
-      "title": "Board the next departure",
-      "body": "Startup teams, solo founders and individuals without a team can all apply."
+    "ask": {
+      "title": "Your turn on stage",
+      "body": "Startup teams, solo founders and individuals without a team can all apply.",
+      "next": "Next on the schedule"
     }
   },
   "About": {

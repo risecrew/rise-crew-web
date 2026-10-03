@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   officerSchema,
+  photoSchema,
   partnerSchema,
   recruitmentSchema,
   stampSchema,
@@ -149,5 +150,34 @@ describe('recruitmentSchema', () => {
   it('requires a next notice when closed', () => {
     const r = recruitmentSchema.safeParse({ status: 'closed' });
     expect(r.success).toBe(false);
+  });
+});
+
+describe('photoSchema', () => {
+  const photo = {
+    id: 'workshop',
+    src: '/images/temp/workshop.jpg',
+    width: 1229,
+    height: 819,
+    alt: L('워크숍 단체 사진', 'Workshop group photo'),
+    source: L('RISE CREW 소개서 9쪽', 'RISE CREW brochure p.9'),
+    temporary: true,
+  };
+
+  it('accepts a sourced temporary photo', () => {
+    expect(photoSchema.safeParse(photo).success).toBe(true);
+  });
+  it('requires alt text in both languages', () => {
+    expect(photoSchema.safeParse({ ...photo, alt: { ko: '사진', en: '' } }).success).toBe(false);
+  });
+  it('requires where the photo came from', () => {
+    const { source: _source, ...noSource } = photo;
+    void _source;
+    expect(photoSchema.safeParse(noSource).success).toBe(false);
+  });
+  it('only serves photos from /images/', () => {
+    expect(photoSchema.safeParse({ ...photo, src: 'https://example.com/a.jpg' }).success).toBe(
+      false,
+    );
   });
 });

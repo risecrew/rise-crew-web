@@ -14,6 +14,7 @@ const cssName: Record<keyof typeof BRAND, string> = {
   paperEdge: 'paper-edge',
   ink: 'ink',
   inkSoft: 'ink-soft',
+  stage: 'stage',
 };
 
 describe('brand tokens', () => {

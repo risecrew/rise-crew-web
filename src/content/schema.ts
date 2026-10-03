@@ -37,6 +37,7 @@ export const stampSchema = z
     stage: stageSchema,
     status: z.enum(['done', 'planned']),
     evidence: z.array(evidenceSchema),
+    photo: id.optional(),
   })
   .superRefine((stamp, ctx) => {
     if (stamp.status === 'done' && stamp.evidence.length === 0) {
@@ -129,3 +130,14 @@ export const recruitmentSchema = z.discriminatedUnion('status', [
   z.object({ status: z.literal('closed'), nextNotice: localizedSchema }),
 ]);
 export type Recruitment = z.infer<typeof recruitmentSchema>;
+
+export const photoSchema = z.object({
+  id,
+  src: z.string().startsWith('/images/'),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  alt: localizedSchema,
+  source: localizedSchema,
+  temporary: z.boolean(),
+});
+export type Photo = z.infer<typeof photoSchema>;

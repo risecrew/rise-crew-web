@@ -1,47 +1,64 @@
 import { expect, test } from '@playwright/test';
 
-test('cover shows the slogan, the stats with their basis and a working CTA', async ({ page }) => {
+test('the deck opens on the slogan over a real photo', async ({ page }) => {
   await page.goto('/ko');
   const h1 = page.locator('h1');
   await expect(h1).toContainText('Reach your vision');
   await expect(h1).toContainText('Elevate your future');
-  for (const value of ['90+', '22+', '33'])
-    await expect(page.getByText(value, { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('2026.01 기준').first()).toBeVisible();
-  // Recruitment is closed in phase 1 data, so the boarding pass must lead to the join page.
-  await expect(page.getByRole('link', { name: /모집 안내 보기/ }).first()).toHaveAttribute(
-    'href',
-    '/ko/join',
+  await expect(page.locator('[data-scene]').first().locator('img')).toHaveAttribute(
+    'alt',
+    /워크숍/,
   );
 });
 
-test('past planned stamps say unconfirmed, not upcoming', async ({ page }) => {
-  await page.goto('/en');
-  const london = page.locator('[data-stamp]', { hasText: 'London' });
-  await expect(london).toHaveAttribute('data-state', 'unconfirmed');
-  await expect(london).toContainText('Unconfirmed');
+test('the deck has eleven scenes and every photo scene is marked temporary', async ({ page }) => {
+  await page.goto('/ko');
+  await expect(page.locator('[data-scene]')).toHaveCount(11);
+  const photoScenes = page.locator('[data-scene][data-photo]');
+  await expect(photoScenes).toHaveCount(6);
+  for (const scene of await photoScenes.all()) await expect(scene).toContainText('임시 사진');
 });
 
-test('every stamp ends up inked after scrolling', async ({ page }) => {
+test('traction numbers land on their real values once scrolled into view', async ({ page }) => {
   await page.goto('/ko');
-  const stamps = page.locator('[data-stamp]');
-  const count = await stamps.count();
-  expect(count).toBeGreaterThan(5);
-  for (let i = 0; i < count; i++) {
-    await stamps.nth(i).scrollIntoViewIfNeeded();
-    await expect(stamps.nth(i)).toHaveCSS('opacity', '1');
+  const traction = page.locator('[data-scene="traction"]');
+  await traction.scrollIntoViewIfNeeded();
+  for (const value of ['90+', '22+', '33']) {
+    await expect(traction.locator('[data-count]', { hasText: value }).first()).toBeVisible({
+      timeout: 4000,
+    });
   }
+  await expect(traction).toContainText('2026.01 기준');
+});
+
+test('the progress counter follows the deck', async ({ page }) => {
+  await page.goto('/ko');
+  const counter = page.locator('[data-deck-counter]');
+  await expect(counter).toHaveText('01 / 11');
+  await page.locator('[data-scene="route"]').scrollIntoViewIfNeeded();
+  await expect(counter).not.toHaveText('01 / 11');
+});
+
+test('the ask slide leads to the join page while recruitment is closed', async ({ page }) => {
+  await page.goto('/ko');
+  const ask = page.locator('[data-scene="ask"]');
+  await expect(ask.getByRole('link', { name: '모집 안내 보기' })).toHaveAttribute(
+    'href',
+    '/ko/join',
+  );
+  await expect(ask.getByRole('link', { name: '제휴 문의' })).toHaveAttribute('href', '/ko/contact');
 });
 
 test.describe('without JavaScript and with reduced motion', () => {
   test.use({ javaScriptEnabled: false, reducedMotion: 'reduce' });
 
-  test('all stamps are visible immediately', async ({ page }) => {
+  test('every scene is readable and the numbers show their final values', async ({ page }) => {
     await page.goto('/ko');
-    const opacities = await page
-      .locator('[data-stamp]')
-      .evaluateAll((els) => els.map((el) => getComputedStyle(el).opacity));
-    expect(opacities.length).toBeGreaterThan(5);
-    expect(opacities.every((o) => o === '1')).toBe(true);
+    await expect(page.locator('[data-scene]')).toHaveCount(11);
+    const traction = page.locator('[data-scene="traction"]');
+    for (const value of ['90+', '22+', '33']) {
+      await expect(traction.locator('[data-count]', { hasText: value }).first()).toBeAttached();
+    }
+    await expect(page.locator('[data-scene="ask"]')).toContainText('다음 무대의 주인공을 찾습니다');
   });
 });

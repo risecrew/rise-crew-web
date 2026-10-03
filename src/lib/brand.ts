@@ -10,4 +10,5 @@ export const BRAND = {
   paperEdge: '#dbe9e4',
   ink: '#13203a',
   inkSoft: '#46546d',
+  stage: '#07090f',
 } as const;
