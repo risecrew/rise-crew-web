@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Deck } from '@/components/home/deck';
+import { Home } from '@/components/home/home';
 import { asLocale } from '@/i18n/as-locale';
 import {
   applyCta,
@@ -47,7 +47,7 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <main id="main" className="bg-stage">
-      <Deck
+      <Home
         locale={locale}
         stats={stats}
         stamps={stamps}

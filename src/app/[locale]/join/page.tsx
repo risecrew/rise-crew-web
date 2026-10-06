@@ -29,7 +29,7 @@ export default async function JoinPage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('Join');
-  const home = await getTranslations('Home');
+  const common = await getTranslations('Common');
   const [recruitment, benefits, faqs, photo] = await Promise.all([
     getRecruitment(),
     getBenefits(),
@@ -43,7 +43,7 @@ export default async function JoinPage({ params }: Props) {
       <PageCover
         title={t('title')}
         lead={t('lead')}
-        photo={photo ? { photo, locale, temporaryLabel: home('deck.temporary') } : undefined}
+        photo={photo ? { photo, locale, temporaryLabel: common('temporaryPhoto') } : undefined}
       />
 
       <section aria-label={t(`status.${recruitment.status}`)} className={SECTION}>

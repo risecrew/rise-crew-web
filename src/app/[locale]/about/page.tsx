@@ -37,7 +37,7 @@ export default async function AboutPage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('About');
-  const home = await getTranslations('Home');
+  const common = await getTranslations('Common');
   const [steps, programs, officers, mentors, stamps, photo] = await Promise.all([
     getGrowthSteps(),
     getPrograms(),
@@ -54,7 +54,7 @@ export default async function AboutPage({ params }: Props) {
       <PageCover
         title={t('title')}
         lead={t('lead')}
-        photo={photo ? { photo, locale, temporaryLabel: home('deck.temporary') } : undefined}
+        photo={photo ? { photo, locale, temporaryLabel: common('temporaryPhoto') } : undefined}
       />
 
       <section aria-labelledby="rise-title" className={SECTION}>

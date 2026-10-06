@@ -29,7 +29,7 @@ export default async function NetworkPage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('Network');
-  const home = await getTranslations('Home');
+  const common = await getTranslations('Common');
   const [mentors, partners, stats, photo] = await Promise.all([
     getMentors(),
     getPartners(),
@@ -43,7 +43,7 @@ export default async function NetworkPage({ params }: Props) {
       <PageCover
         title={t('title', { count: total })}
         lead={t('lead')}
-        photo={photo ? { photo, locale, temporaryLabel: home('deck.temporary') } : undefined}
+        photo={photo ? { photo, locale, temporaryLabel: common('temporaryPhoto') } : undefined}
       />
 
       <section aria-labelledby="mentors-title" className={SECTION}>

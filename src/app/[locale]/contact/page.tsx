@@ -28,7 +28,7 @@ export default async function ContactPage({ params }: Props) {
   const t = await getTranslations('Contact');
   const footer = await getTranslations('Footer');
   const cta = await getTranslations('Cta');
-  const home = await getTranslations('Home');
+  const common = await getTranslations('Common');
   const photo = await getPhoto('beyond-expo-macau-2026');
   const partnerHref = `mailto:${EMAIL}?subject=${encodeURIComponent(t('partnerSubject'))}`;
 
@@ -37,7 +37,7 @@ export default async function ContactPage({ params }: Props) {
       <PageCover
         title={t('title')}
         lead={t('lead')}
-        photo={photo ? { photo, locale, temporaryLabel: home('deck.temporary') } : undefined}
+        photo={photo ? { photo, locale, temporaryLabel: common('temporaryPhoto') } : undefined}
       />
       <section
         aria-labelledby="contact-title"

@@ -48,10 +48,20 @@
     "dateTbc": "날짜 확인 중",
     "source": "출처 보기",
     "stage": {
-      "campus": "Campus · 교내 역량",
-      "domestic": "Domestic · 국내 사업화",
-      "global": "Global · 해외 진출"
-    }
+      "campus": {
+        "name": "Campus",
+        "sub": "교내 역량"
+      },
+      "domestic": {
+        "name": "Domestic",
+        "sub": "국내 사업화"
+      },
+      "global": {
+        "name": "Global",
+        "sub": "해외 진출"
+      }
+    },
+    "temporaryPhoto": "임시 사진"
   },
   "Cta": {
     "apply": "지원하기",
@@ -59,17 +69,14 @@
     "partner": "제휴 문의"
   },
   "Home": {
-    "deck": {
-      "label": "RISE CREW 데모데이 발표",
-      "temporary": "임시 사진",
-      "progress": "발표 진행"
-    },
     "cover": {
-      "subline": "비전에 도달하고, 아이디어에 불을 붙이며, 영향력을 확장하고, 미래를 끌어올려라!",
-      "scroll": "스크롤해서 발표 보기"
+      "subline": "비전에 도달하고, 아이디어에 불을 붙이며, 영향력을 확장하고, 미래를 끌어올려라!"
     },
     "traction": {
       "title": "숫자로 보는 RISE CREW"
+    },
+    "rail": {
+      "label": "RISE CREW 3단계"
     },
     "backing": {
       "title": "학교와 기업이 함께 키웁니다",
@@ -84,8 +91,12 @@
       "title": "캠퍼스에서 세계까지, 세 단계",
       "body": "교내에서 기초를 다지고, 국내에서 사업화를 검증하고, 해외로 확장합니다."
     },
+    "campus": {
+      "body": "VCC 18회차와 교내 트랙으로 창업의 기본기를 다집니다."
+    },
     "global": {
-      "tag": "해외 현장"
+      "tag": "해외 현장",
+      "title": "해외 무대에 직접 섭니다"
     },
     "contest": {
       "title": "AI+X 글로벌 창업경진대회를 함께 열었습니다",

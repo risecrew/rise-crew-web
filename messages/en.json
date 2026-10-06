@@ -48,10 +48,20 @@
     "dateTbc": "Date TBC",
     "source": "View source",
     "stage": {
-      "campus": "Campus · Build the basics",
-      "domestic": "Domestic · Prove the business",
-      "global": "Global · Go abroad"
-    }
+      "campus": {
+        "name": "Campus",
+        "sub": "Build the basics"
+      },
+      "domestic": {
+        "name": "Domestic",
+        "sub": "Prove the business"
+      },
+      "global": {
+        "name": "Global",
+        "sub": "Go abroad"
+      }
+    },
+    "temporaryPhoto": "Temporary photo"
   },
   "Cta": {
     "apply": "Apply",
@@ -59,17 +69,14 @@
     "partner": "Partner with us"
   },
   "Home": {
-    "deck": {
-      "label": "RISE CREW Demo Day deck",
-      "temporary": "Temporary photo",
-      "progress": "Deck progress"
-    },
     "cover": {
-      "subline": "The official startup club of the SKKU ANCHOR Division.",
-      "scroll": "Scroll to run the deck"
+      "subline": "The official startup club of the SKKU ANCHOR Division."
     },
     "traction": {
       "title": "RISE CREW in numbers"
+    },
+    "rail": {
+      "label": "RISE CREW's three stages"
     },
     "backing": {
       "title": "Backed by the university and industry",
@@ -84,8 +91,12 @@
       "title": "From campus to the world, in three stages",
       "body": "Build the basics on campus, prove the business at home, then expand abroad."
     },
+    "campus": {
+      "body": "The 18-session VCC and campus tracks build the fundamentals."
+    },
     "global": {
-      "tag": "On the ground"
+      "tag": "On the ground",
+      "title": "We take the stage abroad"
     },
     "contest": {
       "title": "We co-hosted the AI+X Global Startup Competition",
