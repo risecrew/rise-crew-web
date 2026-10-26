@@ -43,6 +43,7 @@ PR을 올리면 GitHub Actions가 위 검사를 전부 실행합니다.
 - `messages/ko.json`, `messages/en.json`: 버튼, 메뉴, 제목 문구
 - `src/components/home/`: 홈 구성(첫 화면, 숫자, Campus·Domestic·Global 장, 지원 안내)
 - `src/components/stage/`: 무대 스타일 공용 컴포넌트(사진, 숫자 카운트업, 단계 레일, 고정 갤러리)
+- `public/fonts/`: 직접 호스팅하는 글꼴(Pretendard, Wanted Sans). 패키지 버전을 올린 뒤 `pnpm fonts:vendor`로 다시 복사합니다
 - 설계 문서: `docs/superpowers/specs/`, 디자인 방향: `.impeccable/surfaces/`, 디자인 규칙: `DESIGN.md`
 
 ## 보안 규칙

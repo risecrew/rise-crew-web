@@ -1,0 +1,419 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T00:00:00Z",
+  "title": "Design System: RISE CREW",
+  "extensions": {
+    "colorMeta": {
+      "cobalt": {
+        "role": "primary",
+        "displayName": "로고 코발트",
+        "canonical": "#003e91",
+        "tonalRamp": [
+          "oklch(15% 0.074 258.9)",
+          "oklch(26% 0.119 258.9)",
+          "oklch(37% 0.149 258.9)",
+          "oklch(48% 0.149 258.9)",
+          "oklch(59% 0.149 258.9)",
+          "oklch(70% 0.126 258.9)",
+          "oklch(82% 0.089 258.9)",
+          "oklch(95% 0.037 258.9)"
+        ]
+      },
+      "lime": {
+        "role": "secondary",
+        "displayName": "심볼 라임",
+        "canonical": "#9fc952",
+        "tonalRamp": [
+          "oklch(15% 0.077 126.1)",
+          "oklch(26% 0.123 126.1)",
+          "oklch(37% 0.154 126.1)",
+          "oklch(48% 0.154 126.1)",
+          "oklch(59% 0.154 126.1)",
+          "oklch(70% 0.131 126.1)",
+          "oklch(82% 0.093 126.1)",
+          "oklch(95% 0.039 126.1)"
+        ]
+      },
+      "leaf": {
+        "role": "tertiary",
+        "displayName": "심볼 초록",
+        "canonical": "#49b67e",
+        "tonalRamp": [
+          "oklch(15% 0.065 157.8)",
+          "oklch(26% 0.104 157.8)",
+          "oklch(37% 0.130 157.8)",
+          "oklch(48% 0.130 157.8)",
+          "oklch(59% 0.130 157.8)",
+          "oklch(70% 0.111 157.8)",
+          "oklch(82% 0.078 157.8)",
+          "oklch(95% 0.033 157.8)"
+        ]
+      },
+      "teal": {
+        "role": "tertiary",
+        "displayName": "심볼 청록",
+        "canonical": "#10a1c7",
+        "tonalRamp": [
+          "oklch(15% 0.060 223.0)",
+          "oklch(26% 0.096 223.0)",
+          "oklch(37% 0.120 223.0)",
+          "oklch(48% 0.120 223.0)",
+          "oklch(59% 0.120 223.0)",
+          "oklch(70% 0.102 223.0)",
+          "oklch(82% 0.072 223.0)",
+          "oklch(95% 0.030 223.0)"
+        ]
+      },
+      "sky": {
+        "role": "tertiary",
+        "displayName": "심볼 하늘색",
+        "canonical": "#0dbedb",
+        "tonalRamp": [
+          "oklch(15% 0.064 214.0)",
+          "oklch(26% 0.103 214.0)",
+          "oklch(37% 0.128 214.0)",
+          "oklch(48% 0.128 214.0)",
+          "oklch(59% 0.128 214.0)",
+          "oklch(70% 0.109 214.0)",
+          "oklch(82% 0.077 214.0)",
+          "oklch(95% 0.032 214.0)"
+        ]
+      },
+      "ocean": {
+        "role": "tertiary",
+        "displayName": "심볼 파랑",
+        "canonical": "#0175ba",
+        "tonalRamp": [
+          "oklch(15% 0.069 245.4)",
+          "oklch(26% 0.110 245.4)",
+          "oklch(37% 0.138 245.4)",
+          "oklch(48% 0.138 245.4)",
+          "oklch(59% 0.138 245.4)",
+          "oklch(70% 0.117 245.4)",
+          "oklch(82% 0.083 245.4)",
+          "oklch(95% 0.034 245.4)"
+        ]
+      },
+      "stage": {
+        "role": "neutral",
+        "displayName": "무대 검정",
+        "canonical": "#07090f",
+        "tonalRamp": [
+          "oklch(15% 0.007 268.5)",
+          "oklch(26% 0.011 268.5)",
+          "oklch(37% 0.014 268.5)",
+          "oklch(48% 0.014 268.5)",
+          "oklch(59% 0.014 268.5)",
+          "oklch(70% 0.012 268.5)",
+          "oklch(82% 0.008 268.5)",
+          "oklch(95% 0.003 268.5)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "종이",
+        "canonical": "#f4f9f7",
+        "tonalRamp": [
+          "oklch(15% 0.003 170.4)",
+          "oklch(26% 0.005 170.4)",
+          "oklch(37% 0.006 170.4)",
+          "oklch(48% 0.006 170.4)",
+          "oklch(59% 0.006 170.4)",
+          "oklch(70% 0.005 170.4)",
+          "oklch(82% 0.004 170.4)",
+          "oklch(95% 0.001 170.4)"
+        ]
+      },
+      "paper-edge": {
+        "role": "neutral",
+        "displayName": "종이 가장자리",
+        "canonical": "#dbe9e4",
+        "tonalRamp": [
+          "oklch(15% 0.008 172.6)",
+          "oklch(26% 0.013 172.6)",
+          "oklch(37% 0.016 172.6)",
+          "oklch(48% 0.016 172.6)",
+          "oklch(59% 0.016 172.6)",
+          "oklch(70% 0.014 172.6)",
+          "oklch(82% 0.010 172.6)",
+          "oklch(95% 0.004 172.6)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "잉크",
+        "canonical": "#13203a",
+        "tonalRamp": [
+          "oklch(15% 0.026 263.0)",
+          "oklch(26% 0.042 263.0)",
+          "oklch(37% 0.053 263.0)",
+          "oklch(48% 0.053 263.0)",
+          "oklch(59% 0.053 263.0)",
+          "oklch(70% 0.045 263.0)",
+          "oklch(82% 0.032 263.0)",
+          "oklch(95% 0.013 263.0)"
+        ]
+      },
+      "on-stage": {
+        "role": "neutral",
+        "displayName": "무대 위 흰색",
+        "canonical": "#ffffff"
+      },
+      "on-stage-soft": {
+        "role": "neutral",
+        "displayName": "무대 위 흰색 75%",
+        "canonical": "rgb(255 255 255 / 0.75)"
+      },
+      "on-stage-dim": {
+        "role": "neutral",
+        "displayName": "무대 위 흰색 55%",
+        "canonical": "rgb(255 255 255 / 0.55)"
+      },
+      "stage-rule": {
+        "role": "neutral",
+        "displayName": "무대 가로선",
+        "canonical": "rgb(255 255 255 / 0.15)"
+      }
+    },
+    "typographyMeta": {
+      "chapter": {
+        "displayName": "장 이름",
+        "purpose": "Campus · Domestic · Global. 컨테이너 쿼리로 콘텐츠 폭 전체를 가로지른다."
+      },
+      "display": {
+        "displayName": "표지 제목",
+        "purpose": "안쪽 페이지와 404 표지 제목."
+      },
+      "slogan": {
+        "displayName": "슬로건",
+        "purpose": "첫 화면 R·I·S·E 슬로건, 머리글자만 라임."
+      },
+      "numeral": {
+        "displayName": "거대한 숫자",
+        "purpose": "90+ · 22+ · 33, VCC 18. 스크롤에 따라 400 → 950, 정지 상태 900."
+      },
+      "headline": {
+        "displayName": "섹션 제목",
+        "purpose": "안쪽 페이지 섹션 제목과 홈 장 안의 제목."
+      },
+      "title": {
+        "displayName": "항목 제목",
+        "purpose": "프로그램, 멘토, 사실 값."
+      },
+      "body-lead": {
+        "displayName": "리드 문장",
+        "purpose": "제목 아래 설명, 75% 흰색."
+      },
+      "body": {
+        "displayName": "본문",
+        "purpose": "일반 문단과 목록."
+      },
+      "label": {
+        "displayName": "라벨",
+        "purpose": "사실 목록 라벨, 출처 줄."
+      },
+      "control": {
+        "displayName": "조작 라벨",
+        "purpose": "언어 전환과 휴대폰 메뉴 버튼, 대문자."
+      },
+      "data": {
+        "displayName": "데이터",
+        "purpose": "날짜와 단계 번호, JetBrains Mono."
+      }
+    },
+    "shadows": [
+      {
+        "name": "menu-panel",
+        "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        "purpose": "휴대폰 메뉴 패널에만 쓰는 유일한 그림자."
+      }
+    ],
+    "motion": [
+      {
+        "name": "press",
+        "value": "transform 150ms ease-out; hover translateY(-2px); active scale(0.97)",
+        "purpose": "라임 행동 버튼의 hover와 누름."
+      },
+      {
+        "name": "state-fade",
+        "value": "300ms (color, opacity, visibility)",
+        "purpose": "레일과 갤러리 도시 목록의 켜짐/꺼짐, 레일 나타남."
+      },
+      {
+        "name": "count-up",
+        "value": "1.4s easeOutExpo (1 - 2^(-10t)), inView amount 0.6, once",
+        "purpose": "모든 숫자가 같은 박자로 올라가 함께 멈춘다."
+      },
+      {
+        "name": "numeral-weight",
+        "value": "scroll-linked 400 → 950 (offset start end → center center); static 900",
+        "purpose": "스크롤에 따라 숫자가 굵어진다."
+      },
+      {
+        "name": "hero-pullback",
+        "value": "scroll-linked over 170svh: scale 1.18 → 1, stage dim 0 → 0.55, copy y 0 → -60px",
+        "purpose": "첫 화면 사진이 고정된 채 물러나며 어두워진다."
+      },
+      {
+        "name": "gallery-wipe",
+        "value": "per city 100svh; photo clip-path inset(100% 0 0 0) → inset(0) and scale 1.12 → 1 over [-0.75, -0.4]; caption out [0.25, 0.42] y 0 → -48px, in [-0.55, -0.35] y 48px → 0; tail 0.3; scroll-snap y proximity",
+        "purpose": "Global 고정 갤러리. 앞부분에서만 바뀌고 나머지는 멈춘다."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion or no JS: final states, scroll-behavior auto, gallery as vertical list",
+        "purpose": "움직임이 꺼진 환경은 최종 상태를 보여준다."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "라임 알약, 코발트 글자. 지원하기 또는 모집 안내 보기 한 가지 행동.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">모집 안내 보기</a>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;background:var(--color-lime,#9fc952);color:var(--color-cobalt,#003e91);font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;font-weight:600;padding:12px 24px;border-radius:9999px;text-decoration:none;transition:transform 150ms ease-out}.ds-btn-primary:hover{transform:translateY(-2px)}.ds-btn-primary:active{transform:scale(0.97)}.ds-btn-primary:focus-visible{outline:2px solid var(--color-lime,#9fc952);outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Link",
+      "kind": "button",
+      "refersTo": "link-inline",
+      "description": "버튼 옆 보조 행동(제휴 문의). 흰 글자 밑줄.",
+      "html": "<div class=\"ds-stage-pad\"><a class=\"ds-link\" href=\"#\">제휴 문의</a></div>",
+      "css": ".ds-stage-pad{background:#07090f;padding:24px}.ds-link{color:#fff;font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;font-weight:600;text-decoration:underline;text-underline-offset:4px}.ds-link:focus-visible{outline:2px solid #9fc952;outline-offset:3px}"
+    },
+    {
+      "name": "Outline Chip",
+      "kind": "chip",
+      "refersTo": "chip-outline",
+      "description": "운영진 직함, 파트너 이름, 일정 상태 표시.",
+      "html": "<div class=\"ds-chip-wrap\"><span class=\"ds-chip\">회장</span><span class=\"ds-chip ds-chip-sm\">예정</span></div>",
+      "css": ".ds-chip-wrap{background:#07090f;padding:24px;display:flex;gap:8px;align-items:center}.ds-chip{border:1px solid rgb(255 255 255/0.2);border-radius:9999px;padding:8px 16px;color:#fff;font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;font-size:14px;font-weight:600}.ds-chip-sm{padding:2px 8px;font-size:12px;color:rgb(255 255 255/0.8);border-color:rgb(255 255 255/0.25)}"
+    },
+    {
+      "name": "Ruled Fact List",
+      "kind": "card",
+      "refersTo": "stage-rule",
+      "description": "카드 대신 쓰는 라벨 위·값 아래의 가로선 목록.",
+      "html": "<dl class=\"ds-facts\"><div><dt>이메일</dt><dd>risecrew4@gmail.com</dd></div><div><dt>설립</dt><dd>2025</dd></div></dl>",
+      "css": ".ds-facts{background:#07090f;padding:24px;margin:0;font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif}.ds-facts div{border-top:1px solid rgb(255 255 255/0.15);padding:16px 0}.ds-facts dt{font-size:14px;font-weight:500;color:rgb(255 255 255/0.6)}.ds-facts dd{margin:4px 0 0;font-size:18px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Count-Up Numeral",
+      "kind": "custom",
+      "refersTo": "numeral",
+      "description": "코발트 조명 위 거대한 숫자, 라벨은 아래.",
+      "html": "<div class=\"ds-num\"><dl><div><dd>90+</dd><dt>멤버</dt></div><div><dd class=\"ds-lime\">18</dd><dt>VCC 회차</dt></div></dl></div>",
+      "css": ".ds-num{background:linear-gradient(180deg,#07090f,rgb(0 62 145/0.82) 35%,rgb(0 62 145/0.9) 70%,#07090f);padding:40px 24px;color:#fff}.ds-num dl{display:flex;gap:40px;margin:0}.ds-num div{display:flex;flex-direction:column}.ds-num dd{order:1;margin:0;font-family:'Wanted Sans Variable','Pretendard Variable',system-ui,sans-serif;font-weight:900;font-size:96px;line-height:0.85;font-variant-numeric:tabular-nums}.ds-num dt{order:2;margin-top:12px;font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;font-size:18px;font-weight:600}.ds-lime{color:#9fc952}"
+    },
+    {
+      "name": "Stage Photo with Temporary Badge",
+      "kind": "card",
+      "refersTo": "temporary-badge",
+      "description": "화면 폭 사진, 아래쪽 무대 검정 막, 임시 사진 표시.",
+      "html": "<figure class=\"ds-photo\"><span class=\"ds-badge\">임시 사진</span><figcaption><strong>Sushi Tech Tokyo 2026 참가</strong><span>도쿄 · <code>2026.04</code></span></figcaption></figure>",
+      "css": ".ds-photo{position:relative;margin:0;height:320px;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,rgb(7 9 15/0.15) 0%,rgb(7 9 15/0.25) 45%,rgb(7 9 15/0.88) 100%),linear-gradient(135deg,#0175ba,#10a1c7);display:flex;align-items:flex-end}.ds-badge{position:absolute;top:16px;right:16px;border-radius:9999px;background:rgb(0 0 0/0.55);backdrop-filter:blur(4px);padding:4px 10px;font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;font-size:11px;font-weight:600;color:rgb(255 255 255/0.9)}.ds-photo figcaption{padding:24px;color:#fff;display:flex;flex-direction:column;gap:8px}.ds-photo strong{font-family:'Wanted Sans Variable','Pretendard Variable',system-ui,sans-serif;font-weight:850;font-size:30px;line-height:1.1}.ds-photo span{font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;font-size:14px;color:rgb(255 255 255/0.75)}.ds-photo code{font-family:var(--font-jetbrains),ui-monospace,monospace}"
+    },
+    {
+      "name": "Chapter Rail",
+      "kind": "nav",
+      "refersTo": "chapter",
+      "description": "세 장의 진행 표시. 심볼 그라데이션이 차오르고 지금 장에 불이 켜진다.",
+      "html": "<nav class=\"ds-rail\"><div class=\"ds-rail-bar\"><div class=\"ds-rail-fill\"></div></div><ol><li><a href=\"#\">Campus<span>교내</span></a></li><li><a href=\"#\" aria-current=\"step\">Domestic<span>국내</span></a></li><li><a href=\"#\">Global<span>해외</span></a></li></ol></nav>",
+      "css": ".ds-rail{background:#07090f;padding:24px;display:flex}.ds-rail-bar{position:relative;width:2px;margin-right:16px;border-radius:9999px;background:rgb(255 255 255/0.15)}.ds-rail-fill{position:absolute;inset:0;bottom:45%;border-radius:9999px;background:linear-gradient(180deg,#9fc952,#49b67e,#10a1c7,#0175ba)}.ds-rail ol{list-style:none;margin:0;padding:4px 0;display:flex;flex-direction:column;gap:40px}.ds-rail a{display:block;color:rgb(255 255 255/0.55);text-decoration:none;font-family:'Wanted Sans Variable','Pretendard Variable',system-ui,sans-serif;font-weight:850;font-size:18px;line-height:1;transition:color 300ms}.ds-rail a:hover{color:rgb(255 255 255/0.8)}.ds-rail a[aria-current]{color:#fff}.ds-rail a:focus-visible{outline:2px solid #9fc952;outline-offset:3px}.ds-rail span{display:block;margin-top:4px;font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;font-weight:400;font-size:12px}"
+    },
+    {
+      "name": "Mobile Menu",
+      "kind": "nav",
+      "refersTo": "mobile-menu",
+      "description": "휴대폰 메뉴. 무대 위에 열리는 유일한 밝은 종이 패널.",
+      "html": "<div class=\"ds-mm-wrap\"><nav class=\"ds-mm\"><a href=\"#\">홈</a><a href=\"#\">소개</a><a href=\"#\">문의</a><div class=\"ds-mm-foot\"><a class=\"ds-mm-loc\" href=\"#\">ENGLISH</a><a class=\"ds-mm-cta\" href=\"#\">모집 안내 보기</a></div></nav></div>",
+      "css": ".ds-mm-wrap{background:#07090f;padding:24px}.ds-mm{width:256px;background:#f4f9f7;color:#13203a;border-radius:8px;padding:12px;box-shadow:0 20px 25px -5px rgb(0 0 0/0.1),0 8px 10px -6px rgb(0 0 0/0.1);font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,sans-serif;display:flex;flex-direction:column}.ds-mm>a{color:inherit;text-decoration:none;padding:12px;border-radius:4px}.ds-mm>a:hover{background:#dbe9e4}.ds-mm a:focus-visible{outline:2px solid #003e91;outline-offset:3px}.ds-mm-foot{margin-top:8px;padding:12px 12px 0;border-top:1px solid #dbe9e4;display:flex;justify-content:space-between;align-items:center}.ds-mm-loc{color:#003e91;font-size:12px;font-weight:600;letter-spacing:0.2em;text-decoration:none}.ds-mm-cta{background:#9fc952;color:#003e91;border-radius:9999px;padding:8px 16px;font-weight:600;text-decoration:none}"
+    }
+  ],
+  "narrative": {
+    "northStar": "데모데이 무대",
+    "overview": "사이트 전체가 불이 꺼진 객석에서 올려다보는 하나의 무대다. 바탕은 색이 거의 없는 무대 검정이고, 빛은 로고에서만 온다. 로고 코발트는 숫자 구간과 사진 없는 장면을 물들이는 조명이고, 라임은 무대 위에서 손을 드는 순간(행동 버튼, R·I·S·E 머리글자, 거대한 숫자)에만 켜진다. 실제 사람이 찍힌 사진이 화면 폭을 채우고, 그 위에 Wanted Sans의 매우 굵은 글자가 직접 올라간다.\n\n밀도는 낮고 크기 대비는 극단적이다. 장(章) 이름 Campus · Domestic · Global은 콘텐츠 폭을 끝에서 끝까지 가로지르고, 숫자는 최대 11rem까지 커진다. 그 사이의 정보는 카드가 아니라 얇은 흰 선(15~20% 불투명) 위에 라벨과 값을 쌓는 발표 자료 부록 같은 표로 정리된다. 상자, 그림자, 둥근 카드가 없는 평면이고, 깊이는 사진, 어둡게 까는 그라데이션, 코발트 빛 번짐으로만 만든다.\n\n움직임은 확실히 체감되되 항상 스크롤 방향을 따른다. 첫 화면 사진은 고정된 채 물러나며 어두워지고, 숫자는 같은 박자로 올라가며 굵어지고, Global은 화면을 고정한 채 도시 사진을 아래에서 위로 덮는다. JavaScript가 없거나 `prefers-reduced-motion`이면 모든 연출이 최종 상태로 멈춰 보인다. 16:9 슬라이드 틀, 슬라이드 번호, 단체 사진 히어로 아래 카드 격자는 이 세계가 거부한 형식이다.",
+    "keyCharacteristics": [
+      "거의 검은 무대 바탕(`stage`) 위의 흰 글자, 색은 로고에서만 가져온다.",
+      "코발트는 조명, 라임은 행동과 강조, 심볼 그라데이션은 진행 표시에만.",
+      "실제 사진을 화면 폭으로, 아래쪽 어둠 그라데이션 위에 글자를 얹는다.",
+      "콘텐츠 폭을 가로지르는 장 이름과 가변 굵기의 거대한 숫자.",
+      "카드 대신 얇은 가로선으로 나눈 라벨·값 목록.",
+      "스크롤에 묶인 고정 장면 전환, 움직임 축은 언제나 세로."
+    ],
+    "rules": [
+      {
+        "name": "The Logo Light Rule",
+        "body": "색은 로고에서만 온다. 코발트, 라임, 심볼 그라데이션 외의 색상(남색, 보라, 임의의 파랑)을 메인이나 강조로 들이지 않는다. 무대 검정은 색조가 없어야 하고, 잉크는 휴대폰 메뉴 밖으로 나오지 않는다.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lime Is A Cue Rule",
+        "body": "라임은 행동 버튼, 머리글자, 일부 숫자, 강조 링크와 포커스에만 켠다. 제목 전체나 넓은 면을 라임으로 칠하지 않는다.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gradient Means Progress Rule",
+        "body": "심볼 그라데이션은 \"지금 어디까지 왔는가\"를 보여주는 진행 표시에만 쓴다. 버튼, 글자, 배경 장식에 쓰지 않는다.",
+        "section": "colors"
+      },
+      {
+        "name": "The Keep-Words Rule",
+        "body": "한국어 문장과 제목은 모두 `word-break: keep-all`로 어절 단위로 줄을 바꾼다. 음절 중간에서 끊긴 한국어 제목은 결함이다.",
+        "section": "typography"
+      },
+      {
+        "name": "The Weight Is Motion Rule",
+        "body": "숫자의 굵기 변화(400 → 950)는 스크롤 연출의 일부다. 움직임이 꺼진 환경에서는 처음부터 900으로 보인다.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ruled List Rule",
+        "body": "정보 묶음은 위쪽 1px 선과 16px 안쪽 여백으로 시작한다. 카드 상자나 배경 면으로 묶지 않는다.",
+        "section": "layout"
+      },
+      {
+        "name": "The Light, Not Lift Rule",
+        "body": "무대에서 무언가를 강조할 때는 그림자로 띄우지 않고 빛(코발트 번짐, 라임)으로 비춘다.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** 모든 페이지를 무대 검정(`stage`) 위의 흰 글자로 시작하고, 사진이 있으면 화면 폭으로 연다.",
+      "**Do** 행동 버튼은 라임 알약에 코발트 글자 하나로 두고, 보조 행동은 흰 밑줄 링크로 둔다.",
+      "**Do** 정보 묶음은 15~20% 흰 가로선과 라벨·값 순서로 나눈다.",
+      "**Do** 사진이 없는 장면에는 코발트 방사형 조명과 거대한 숫자로 증거를 댄다.",
+      "**Do** 임시 사진에는 반드시 \"임시 사진\" 표시를 단다.",
+      "**Do** 스크롤 연출은 세로 방향으로만 움직이고, 움직임 꺼짐과 JavaScript 없음에서는 최종 상태를 보여준다.",
+      "**Do** 날짜와 번호는 JetBrains Mono와 고정폭 숫자로 쓴다."
+    ],
+    "donts": [
+      "**Don't** 로고에 없는 색(남색 등)을 메인이나 강조색으로 쓰지 않는다. 잉크(`ink`)는 휴대폰 메뉴 밖으로 꺼내지 않는다.",
+      "**Don't** 심볼 그라데이션을 진행 표시 밖(버튼, 글자, 배경 장식)에 쓰지 않는다.",
+      "**Don't** 16:9 스크린 틀이나 슬라이드 번호를 쓰지 않는다.",
+      "**Don't** 단체 사진 히어로 아래에 같은 모양의 카드 격자를 늘어놓지 않는다.",
+      "**Don't** 스크롤을 내리는데 옆으로 움직이는 가로 이동 연출을 쓰지 않는다.",
+      "**Don't** 무대 위 요소를 그림자로 띄우지 않는다. 그림자는 휴대폰 메뉴 패널에만 있다."
+    ]
+  }
+}
