@@ -24,7 +24,7 @@
 - 지원자·회원의 개인정보(연락처, 학번 등)를 repo에 넣지 않는다. 테스트 데이터는 가짜 값을 쓴다.
 - 참고자료 폴더(`RISE CREW 소개서/`, `앵커 사업단 소개서/`, `오티 자료/`, `_references/`)는 내부 자료다. 커밋하지 않는다.
 
-## 디자인 스킬 역할 분담
+## 스킬 역할 분담
 
 `.claude/skills/`에 설치된 스킬은 아래처럼 역할을 나눈다. 충돌하면 이 표를 따른다.
 
@@ -36,6 +36,9 @@
 | 라이브러리 선택 | `pick-ui-library` | 직접 호출할 때만 동작한다. |
 | 컴포넌트 | `shadcn` | |
 | React / Next.js 성능 | `vercel-react-best-practices` | |
+| DB, Supabase(로그인, 스토리지, CLI) | `supabase` | 작업 전에 Supabase 변경 기록과 최신 문서를 먼저 확인한다. |
+| 테이블 설계, 마이그레이션, RLS 정책과 그 테스트, 인덱스 | `supabase-postgres-best-practices` | DB에 무엇이든 만들거나 바꾸기 전에 먼저 읽는다. |
+| 보안 리뷰 | Claude Code 내장 `/security-review` | 로그인·권한·RLS가 바뀌는 PR은 merge 전에 돌린다. |
 
 - 기능 단위 설계는 superpowers `brainstorming`, 화면 단위 UI 설계는 `impeccable shape`를 쓴다.
 - 스킬 버전은 `skills-lock.json`에 고정되어 있다. impeccable은 `npx impeccable update`로 갱신한다.
