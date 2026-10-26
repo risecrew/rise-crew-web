@@ -16,16 +16,23 @@ const RULE = 'border-t border-white/20 pt-4';
 
 type Stage = 'campus' | 'domestic' | 'global';
 
+// Width of each chapter word in em, measured in Wanted Sans at 900 with -0.03em tracking.
+// The title is sized so the word runs across the whole content width.
+const WORD_EM: Record<Stage, number> = { campus: 3.898, domestic: 4.388, global: 3.035 };
+
 async function ChapterName({ stage }: { stage: Stage }) {
   const common = await getTranslations('Common');
   return (
-    <h2
-      id={`${stage}-title`}
-      className="font-display text-[clamp(4.5rem,15vw,13rem)] leading-[0.82] font-[900] tracking-[-0.03em] text-white"
-    >
-      <span lang="en">{common(`stage.${stage}.name`)}</span>
-      <span className="sr-only"> · {common(`stage.${stage}.sub`)}</span>
-    </h2>
+    <div className="[container-type:inline-size] overflow-x-clip">
+      <h2
+        id={`${stage}-title`}
+        className="font-display leading-[0.82] font-[900] tracking-[-0.03em] whitespace-nowrap text-white"
+        style={{ fontSize: `calc(100cqw / ${WORD_EM[stage]} * 0.98)` }}
+      >
+        <span lang="en">{common(`stage.${stage}.name`)}</span>
+        <span className="sr-only"> · {common(`stage.${stage}.sub`)}</span>
+      </h2>
+    </div>
   );
 }
 
@@ -63,8 +70,13 @@ export async function CampusChapter({
       id="campus"
       data-chapter
       aria-labelledby="campus-title"
-      className={`${GUTTER} py-24 text-white md:py-36`}
+      className={`relative isolate ${GUTTER} py-24 text-white md:py-36`}
     >
+      {/* No campus photo yet, so the chapter is lit like a stage instead. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 -z-10 h-[80%] bg-[radial-gradient(ellipse_70%_55%_at_50%_0%,rgb(0_62_145/0.6),transparent_70%)]"
+      />
       <ChapterName stage="campus" />
       <div className="mt-14 grid gap-14 md:grid-cols-[1fr_1.2fr]">
         <div>
@@ -76,7 +88,7 @@ export async function CampusChapter({
             <div className={RULE}>
               <CountUp
                 value={vcc.value}
-                className="font-display text-[clamp(4rem,9vw,8rem)] leading-[0.85] text-lime"
+                className="font-display text-[clamp(5rem,13vw,11rem)] leading-[0.85] text-lime"
               />
               <p className="mt-3 text-lg font-semibold">{pick(vcc.label, locale)}</p>
             </div>
@@ -129,7 +141,7 @@ export async function DomesticChapter({
             badge="under-header"
           />
         ) : null}
-        <div className={`relative ${GUTTER} pb-14`}>
+        <div className={`relative w-full ${GUTTER} pb-14`}>
           <ChapterName stage="domestic" />
           {event?.date ? (
             <p className="mt-4 text-sm font-semibold break-keep text-white/85">
@@ -143,15 +155,15 @@ export async function DomesticChapter({
         <div>
           <h3 className={TITLE}>{t('backing.title')}</h3>
           <dl className="mt-10 grid gap-8">
-            <div className={RULE}>
-              <dt className="text-white/75">{t('backing.mou')}</dt>
-              <dd className="mt-1 font-display text-3xl font-[850] break-keep">
+            <div className={`${RULE} flex flex-col`}>
+              <dt className="order-2 mt-2 text-white/75">{t('backing.mou')}</dt>
+              <dd className="order-1 font-display text-3xl font-[850] break-keep">
                 {t('backing.mouDate')}
               </dd>
             </div>
-            <div className={RULE}>
-              <dt className="text-white/75">{t('backing.seed')}</dt>
-              <dd className="mt-1 font-display text-3xl font-[850] break-keep">
+            <div className={`${RULE} flex flex-col`}>
+              <dt className="order-2 mt-2 text-white/75">{t('backing.seed')}</dt>
+              <dd className="order-1 font-display text-3xl font-[850] break-keep">
                 {t('backing.seedValue')}
               </dd>
             </div>
@@ -222,15 +234,15 @@ export async function GlobalChapter({
             ),
             caption: (
               <>
-                <p className="text-sm font-semibold text-lime">
-                  {t('global.tag')} · {pick(stamp.city, locale)} ·{' '}
+                <h4 className="font-display text-3xl font-[850] text-balance break-keep md:text-5xl">
+                  {pick(stamp.title, locale)}
+                </h4>
+                <p className="mt-3 text-sm break-keep text-white/75 md:text-base">
+                  {pick(stamp.city, locale)} ·{' '}
                   <span className="font-mono">
                     {stamp.date ? formatStampDate(stamp.date, locale) : common('dateTbc')}
                   </span>
                 </p>
-                <h4 className="mt-2 font-display text-3xl font-[850] text-balance break-keep md:text-5xl">
-                  {pick(stamp.title, locale)}
-                </h4>
               </>
             ),
           }))}

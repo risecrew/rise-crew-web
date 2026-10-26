@@ -30,7 +30,21 @@ test('Open Graph image renders', async ({ request }) => {
 
 test('search engines stay out until the real domain is set', async ({ page, request }) => {
   const robots = await (await request.get('/robots.txt')).text();
-  expect(robots).toMatch(/Disallow: \/\s/);
+  // Crawlers must be allowed in to see the noindex; a Disallow would hide it from them.
+  expect(robots).not.toMatch(/Disallow: \/\s/);
   await page.goto('/ko');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+});
+
+test('the site icon is the RISE CREW symbol, not the framework default', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/ko');
+  const href = await page.locator('link[rel="icon"]').first().getAttribute('href');
+  expect(href).toMatch(/icon/);
+  const icon = await request.get(href!);
+  expect(icon.status()).toBe(200);
+  expect(await icon.text()).toContain('<svg');
+  expect((await request.get('/favicon.ico')).status()).toBe(404);
 });

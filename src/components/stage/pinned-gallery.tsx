@@ -3,12 +3,11 @@
 import {
   motion,
   useMotionValueEvent,
-  useReducedMotion,
   useScroll,
   useTransform,
   type MotionValue,
 } from 'motion/react';
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   galleryCaptionFrames,
   galleryCity,
@@ -17,28 +16,16 @@ import {
   gallerySnapPoints,
 } from '@/lib/stage';
 import { cn } from '@/lib/utils';
+import { useMotionAllowed } from './use-motion-allowed';
 
 export type GalleryItem = { id: string; label: string; photo: ReactNode; caption: ReactNode };
 
 const STEP = 100; // svh of scroll per city
-const noop = () => () => {};
-
-// True only after hydration, so the server and no-JS render stay a plain list.
-function useHydrated() {
-  return useSyncExternalStore(
-    noop,
-    () => true,
-    () => false,
-  );
-}
-
 // Global: photo and caption pinned together. Each next city wipes up from the bottom early in
 // its screen of scroll, then holds so it can be read; letting go settles on the nearest city.
 // Without JavaScript, or with reduced motion, the cities are a plain vertical list.
 export function PinnedGallery({ items }: { items: GalleryItem[] }) {
-  const hydrated = useHydrated();
-  const reduce = useReducedMotion();
-  return hydrated && !reduce ? <Pinned items={items} /> : <List items={items} />;
+  return useMotionAllowed() ? <Pinned items={items} /> : <List items={items} />;
 }
 
 function List({ items }: { items: GalleryItem[] }) {
@@ -113,13 +100,7 @@ function Pinned({ items }: { items: GalleryItem[] }) {
           </ol>
           <div className="relative mt-5 min-h-[11rem] md:mt-10 md:min-h-[15rem]">
             {items.map((item, i) => (
-              <Caption
-                key={item.id}
-                index={i}
-                count={count}
-                position={position}
-                hidden={i !== active}
-              >
+              <Caption key={item.id} index={i} count={count} position={position}>
                 {item.caption}
               </Caption>
             ))}
@@ -127,7 +108,7 @@ function Pinned({ items }: { items: GalleryItem[] }) {
         </div>
         <div className="relative order-1 h-[42svh] w-full shrink-0 overflow-hidden rounded-lg md:order-2 md:h-[72svh]">
           {items.map((item, i) => (
-            <Photo key={item.id} index={i} position={position} hidden={i !== active}>
+            <Photo key={item.id} index={i} position={position}>
               {item.photo}
             </Photo>
           ))}
@@ -141,25 +122,18 @@ function Caption({
   index,
   count,
   position,
-  hidden,
   children,
 }: {
   index: number;
   count: number;
   position: MotionValue<number>;
-  hidden: boolean;
   children: ReactNode;
 }) {
   const frames = galleryCaptionFrames(index, count);
   const opacity = useTransform(position, frames.input, frames.opacity);
   const y = useTransform(position, frames.input, frames.y);
   return (
-    <motion.div
-      data-caption
-      aria-hidden={hidden}
-      className="absolute inset-x-0 top-0"
-      style={{ opacity, y }}
-    >
+    <motion.div data-caption className="absolute inset-x-0 top-0" style={{ opacity, y }}>
       {children}
     </motion.div>
   );
@@ -168,12 +142,10 @@ function Caption({
 function Photo({
   index,
   position,
-  hidden,
   children,
 }: {
   index: number;
   position: MotionValue<number>;
-  hidden: boolean;
   children: ReactNode;
 }) {
   const range = galleryPhotoRange(index);
@@ -181,14 +153,10 @@ function Photo({
   const scale = useTransform(position, range, [1.12, 1]);
 
   if (index === 0) {
-    return (
-      <div aria-hidden={hidden} className="absolute inset-0">
-        {children}
-      </div>
-    );
+    return <div className="absolute inset-0">{children}</div>;
   }
   return (
-    <motion.div aria-hidden={hidden} className="absolute inset-0" style={{ clipPath }}>
+    <motion.div className="absolute inset-0" style={{ clipPath }}>
       <motion.div className="absolute inset-0" style={{ scale }}>
         {children}
       </motion.div>

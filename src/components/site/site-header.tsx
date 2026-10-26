@@ -1,6 +1,8 @@
 import { getTranslations } from 'next-intl/server';
 import { RiseSymbol } from '@/components/brand/rise-symbol';
+import { AskButton } from '@/components/stage/ask-button';
 import { Link } from '@/i18n/navigation';
+import { applyCta, getRecruitment } from '@/lib/content';
 import { LocaleSwitch } from './locale-switch';
 import { MobileNav } from './mobile-nav';
 
@@ -13,7 +15,15 @@ export const NAV_ITEMS = [
 
 export async function SiteHeader() {
   const t = await getTranslations('Nav');
+  const ctaT = await getTranslations('Cta');
   const items = NAV_ITEMS.map((item) => ({ href: item.href, label: t(item.key) }));
+  // The header action says what actually happens: apply while recruiting, read the notice
+  // otherwise.
+  const cta = applyCta(await getRecruitment());
+  const action =
+    cta.kind === 'apply'
+      ? { href: cta.href, label: ctaT('apply'), external: true }
+      : { href: '/join', label: ctaT('notice'), external: false };
 
   return (
     <header className="absolute inset-x-0 top-0 z-30">
@@ -35,14 +45,9 @@ export async function SiteHeader() {
             </Link>
           ))}
           <LocaleSwitch />
-          <Link
-            href="/join"
-            className="rounded bg-white px-4 py-2 font-semibold text-cobalt transition-transform duration-150 ease-out active:scale-[0.97]"
-          >
-            {t('join')}
-          </Link>
+          <AskButton cta={cta} className="px-4 py-2" />
         </nav>
-        <MobileNav items={items} joinLabel={t('join')} menuLabel={t('menu')} />
+        <MobileNav items={items} action={action} menuLabel={t('menu')} />
       </div>
     </header>
   );

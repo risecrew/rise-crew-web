@@ -42,8 +42,8 @@ export async function Ask({
         </div>
         {upcoming.length > 0 ? (
           <div>
-            <h3 className="text-sm font-semibold text-white/75">{t('ask.next')}</h3>
-            <ol className="mt-2 divide-y divide-white/15 border-y border-white/15">
+            <h3 className="font-display text-2xl font-[800] break-keep">{t('ask.next')}</h3>
+            <ol className="mt-4 divide-y divide-white/15 border-y border-white/15">
               {upcoming.map((s) => (
                 <li key={s.id} className="flex gap-4 py-3">
                   <span className="w-[8ch] shrink-0 font-mono text-white/70">

@@ -30,7 +30,8 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} className={mono.variable}>
+    // data-scroll-behavior lets Next 16 jump to the top on navigation despite smooth scrolling.
+    <html lang={locale} className={mono.variable} data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
         {FONT_STYLESHEETS.map((href) => (

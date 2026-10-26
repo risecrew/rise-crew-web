@@ -4,8 +4,11 @@ import { Link } from '@/i18n/navigation';
 
 export default async function NotFound() {
   const t = await getTranslations('NotFound');
+  const meta = await getTranslations('Meta.notFound');
   return (
     <main id="main" className="bg-stage">
+      {/* not-found has no generateMetadata; React hoists this into the head. */}
+      <title>{meta('title')}</title>
       <PageCover title={t('title')} lead={t('body')}>
         <Link
           href="/"

@@ -37,3 +37,27 @@ for (const path of ['/about', '/network', '/contact', '/join'] as const) {
     expect(title!.y + title!.height).toBeLessThanOrEqual(photo!.y + photo!.height);
   });
 }
+
+test('an unknown page has a title saying so', async ({ page }) => {
+  await page.goto('/ko/startups');
+  await expect(page).toHaveTitle(/페이지를 찾을 수 없습니다/);
+});
+
+test('following a link from far down a page lands at the top at once', async ({ page }) => {
+  await page.goto('/ko');
+  const ask = page.locator('[data-ask]');
+  await ask.scrollIntoViewIfNeeded();
+  await ask.getByRole('link', { name: '모집 안내 보기' }).click();
+  await page.waitForURL('**/ko/join');
+  await page.waitForTimeout(120);
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+});
+
+test('keyboard focus is visible on lime buttons', async ({ page }) => {
+  await page.goto('/ko');
+  await page.keyboard.press('Tab');
+  const cta = page.locator('[data-hero]').getByRole('link', { name: '모집 안내 보기' });
+  await cta.focus();
+  const outline = await cta.evaluate((el) => getComputedStyle(el).outlineColor);
+  expect(outline).toBe('rgb(159, 201, 82)');
+});

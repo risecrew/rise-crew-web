@@ -1,17 +1,10 @@
 'use client';
 
-import {
-  animate,
-  motion,
-  useInView,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from 'motion/react';
+import { animate, motion, useInView, useMotionValue, useScroll, useTransform } from 'motion/react';
 import { useEffect, useMemo, useRef } from 'react';
 import { easeOutExpo, parseStatValue } from '@/lib/stage';
 import { cn } from '@/lib/utils';
+import { useMotionAllowed } from './use-motion-allowed';
 
 const DURATION = 1.4;
 
@@ -22,7 +15,7 @@ export function CountUp({ value, className }: { value: string; className?: strin
   // Memoised so the animation effect does not restart on unrelated re-renders.
   const parsed = useMemo(() => parseStatValue(value), [value]);
   const ref = useRef<HTMLSpanElement>(null);
-  const reduce = useReducedMotion();
+  const motionAllowed = useMotionAllowed();
   const inView = useInView(ref, { once: true, amount: 0.6 });
   const count = useMotionValue(parsed?.number ?? 0);
   const text = useTransform(count, (v) => `${Math.round(v)}${parsed?.suffix ?? ''}`);
@@ -30,21 +23,21 @@ export function CountUp({ value, className }: { value: string; className?: strin
   const weight = useTransform(scrollYProgress, [0, 1], [400, 950]);
 
   useEffect(() => {
-    if (!parsed || reduce) return;
+    if (!parsed || !motionAllowed) return;
     if (!inView) {
       count.set(0);
       return;
     }
     const controls = animate(count, parsed.number, { duration: DURATION, ease: easeOutExpo });
     return () => controls.stop();
-  }, [count, inView, parsed, reduce]);
+  }, [count, inView, motionAllowed, parsed]);
 
   return (
     <motion.span
       ref={ref}
       data-count
       className={cn('block tabular-nums', className)}
-      style={reduce || !parsed ? { fontWeight: 900 } : { fontWeight: weight }}
+      style={motionAllowed && parsed ? { fontWeight: weight } : { fontWeight: 900 }}
     >
       <motion.span aria-hidden>{parsed ? text : value}</motion.span>
       <span className="sr-only">{value}</span>

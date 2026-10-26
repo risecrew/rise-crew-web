@@ -5,14 +5,18 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { LocaleSwitch } from './locale-switch';
 
 type Item = { href: string; label: string };
+type Action = { href: string; label: string; external: boolean };
+
+const ACTION =
+  'rounded-full bg-lime px-4 py-2 font-semibold text-cobalt transition-transform duration-150 ease-out active:scale-[0.97]';
 
 export function MobileNav({
   items,
-  joinLabel,
+  action,
   menuLabel,
 }: {
   items: Item[];
-  joinLabel: string;
+  action: Action;
   menuLabel: string;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
@@ -42,9 +46,15 @@ export function MobileNav({
         </ul>
         <div className="mt-2 flex items-center justify-between border-t border-paper-edge px-3 pt-3">
           <LocaleSwitch tone="ink" />
-          <Link href="/join" className="rounded bg-cobalt px-4 py-2 font-semibold text-white">
-            {joinLabel}
-          </Link>
+          {action.external ? (
+            <a href={action.href} target="_blank" rel="noreferrer" className={ACTION}>
+              {action.label}
+            </a>
+          ) : (
+            <Link href={action.href} className={ACTION}>
+              {action.label}
+            </Link>
+          )}
         </div>
       </nav>
     </details>

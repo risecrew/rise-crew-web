@@ -12,13 +12,30 @@ test('about shows the five-step plan, programs, crew and the event timeline', as
   expect(await page.locator('[data-event]').count()).toBeGreaterThan(10);
 });
 
-test('timeline: past planned dates read unconfirmed, future ones upcoming', async ({ page }) => {
+// Checks the rule, not a fixed date, so the test does not expire as the calendar moves.
+test('timeline: past planned dates read unconfirmed, only future ones upcoming', async ({
+  page,
+}) => {
   await page.goto('/en/about');
-  const london = page.locator('[data-event]', { hasText: 'London' });
-  await expect(london).toHaveAttribute('data-state', 'unconfirmed');
-  await expect(london).toContainText('Unconfirmed');
-  const final = page.locator('[data-event]', { hasText: 'AI+X Global Startup Competition final' });
-  await expect(final).toHaveAttribute('data-state', 'upcoming');
+  const events = await page.locator('[data-event]').evaluateAll((els) =>
+    els.map((el) => ({
+      state: el.getAttribute('data-state'),
+      date: el.querySelector('time')?.getAttribute('datetime') ?? '',
+      text: el.textContent ?? '',
+    })),
+  );
+  const now = new Date();
+  // A planned date like "2026-07" counts as past once that month is over.
+  const isPast = (date: string) => {
+    const [y, m = '12'] = date.split('-');
+    return new Date(Number(y), Number(m), 1) <= now;
+  };
+  for (const e of events.filter((e) => e.state === 'upcoming')) {
+    expect(isPast(e.date), `${e.text} is marked upcoming`).toBe(false);
+  }
+  const unconfirmed = events.filter((e) => e.state === 'unconfirmed');
+  expect(unconfirmed.length).toBeGreaterThan(0);
+  for (const e of unconfirmed) expect(e.text).toContain('Unconfirmed');
 });
 
 test('the page cover shows a real photo marked temporary', async ({ page }) => {
