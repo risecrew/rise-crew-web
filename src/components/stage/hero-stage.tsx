@@ -5,7 +5,16 @@ import { useRef, type ReactNode } from 'react';
 
 // The opening: the photo fills the screen and, while the page holds still, pulls back and
 // dims as the reader starts to scroll. Without JavaScript it is a full-screen photo.
-export function HeroStage({ photo, children }: { photo: ReactNode; children: ReactNode }) {
+export function HeroStage({
+  photo,
+  badge,
+  children,
+}: {
+  photo: ReactNode;
+  /** Kept out of the scaling layer so it stays clear of the site header. */
+  badge?: ReactNode;
+  children: ReactNode;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
@@ -24,6 +33,7 @@ export function HeroStage({ photo, children }: { photo: ReactNode; children: Rea
           className="absolute inset-0 bg-stage"
           style={{ opacity: reduce ? 0 : dim }}
         />
+        {badge}
         <motion.div className="absolute inset-0" style={reduce ? undefined : { y: lift }}>
           {children}
         </motion.div>

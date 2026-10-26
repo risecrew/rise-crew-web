@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { AskButton } from '@/components/stage/ask-button';
 import { HeroStage } from '@/components/stage/hero-stage';
-import { StagePhoto } from '@/components/stage/stage-photo';
+import { StagePhoto, TemporaryBadge } from '@/components/stage/stage-photo';
 import type { Photo } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
@@ -36,8 +36,13 @@ export async function Hero({
             locale={locale}
             temporaryLabel={common('temporaryPhoto')}
             priority
-            badge="under-header"
+            badge="none"
           />
+        ) : null
+      }
+      badge={
+        photo?.temporary ? (
+          <TemporaryBadge label={common('temporaryPhoto')} placement="under-header" />
         ) : null
       }
     >

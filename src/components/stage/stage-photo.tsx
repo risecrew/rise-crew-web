@@ -12,9 +12,29 @@ type Props = {
   className?: string;
   /** Darkens the photo so type can sit on it. */
   scrim?: 'bottom' | 'full';
-  /** Full-bleed photos sit under the site header, so their badge drops below it. */
-  badge?: 'corner' | 'under-header';
+  /**
+   * Full-bleed photos sit under the site header, so their badge drops below it. 'none' when
+   * the caller places the badge itself (e.g. outside a layer that scales).
+   */
+  badge?: 'corner' | 'under-header' | 'none';
 };
+
+type BadgePlacement = 'corner' | 'under-header';
+
+export function TemporaryBadge({ label, placement }: { label: string; placement: BadgePlacement }) {
+  return (
+    <span
+      className={cn(
+        'absolute z-10 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white/90 backdrop-blur-sm',
+        placement === 'corner'
+          ? 'top-[clamp(10px,2cqw,24px)] right-[clamp(10px,2cqw,24px)]'
+          : 'top-20 right-5 md:top-24 md:right-10',
+      )}
+    >
+      {label}
+    </span>
+  );
+}
 
 export function StagePhoto({
   photo,
@@ -44,17 +64,8 @@ export function StagePhoto({
             : 'bg-[linear-gradient(180deg,rgb(7_9_15/0.15)_0%,rgb(7_9_15/0.25)_45%,rgb(7_9_15/0.88)_100%)]',
         )}
       />
-      {photo.temporary ? (
-        <span
-          className={cn(
-            'absolute z-10 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white/90 backdrop-blur-sm',
-            badge === 'corner'
-              ? 'top-[clamp(10px,2cqw,24px)] right-[clamp(10px,2cqw,24px)]'
-              : 'top-20 right-5 md:top-24 md:right-10',
-          )}
-        >
-          {temporaryLabel}
-        </span>
+      {photo.temporary && badge !== 'none' ? (
+        <TemporaryBadge label={temporaryLabel} placement={badge} />
       ) : null}
     </>
   );
