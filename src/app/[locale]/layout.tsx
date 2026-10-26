@@ -1,0 +1,49 @@
+import type { Metadata } from 'next';
+import { JetBrains_Mono } from 'next/font/google';
+import type { ReactNode } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
+import { SiteFooter } from '@/components/site/site-footer';
+import { SiteHeader } from '@/components/site/site-header';
+import { asLocale } from '@/i18n/as-locale';
+import { routing } from '@/i18n/routing';
+import { FONT_STYLESHEETS } from '@/lib/fonts';
+import { getSiteUrl, isLaunched } from '@/lib/site';
+import '../globals.css';
+
+const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains', display: 'swap' });
+
+export const metadata: Metadata = {
+  metadataBase: getSiteUrl(),
+  // Until the real domain is live, nothing on the temporary address is indexed.
+  ...(isLaunched() ? {} : { robots: { index: false, follow: false } }),
+};
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+type Props = { children: ReactNode; params: Promise<{ locale: string }> };
+
+export default async function LocaleLayout({ children, params }: Props) {
+  const locale = asLocale((await params).locale);
+  setRequestLocale(locale);
+
+  return (
+    // data-scroll-behavior lets Next 16 jump to the top on navigation despite smooth scrolling.
+    <html lang={locale} className={mono.variable} data-scroll-behavior="smooth">
+      <head>
+        {FONT_STYLESHEETS.map((href) => (
+          <link key={href} rel="stylesheet" href={href} precedence="default" />
+        ))}
+      </head>
+      <body className="bg-stage font-sans text-white antialiased">
+        <NextIntlClientProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
+}

@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-cobalt: #003e91;
+  --color-lime: #9fc952;
+  --color-leaf: #49b67e;
+  --color-teal: #10a1c7;
+  --color-sky: #0dbedb;
+  --color-ocean: #0175ba;
+  --color-paper: #f4f9f7;
+  --color-paper-edge: #dbe9e4;
+  --color-ink: #13203a;
+  --color-ink-soft: #46546d;
+  /* Neutral auditorium dark for the Demo Day stage; the hue comes from the cobalt stage light. */
+  --color-stage: #07090f;
+
+  --font-sans: 'Pretendard Variable', Pretendard, system-ui, -apple-system, sans-serif;
+  --font-display: 'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Browser surfaces carry the palette too. */
+html {
+  accent-color: var(--color-cobalt);
+  caret-color: var(--color-lime);
+  scrollbar-color: color-mix(in oklab, var(--color-cobalt) 45%, transparent) transparent;
+}
+::selection {
+  background: var(--color-lime);
+  color: var(--color-cobalt);
+}
+/* Lime reads on the dark stage, on photos and on the cobalt footer, and stays visible around
+   lime buttons because of the offset. The light mobile menu uses cobalt instead. */
+:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 3px;
+}
+.bg-paper :focus-visible {
+  outline-color: var(--color-cobalt);
+}
+a {
+  text-underline-offset: 0.2em;
+}
+dd,
+time {
+  font-variant-numeric: tabular-nums;
+}

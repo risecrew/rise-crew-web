@@ -5,16 +5,46 @@ RISE CREW 창업 동아리 공식 홈페이지.
 ## 기술 스택
 
 - Next.js (App Router) + TypeScript
-- Tailwind CSS + shadcn/ui
+- Tailwind CSS (shadcn/ui는 2단계 관리자 화면에서 도입)
 - Supabase (Postgres, Auth, Storage)
 - Vercel
 
 ## 개발 환경
 
-- Node.js 24 (`.nvmrc`)
+- Node.js 24 (`.nvmrc`, fnm 사용 시 폴더에 들어가면 자동 전환)
 - pnpm
 
-> 프로젝트 초기 설정 진행 중입니다. 실행 방법은 설정 완료 후 추가됩니다.
+```bash
+pnpm install
+pnpm exec playwright install chromium
+pnpm dev            # http://localhost:3000 → /ko 로 이동
+```
+
+## 검사
+
+```bash
+pnpm lint && pnpm typecheck && pnpm format:check
+pnpm test           # 데이터 검사, 단위 테스트
+pnpm build && pnpm e2e   # 화면·접근성 확인 (빌드 후 실행)
+```
+
+PR을 올리면 GitHub Actions가 위 검사를 전부 실행합니다.
+
+## 배포 주소
+
+- `main`에 merge하면 Vercel이 `https://rise-crew-web.vercel.app`에 배포한다. 이 주소는 **진짜 도메인을 연결하기 전까지 쓰는 임시 주소**다.
+- 임시 주소는 검색엔진에 잡히지 않게 막아 둔다(`robots.txt` Disallow, 모든 페이지 `noindex`).
+- 진짜 도메인을 연결할 때 Vercel 환경변수 `NEXT_PUBLIC_SITE_URL`에 그 주소(예: `https://도메인`)를 넣고 다시 배포하면 검색 허용, canonical, sitemap 주소가 모두 그 도메인으로 바뀐다. `*.vercel.app`이나 `localhost`를 넣으면 계속 막힌 상태로 남는다.
+
+## 구조
+
+- `src/app/[locale]/`: 페이지 (`/ko`, `/en`)
+- `src/content/data/`: 사이트 콘텐츠 데이터. 형식은 `src/content/schema.ts`가 검사합니다
+- `messages/ko.json`, `messages/en.json`: 버튼, 메뉴, 제목 문구
+- `src/components/home/`: 홈 구성(첫 화면, 숫자, Campus·Domestic·Global 장, 지원 안내)
+- `src/components/stage/`: 무대 스타일 공용 컴포넌트(사진, 숫자 카운트업, 단계 레일, 고정 갤러리)
+- `public/fonts/`: 직접 호스팅하는 글꼴(Pretendard, Wanted Sans). 패키지 버전을 올린 뒤 `pnpm fonts:vendor`로 다시 복사합니다
+- 설계 문서: `docs/superpowers/specs/`, 디자인 방향: `.impeccable/surfaces/`, 디자인 규칙: `DESIGN.md`
 
 ## 보안 규칙
 

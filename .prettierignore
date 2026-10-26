@@ -1,0 +1,11 @@
+.next
+node_modules
+pnpm-lock.yaml
+public/brand
+.claude
+.impeccable
+playwright-report
+test-results
+**/*.md
+.superpowers
+public/fonts
