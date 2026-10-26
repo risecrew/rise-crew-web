@@ -10,8 +10,10 @@ type Props = {
   temporaryLabel: string;
   priority?: boolean;
   className?: string;
-  /** Darkens the photo so slide type can sit on it. */
+  /** Darkens the photo so type can sit on it. */
   scrim?: 'bottom' | 'full';
+  /** Full-bleed photos sit under the site header, so their badge drops below it. */
+  badge?: 'corner' | 'under-header';
 };
 
 export function StagePhoto({
@@ -21,6 +23,7 @@ export function StagePhoto({
   priority,
   className,
   scrim = 'bottom',
+  badge = 'corner',
 }: Props) {
   return (
     <>
@@ -42,7 +45,14 @@ export function StagePhoto({
         )}
       />
       {photo.temporary ? (
-        <span className="absolute top-[clamp(10px,2cqw,24px)] right-[clamp(10px,2cqw,24px)] z-10 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white/90 backdrop-blur-sm">
+        <span
+          className={cn(
+            'absolute z-10 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white/90 backdrop-blur-sm',
+            badge === 'corner'
+              ? 'top-[clamp(10px,2cqw,24px)] right-[clamp(10px,2cqw,24px)]'
+              : 'top-20 right-5 md:top-24 md:right-10',
+          )}
+        >
           {temporaryLabel}
         </span>
       ) : null}

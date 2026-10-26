@@ -21,3 +21,19 @@ for (const locale of LOCALES) {
     });
   }
 }
+
+// Inner pages open the way the home's chapters do: a photo from edge to edge with the title
+// on it, not a framed screen beside the title.
+for (const path of ['/about', '/network', '/contact', '/join'] as const) {
+  test(`${path} opens on an edge-to-edge photo with the title on it`, async ({ page }) => {
+    await page.goto(`/ko${path}`);
+    const cover = page.locator('[data-page-cover]');
+    const photo = await cover.locator('img').first().boundingBox();
+    const viewport = page.viewportSize()!;
+    expect(photo?.x).toBeLessThanOrEqual(0);
+    expect(photo!.width).toBeGreaterThanOrEqual(viewport.width);
+    const title = await cover.locator('h1').boundingBox();
+    expect(title!.y).toBeGreaterThan(photo!.y);
+    expect(title!.y + title!.height).toBeLessThanOrEqual(photo!.y + photo!.height);
+  });
+}

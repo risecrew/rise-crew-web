@@ -30,6 +30,12 @@ pnpm build && pnpm e2e   # 화면·접근성 확인 (빌드 후 실행)
 
 PR을 올리면 GitHub Actions가 위 검사를 전부 실행합니다.
 
+## 배포 주소
+
+- `main`에 merge하면 Vercel이 `https://rise-crew-web.vercel.app`에 배포한다. 이 주소는 **진짜 도메인을 연결하기 전까지 쓰는 임시 주소**다.
+- 임시 주소는 검색엔진에 잡히지 않게 막아 둔다(`robots.txt` Disallow, 모든 페이지 `noindex`).
+- 진짜 도메인을 연결할 때 Vercel 환경변수 `NEXT_PUBLIC_SITE_URL`에 그 주소(예: `https://도메인`)를 넣고 다시 배포하면 검색 허용, canonical, sitemap 주소가 모두 그 도메인으로 바뀐다. `*.vercel.app`이나 `localhost`를 넣으면 계속 막힌 상태로 남는다.
+
 ## 구조
 
 - `src/app/[locale]/`: 페이지 (`/ko`, `/en`)

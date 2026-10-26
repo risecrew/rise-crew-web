@@ -36,6 +36,7 @@ export async function Hero({
             locale={locale}
             temporaryLabel={common('temporaryPhoto')}
             priority
+            badge="under-header"
           />
         ) : null
       }

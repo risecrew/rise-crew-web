@@ -122,7 +122,12 @@ export async function DomesticChapter({
     <section id="domestic" data-chapter aria-labelledby="domestic-title" className="text-white">
       <div className="relative flex h-[85svh] items-end overflow-hidden">
         {photo ? (
-          <StagePhoto photo={photo} locale={locale} temporaryLabel={common('temporaryPhoto')} />
+          <StagePhoto
+            photo={photo}
+            locale={locale}
+            temporaryLabel={common('temporaryPhoto')}
+            badge="under-header"
+          />
         ) : null}
         <div className={`relative ${GUTTER} pb-14`}>
           <ChapterName stage="domestic" />

@@ -8,12 +8,16 @@ import { SiteHeader } from '@/components/site/site-header';
 import { asLocale } from '@/i18n/as-locale';
 import { routing } from '@/i18n/routing';
 import { FONT_STYLESHEETS } from '@/lib/fonts';
-import { getSiteUrl } from '@/lib/site';
+import { getSiteUrl, isLaunched } from '@/lib/site';
 import '../globals.css';
 
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains', display: 'swap' });
 
-export const metadata: Metadata = { metadataBase: getSiteUrl() };
+export const metadata: Metadata = {
+  metadataBase: getSiteUrl(),
+  // Until the real domain is live, nothing on the temporary address is indexed.
+  ...(isLaunched() ? {} : { robots: { index: false, follow: false } }),
+};
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

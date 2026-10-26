@@ -27,3 +27,10 @@ test('Open Graph image renders', async ({ request }) => {
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('image/png');
 });
+
+test('search engines stay out until the real domain is set', async ({ page, request }) => {
+  const robots = await (await request.get('/robots.txt')).text();
+  expect(robots).toMatch(/Disallow: \/\s/);
+  await page.goto('/ko');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+});
