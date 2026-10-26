@@ -98,7 +98,7 @@ function Pinned({ items }: { items: GalleryItem[] }) {
               </li>
             ))}
           </ol>
-          <div className="relative mt-5 min-h-[11rem] md:mt-10 md:min-h-[15rem]">
+          <div className="relative mt-5 min-h-[11rem] overflow-hidden md:mt-10 md:min-h-[15rem]">
             {items.map((item, i) => (
               <Caption key={item.id} index={i} count={count} position={position}>
                 {item.caption}

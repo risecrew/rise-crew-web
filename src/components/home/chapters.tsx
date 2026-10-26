@@ -75,7 +75,7 @@ export async function CampusChapter({
       {/* No campus photo yet, so the chapter is lit like a stage instead. */}
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-[80%] bg-[radial-gradient(ellipse_70%_55%_at_50%_0%,rgb(0_62_145/0.6),transparent_70%)]"
+        className="absolute inset-x-0 top-0 -z-10 h-full bg-[radial-gradient(ellipse_100%_45%_at_50%_30%,rgb(0_62_145/0.55),transparent_100%)] [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_60%,transparent)]"
       />
       <ChapterName stage="campus" />
       <div className="mt-14 grid gap-14 md:grid-cols-[1fr_1.2fr]">
