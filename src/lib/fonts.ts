@@ -1,4 +1,7 @@
+// Served from public/fonts, copied out of the official npm packages by `pnpm fonts:vendor`
+// (scripts/vendor-fonts.mjs). Both are split into small unicode-range files, so a page only
+// downloads the glyphs it uses.
 export const FONT_STYLESHEETS = [
-  'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css',
-  'https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css',
+  '/fonts/pretendard-1.3.9/pretendardvariable-dynamic-subset.css',
+  '/fonts/wanted-sans-1.0.3/WantedSansVariable.css',
 ] as const;

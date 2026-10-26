@@ -33,7 +33,6 @@ export default async function LocaleLayout({ children, params }: Props) {
     // data-scroll-behavior lets Next 16 jump to the top on navigation despite smooth scrolling.
     <html lang={locale} className={mono.variable} data-scroll-behavior="smooth">
       <head>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
         {FONT_STYLESHEETS.map((href) => (
           <link key={href} rel="stylesheet" href={href} precedence="default" />
         ))}

@@ -61,3 +61,19 @@ test('keyboard focus is visible on lime buttons', async ({ page }) => {
   const outline = await cta.evaluate((el) => getComputedStyle(el).outlineColor);
   expect(outline).toBe('rgb(159, 201, 82)');
 });
+
+test('fonts load from the site itself, not a third-party CDN', async ({ page }) => {
+  const external: string[] = [];
+  page.on('request', (r) => {
+    const host = new URL(r.url()).host;
+    if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(host)) external.push(r.url());
+  });
+  await page.goto('/ko');
+  await page.evaluate(() => document.fonts.ready);
+  expect(external).toEqual([]);
+  const loaded = await page.evaluate(() =>
+    [...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family),
+  );
+  expect(loaded.some((f) => f.includes('Wanted Sans Variable'))).toBe(true);
+  expect(loaded.some((f) => f.includes('Pretendard Variable'))).toBe(true);
+});
