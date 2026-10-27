@@ -9,6 +9,9 @@
 --   access token expires (up to an hour later).
 -- - The token hook copies the role into the token as `app_role` and `blocked`
 --   for display only. Never authorize on those claims.
+-- - Sign-up finishes only after the privacy and age14 consents are recorded,
+--   and recruit_opt_in always follows the latest recruit consent (triggers
+--   below), so the consent log and the profile cannot disagree.
 -- - Nothing here reads user_metadata.
 -- - New tables are not exposed to the Data API automatically. Every grant
 --   below is deliberate; anon gets nothing.
@@ -123,6 +126,71 @@ create trigger user_roles_set_updated_at
   for each row execute function private.set_updated_at();
 
 -- ---------------------------------------------------------------------------
+-- Consent before sign-up completes
+-- ---------------------------------------------------------------------------
+
+-- onboarded_at marks a finished sign-up. It can be set only when a granted
+-- privacy consent and a granted age14 consent exist, it is always stamped
+-- with the server time, and once set it never changes (no clearing, no
+-- backdating).
+create function private.guard_onboarding()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if old.onboarded_at is not null then
+    new.onboarded_at := old.onboarded_at;
+  elsif new.onboarded_at is not null then
+    if not exists (
+      select 1 from public.consents as c
+      where c.user_id = new.id and c.kind = 'privacy' and c.granted
+    ) or not exists (
+      select 1 from public.consents as c
+      where c.user_id = new.id and c.kind = 'age14' and c.granted
+    ) then
+      raise exception 'sign-up cannot finish before the privacy and age14 consents are recorded'
+        using errcode = 'P0001',
+              hint = 'Insert granted privacy and age14 rows into public.consents first.';
+    end if;
+    new.onboarded_at := now();
+  end if;
+  return new;
+end;
+$$;
+
+revoke execute on function private.guard_onboarding() from public, anon, authenticated, service_role;
+
+create trigger profiles_guard_onboarding
+  before update on public.profiles
+  for each row execute function private.guard_onboarding();
+
+-- recruit_opt_in is not writable by users. It follows the newest recruit
+-- consent, so every change has a timestamped, versioned record.
+create function private.sync_recruit_opt_in()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.profiles
+     set recruit_opt_in = new.granted
+   where id = new.user_id;
+  return null;
+end;
+$$;
+
+revoke execute on function private.sync_recruit_opt_in() from public, anon, authenticated, service_role;
+
+create trigger consents_sync_recruit_opt_in
+  after insert on public.consents
+  for each row
+  when (new.kind = 'recruit')
+  execute function private.sync_recruit_opt_in();
+
+-- ---------------------------------------------------------------------------
 -- Sign-up: every new auth user gets a profile and a guest role
 -- ---------------------------------------------------------------------------
 
@@ -206,11 +274,12 @@ revoke all on sequence public.consents_id_seq
   from public, anon, authenticated, service_role;
 
 -- Signed-in users: read (rows limited by RLS), edit their own form fields,
--- record their own consents. id, email, created_at and updated_at are not
--- writable.
+-- record their own consents. id, email, recruit_opt_in (set from consents),
+-- created_at and updated_at are not writable; onboarded_at is guarded by
+-- private.guard_onboarding.
 grant select on table public.profiles to authenticated;
 grant update (
-  last_name, first_name, occupation, school, major, affiliation, recruit_opt_in, onboarded_at
+  last_name, first_name, occupation, school, major, affiliation, onboarded_at
 ) on table public.profiles to authenticated;
 grant select on table public.user_roles to authenticated;
 grant select on table public.consents to authenticated;

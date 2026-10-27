@@ -43,7 +43,20 @@ from auth.users as u
 where u.id::text like '5eed0000-%';
 
 -- The sign-up trigger already created a profile and a guest role for each
--- account. Fill in the sign-up form for all four.
+-- account. Record the consents the sign-up form records first: sign-up
+-- cannot finish without granted privacy and age14 consents, and the recruit
+-- consent sets profiles.recruit_opt_in.
+insert into public.consents (user_id, kind, granted, policy_version)
+select s.user_id, k.kind, case when k.kind = 'recruit' then s.recruit else true end, '2026-10-27'
+from (values
+  ('5eed0000-0000-4000-8000-000000000001'::uuid, true),
+  ('5eed0000-0000-4000-8000-000000000002'::uuid, false),
+  ('5eed0000-0000-4000-8000-000000000003'::uuid, true),
+  ('5eed0000-0000-4000-8000-000000000004'::uuid, false)
+) as s (user_id, recruit)
+cross join (values ('privacy'), ('age14'), ('recruit')) as k (kind);
+
+-- Then fill in the sign-up form for all four.
 update public.profiles as p
 set
   last_name = s.last_name,
@@ -52,14 +65,13 @@ set
   school = s.school,
   major = s.major,
   affiliation = s.affiliation,
-  recruit_opt_in = s.recruit_opt_in,
   onboarded_at = now()
 from (values
-  ('5eed0000-0000-4000-8000-000000000001'::uuid, '김', '가입', 'undergrad', '성균관대학교', '경영학', null, true),
-  ('5eed0000-0000-4000-8000-000000000002'::uuid, '이', '회원', 'grad', '성균관대학교', '컴퓨터공학', null, false),
-  ('5eed0000-0000-4000-8000-000000000003'::uuid, '박', '운영', 'alumni', null, null, '예시 스튜디오', true),
-  ('5eed0000-0000-4000-8000-000000000004'::uuid, '최', '관리', 'founder', null, null, null, false)
-) as s (id, last_name, first_name, occupation, school, major, affiliation, recruit_opt_in)
+  ('5eed0000-0000-4000-8000-000000000001'::uuid, '김', '가입', 'undergrad', '성균관대학교', '경영학', null),
+  ('5eed0000-0000-4000-8000-000000000002'::uuid, '이', '회원', 'grad', '성균관대학교', '컴퓨터공학', null),
+  ('5eed0000-0000-4000-8000-000000000003'::uuid, '박', '운영', 'alumni', null, null, '예시 스튜디오'),
+  ('5eed0000-0000-4000-8000-000000000004'::uuid, '최', '관리', 'founder', null, null, null)
+) as s (id, last_name, first_name, occupation, school, major, affiliation)
 where p.id = s.id;
 
 update public.user_roles as r
@@ -70,10 +82,3 @@ from (values
   ('5eed0000-0000-4000-8000-000000000004'::uuid, 'admin')
 ) as s (user_id, role)
 where r.user_id = s.user_id;
-
--- The consents the sign-up form records.
-insert into public.consents (user_id, kind, granted, policy_version)
-select p.id, k.kind, case when k.kind = 'recruit' then p.recruit_opt_in else true end, '2026-10-27'
-from public.profiles as p
-cross join (values ('privacy'), ('age14'), ('recruit')) as k (kind)
-where p.id::text like '5eed0000-%';

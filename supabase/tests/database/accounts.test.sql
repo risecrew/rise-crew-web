@@ -14,7 +14,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(65);
+select plan(81);
 
 -- ---------------------------------------------------------------------------
 -- Setup (as postgres)
@@ -65,8 +65,8 @@ select is(
     where attrelid = 'public.profiles'::regclass and attnum > 0 and not attisdropped
       and has_column_privilege('authenticated', attrelid, attnum, 'UPDATE')),
   array['affiliation', 'first_name', 'last_name', 'major', 'occupation',
-        'onboarded_at', 'recruit_opt_in', 'school'],
-  'authenticated can update exactly the editable profile columns'
+        'onboarded_at', 'school'],
+  'authenticated can update exactly the editable profile columns (not recruit_opt_in)'
 );
 select is(
   (select array_agg(attname::text order by attname)
@@ -115,6 +115,14 @@ select ok(
   and not has_function_privilege('service_role', 'private.app_role_of(uuid)', 'EXECUTE'),
   'no API role can call app_role_of for an arbitrary user'
 );
+select is_empty(
+  $$select r, f
+      from unnest(array['anon', 'authenticated', 'service_role']) as r,
+           unnest(array['private.guard_onboarding()', 'private.sync_recruit_opt_in()',
+                        'private.handle_new_user()', 'private.set_updated_at()']) as f
+     where has_function_privilege(r, f, 'EXECUTE')$$,
+  'no API role can call the trigger functions'
+);
 select ok(
   has_function_privilege('authenticated', 'private.is_at_least(public.app_role)', 'EXECUTE')
   and not has_function_privilege('anon', 'private.is_at_least(public.app_role)', 'EXECUTE'),
@@ -139,6 +147,15 @@ select results_eq(
 -- Roles for the rest of the file.
 update public.user_roles set role = 'member'
  where user_id = '7e570000-0000-4000-8000-000000000002';
+
+-- The member finished sign-up earlier. Set directly with the guard off, so
+-- the "never changes" checks below compare against a time other than now().
+alter table public.profiles disable trigger profiles_guard_onboarding;
+update public.profiles
+   set last_name = '이', first_name = '회원', occupation = 'founder',
+       onboarded_at = '2026-01-01 00:00:00+00'
+ where id = '7e570000-0000-4000-8000-000000000002';
+alter table public.profiles enable trigger profiles_guard_onboarding;
 update public.user_roles set role = 'operator'
  where user_id in ('7e570000-0000-4000-8000-000000000003',
                    '7e570000-0000-4000-8000-000000000004');
@@ -252,7 +269,92 @@ select lives_ok(
   'a guest can update the editable columns of their own profile'
 );
 
--- Onboarding check constraint
+-- Consent before sign-up completes
+select throws_ok(
+  $$update public.profiles set occupation = 'other', onboarded_at = now()
+     where id = '7e570000-0000-4000-8000-000000000001'$$,
+  'P0001', 'sign-up cannot finish before the privacy and age14 consents are recorded',
+  'sign-up cannot finish without any consent'
+);
+select lives_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version)
+    values ('7e570000-0000-4000-8000-000000000001', 'privacy', true, '2026-10-27')$$,
+  'a user can record their own consent'
+);
+select throws_ok(
+  $$update public.profiles set occupation = 'other', onboarded_at = now()
+     where id = '7e570000-0000-4000-8000-000000000001'$$,
+  'P0001', 'sign-up cannot finish before the privacy and age14 consents are recorded',
+  'sign-up cannot finish with privacy but no age14 consent'
+);
+select lives_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version)
+    values ('7e570000-0000-4000-8000-000000000001', 'age14', false, '2026-10-27')$$,
+  'a declined consent is recorded too'
+);
+select throws_ok(
+  $$update public.profiles set occupation = 'other', onboarded_at = now()
+     where id = '7e570000-0000-4000-8000-000000000001'$$,
+  'P0001', 'sign-up cannot finish before the privacy and age14 consents are recorded',
+  'a declined age14 consent does not let sign-up finish'
+);
+select lives_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version)
+    values ('7e570000-0000-4000-8000-000000000001', 'age14', true, '2026-10-27')$$,
+  'a user can record the age14 consent'
+);
+select throws_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version)
+    values ('7e570000-0000-4000-8000-000000000002', 'privacy', true, '2026-10-27')$$,
+  '42501', null,
+  'a user cannot insert a consent for another user'
+);
+select throws_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version, created_at)
+    values ('7e570000-0000-4000-8000-000000000001', 'privacy', true, '2026-10-27', '2000-01-01')$$,
+  '42501', null,
+  'a user cannot backdate a consent'
+);
+select throws_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version)
+    values ('7e570000-0000-4000-8000-000000000001', 'marketing', true, '2026-10-27')$$,
+  '23514', null,
+  'consent kind must be privacy, age14 or recruit'
+);
+select results_eq(
+  'select distinct user_id from public.consents',
+  $$values ('7e570000-0000-4000-8000-000000000001'::uuid)$$,
+  'a user sees only their own consents'
+);
+
+-- Recruit opt-in follows the consent log
+select throws_ok(
+  $$update public.profiles set recruit_opt_in = true where id = '7e570000-0000-4000-8000-000000000001'$$,
+  '42501', null,
+  'a user cannot set recruit_opt_in directly'
+);
+select lives_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version)
+    values ('7e570000-0000-4000-8000-000000000001', 'recruit', true, '2026-10-27')$$,
+  'a user can opt in to recruitment email'
+);
+select is(
+  (select recruit_opt_in from public.profiles where id = '7e570000-0000-4000-8000-000000000001'),
+  true,
+  'a granted recruit consent sets recruit_opt_in'
+);
+select lives_ok(
+  $$insert into public.consents (user_id, kind, granted, policy_version)
+    values ('7e570000-0000-4000-8000-000000000001', 'recruit', false, '2026-10-27')$$,
+  'a user can opt out of recruitment email'
+);
+select is(
+  (select recruit_opt_in from public.profiles where id = '7e570000-0000-4000-8000-000000000001'),
+  false,
+  'a declined recruit consent clears recruit_opt_in'
+);
+
+-- Onboarding check constraint (the consents are in place, so the check decides)
 select throws_ok(
   $$update public.profiles set last_name = null, first_name = null, onboarded_at = now()
      where id = '7e570000-0000-4000-8000-000000000001'$$,
@@ -296,44 +398,20 @@ select throws_ok(
   'affiliation is capped at 100 characters'
 );
 select lives_ok(
-  $$update public.profiles set occupation = 'grad', school = '예시대학교', major = '경영학', onboarded_at = now()
+  $$update public.profiles
+       set occupation = 'grad', school = '예시대학교', major = '경영학', onboarded_at = '2000-01-01'
      where id = '7e570000-0000-4000-8000-000000000001'$$,
-  'a complete grad profile can be onboarded'
+  'with privacy and age14 consents, a complete grad profile finishes sign-up'
+);
+select is(
+  (select onboarded_at from public.profiles where id = '7e570000-0000-4000-8000-000000000001'),
+  now(),
+  'onboarded_at is stamped with the server time, not the value sent'
 );
 select lives_ok(
   $$update public.profiles set occupation = 'alumni', school = null, major = null, affiliation = null
      where id = '7e570000-0000-4000-8000-000000000001'$$,
   'alumni need no school, major or affiliation'
-);
-
--- Consents
-select lives_ok(
-  $$insert into public.consents (user_id, kind, granted, policy_version)
-    values ('7e570000-0000-4000-8000-000000000001', 'privacy', true, '2026-10-27')$$,
-  'a user can record their own consent'
-);
-select throws_ok(
-  $$insert into public.consents (user_id, kind, granted, policy_version)
-    values ('7e570000-0000-4000-8000-000000000002', 'privacy', true, '2026-10-27')$$,
-  '42501', null,
-  'a user cannot insert a consent for another user'
-);
-select throws_ok(
-  $$insert into public.consents (user_id, kind, granted, policy_version, created_at)
-    values ('7e570000-0000-4000-8000-000000000001', 'privacy', true, '2026-10-27', '2000-01-01')$$,
-  '42501', null,
-  'a user cannot backdate a consent'
-);
-select throws_ok(
-  $$insert into public.consents (user_id, kind, granted, policy_version)
-    values ('7e570000-0000-4000-8000-000000000001', 'marketing', true, '2026-10-27')$$,
-  '23514', null,
-  'consent kind must be privacy, age14 or recruit'
-);
-select results_eq(
-  'select user_id, kind from public.consents',
-  $$values ('7e570000-0000-4000-8000-000000000001'::uuid, 'privacy'::text)$$,
-  'a user sees only their own consents'
 );
 
 -- ---------------------------------------------------------------------------
@@ -346,6 +424,24 @@ select results_eq(
   'select id from public.profiles',
   $$values ('7e570000-0000-4000-8000-000000000002'::uuid)$$,
   'a member sees only their own profile'
+);
+select lives_ok(
+  $$update public.profiles set onboarded_at = null where id = '7e570000-0000-4000-8000-000000000002'$$,
+  'an update that clears onboarded_at runs'
+);
+select is(
+  (select onboarded_at from public.profiles where id = '7e570000-0000-4000-8000-000000000002'),
+  '2026-01-01 00:00:00+00'::timestamptz,
+  'onboarded_at cannot be cleared once set'
+);
+select lives_ok(
+  $$update public.profiles set onboarded_at = '2030-01-01' where id = '7e570000-0000-4000-8000-000000000002'$$,
+  'an update that changes onboarded_at runs'
+);
+select is(
+  (select onboarded_at from public.profiles where id = '7e570000-0000-4000-8000-000000000002'),
+  '2026-01-01 00:00:00+00'::timestamptz,
+  'onboarded_at cannot be changed once set'
 );
 
 -- ---------------------------------------------------------------------------
