@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Tables, TablesUpdate } from '@/lib/supabase/database.types';
+import { NAME_MAX, OCCUPATIONS, TEXT_MAX, isStudent } from './occupation';
 
 export type ProfileRow = Tables<'profiles'>;
 
@@ -10,21 +11,13 @@ export type ProfileUpdate = Pick<
   'last_name' | 'first_name' | 'occupation' | 'school' | 'major' | 'affiliation' | 'onboarded_at'
 >;
 
-export const OCCUPATIONS = ['undergrad', 'grad', 'alumni', 'founder', 'other'] as const;
-export type Occupation = (typeof OCCUPATIONS)[number];
-
-const STUDENT_OCCUPATIONS: readonly Occupation[] = ['undergrad', 'grad'];
-
-// School and major are asked of students; everyone else may give an affiliation.
-export function isStudent(occupation: Occupation): boolean {
-  return STUDENT_OCCUPATIONS.includes(occupation);
-}
+// The list of occupations and the limits live in occupation.ts, which the sign-up form can load
+// without this schema; they are re-exported here for everything that already imports them.
+export { NAME_MAX, OCCUPATIONS, TEXT_MAX, isStudent };
+export type { Occupation } from './occupation';
 
 // Bumped whenever the privacy policy text changes. Stored with every consent record.
 export const PRIVACY_POLICY_VERSION = '2026-10-27';
-
-const NAME_MAX = 50;
-const TEXT_MAX = 100;
 
 // Messages are codes, not sentences, so the form can show them in either language:
 //   required          the field is empty (or, for an occupation, not one of the options)
@@ -60,14 +53,21 @@ export const profileSchema = z
     privacy: mustAgree,
     recruit: z.boolean({ error: 'required' }).default(false),
   })
-  .superRefine((value, ctx) => {
-    if (!isStudent(value.occupation)) return;
-    for (const field of ['school', 'major'] as const) {
-      if (value[field] === '') {
-        ctx.addIssue({ code: 'custom', path: [field], message: 'required' });
+  .superRefine(
+    (value, ctx) => {
+      if (!isStudent(value.occupation)) return;
+      for (const field of ['school', 'major'] as const) {
+        if (value[field] === '') {
+          ctx.addIssue({ code: 'custom', path: [field], message: 'required' });
+        }
       }
-    }
-  })
+    },
+    // By default a check is skipped once another field has failed, which would hold back the
+    // missing school or major until the other mistakes were fixed. The form shows every problem
+    // at once, so this one runs regardless (a field that failed on its own is not empty text, and
+    // is left out of this check).
+    { when: () => true },
+  )
   .transform((value) => {
     const student = isStudent(value.occupation);
     return {

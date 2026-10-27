@@ -5,6 +5,7 @@ import {
   confirmUrl,
   isEmailAddress,
   leaveLogin,
+  leaveWelcome,
   loginNotice,
 } from '@/lib/auth/login';
 
@@ -35,6 +36,31 @@ describe('leaveLogin', () => {
   it('leaves pages whose name only starts like the login page alone', () => {
     expect(leaveLogin('/ko/loginx', 'ko')).toBe('/ko/loginx');
     expect(leaveLogin('/ko/about/login', 'ko')).toBe('/ko/about/login');
+  });
+});
+
+describe('leaveWelcome', () => {
+  it('follows next like safeNext does', () => {
+    expect(leaveWelcome('/ko/about', 'ko')).toBe('/ko/about');
+    expect(leaveWelcome('/en/about?tab=1#top', 'en')).toBe('/en/about?tab=1#top');
+    expect(leaveWelcome(null, 'ko')).toBe('/ko');
+    expect(leaveWelcome('https://evil.example/ko', 'ko')).toBe('/ko');
+  });
+
+  it('never points back at the welcome page, which would only redirect in a circle', () => {
+    for (const next of [
+      '/ko/welcome',
+      '/ko/welcome/',
+      '/ko/welcome?next=%2Fko%2Fwelcome',
+      '/ko/%77elcome',
+    ]) {
+      expect(leaveWelcome(next, 'ko'), next).toBe('/ko');
+    }
+    expect(leaveWelcome('/en/welcome', 'en')).toBe('/en');
+  });
+
+  it('leaves the login page alone, which sends a signed-in visitor on by itself', () => {
+    expect(leaveWelcome('/ko/login', 'ko')).toBe('/ko/login');
   });
 });
 

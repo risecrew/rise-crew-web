@@ -239,6 +239,60 @@
         "blocked": "This account has been suspended.",
         "oauth": "Google sign-in didn't finish. Please try again."
       }
+    },
+    "welcome": {
+      "metaTitle": "Finish sign-up",
+      "title": "Welcome!",
+      "lead": "Tell us a few things to finish signing up"
+    },
+    "profile": {
+      "email": "Email",
+      "emailNote": "(your sign-in account)",
+      "lastName": "Last name",
+      "firstName": "First name",
+      "occupation": {
+        "legend": "What you do now",
+        "undergrad": "Undergraduate",
+        "grad": "Graduate student",
+        "alumni": "Alumni or working",
+        "founder": "Founder",
+        "other": "Other"
+      },
+      "school": "School",
+      "major": "Major",
+      "affiliation": "Affiliation (optional)",
+      "affiliationPlaceholder": "Company or team name",
+      "consents": {
+        "age14": "[Required] I am 14 or older",
+        "privacy": "[Required] I agree to the collection and use of my personal information",
+        "privacyLink": "read",
+        "privacyLinkLabel": "Read how we collect and use personal information (opens in a new tab)",
+        "recruit": "[Optional] Email me about recruitment"
+      },
+      "submit": {
+        "welcome": "Finish sign-up",
+        "edit": "Save"
+      },
+      "submitting": {
+        "welcome": "Signing you up",
+        "edit": "Saving"
+      },
+      "errors": {
+        "summary": "{count, plural, one {# item needs} other {# items need}} a look.",
+        "saveFailed": "We couldn't save that. Please try again in a moment.",
+        "tooLong": "Use {max} characters or fewer.",
+        "required": {
+          "last_name": "Enter your last name.",
+          "first_name": "Enter your first name.",
+          "occupation": "Choose what you do now.",
+          "school": "Enter your school.",
+          "major": "Enter your major."
+        },
+        "consent": {
+          "age14": "You need to be 14 or older to sign up.",
+          "privacy": "You need to agree to sign up."
+        }
+      }
     }
   }
 }

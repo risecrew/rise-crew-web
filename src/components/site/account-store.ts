@@ -25,6 +25,8 @@ let started = false;
 let latest = 0;
 // The names of the last profile read, so a refreshed token does not read the row again.
 let known: { id: string; names: NameParts } | null = null;
+// The Supabase client, once the store has started (there is a session to look up).
+let client: Client | null = null;
 const listeners = new Set<() => void>();
 
 function publish(next: Account) {
@@ -68,11 +70,23 @@ async function start() {
   // The Supabase client is a separate download that only visitors with a session ever fetch.
   const { createSupabaseBrowserClient } = await import('@/lib/supabase/browser');
   const supabase = createSupabaseBrowserClient();
+  client = supabase;
   // This reports the current session right away and again on every sign-in, sign-out and token
   // refresh. The callback must not call back into Supabase itself, so the work waits a tick.
   supabase.auth.onAuthStateChange((_event, session) => {
     setTimeout(() => void apply(supabase, session), 0);
   });
+}
+
+// The names the header remembers are the ones it read when the visitor signed in, so they go out
+// of date when the visitor's profile changes: a sign-up that has just been finished (the profile
+// had no name yet), or a name edited later. Whoever saves the profile calls this afterwards, and
+// the header reads the profile again and shows the new initial without a page reload.
+export function refreshAccount() {
+  known = null;
+  const supabase = client;
+  if (!supabase) return;
+  void supabase.auth.getSession().then(({ data }) => apply(supabase, data.session));
 }
 
 export function subscribe(listener: () => void): () => void {

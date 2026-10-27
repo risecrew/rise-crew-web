@@ -239,6 +239,60 @@
         "blocked": "이용이 제한된 계정이에요.",
         "oauth": "구글 로그인을 마치지 못했어요. 다시 시도해 주세요."
       }
+    },
+    "welcome": {
+      "metaTitle": "가입 정보 입력",
+      "title": "반가워요!",
+      "lead": "가입을 마치려면 몇 가지만 알려주세요"
+    },
+    "profile": {
+      "email": "이메일",
+      "emailNote": "(로그인 계정)",
+      "lastName": "성",
+      "firstName": "이름",
+      "occupation": {
+        "legend": "지금 하고 있는 일",
+        "undergrad": "대학생",
+        "grad": "대학원생",
+        "alumni": "졸업생·직장인",
+        "founder": "창업자",
+        "other": "기타"
+      },
+      "school": "학교",
+      "major": "전공",
+      "affiliation": "소속 (선택)",
+      "affiliationPlaceholder": "회사나 팀 이름",
+      "consents": {
+        "age14": "[필수] 만 14세 이상이에요",
+        "privacy": "[필수] 개인정보 수집·이용에 동의해요",
+        "privacyLink": "내용 보기",
+        "privacyLinkLabel": "개인정보 수집·이용 내용 보기 (새 탭에서 열려요)",
+        "recruit": "[선택] 모집 소식을 이메일로 받을래요"
+      },
+      "submit": {
+        "welcome": "가입 완료",
+        "edit": "저장"
+      },
+      "submitting": {
+        "welcome": "가입하는 중",
+        "edit": "저장하는 중"
+      },
+      "errors": {
+        "summary": "확인이 필요한 항목이 {count}개 있어요.",
+        "saveFailed": "저장하지 못했어요. 잠시 후 다시 시도해 주세요.",
+        "tooLong": "{max}자 이내로 입력해 주세요.",
+        "required": {
+          "last_name": "성을 입력해 주세요.",
+          "first_name": "이름을 입력해 주세요.",
+          "occupation": "하고 있는 일을 골라 주세요.",
+          "school": "학교를 입력해 주세요.",
+          "major": "전공을 입력해 주세요."
+        },
+        "consent": {
+          "age14": "만 14세 이상이어야 가입할 수 있어요.",
+          "privacy": "동의해야 가입할 수 있어요."
+        }
+      }
     }
   }
 }

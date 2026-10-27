@@ -5,11 +5,11 @@ import { safeNext } from './redirect';
 // of emails.
 export const RESEND_SECONDS = 60;
 
-// Where a visitor who is already signed in goes when they open the login page: where they were
-// heading, as safeNext decides it, except the login page itself. Sending them there would only
-// bring them back here. The path is judged the way the router reads it (percent-escapes decoded,
-// a trailing slash dropped), so "/ko/%6Cogin/" counts as the login page too.
-export function leaveLogin(next: string | null | undefined, locale: Locale): string {
+// Where to go on from a screen that has nothing more to do for the visitor: where they were
+// heading, as safeNext decides it, except the screen itself. Sending them there would only bring
+// them back. The path is judged the way the router reads it (percent-escapes decoded, a trailing
+// slash dropped), so "/ko/%6Cogin/" counts as the login page too.
+function leaveScreen(next: string | null | undefined, locale: Locale, screen: string): string {
   const target = safeNext(next, locale);
   const path = target.split(/[?#]/)[0];
 
@@ -19,8 +19,18 @@ export function leaveLogin(next: string | null | undefined, locale: Locale): str
   } catch {
     return `/${locale}`;
   }
-  const login = `/${locale}/login`;
-  return readAs === login || readAs.startsWith(`${login}/`) ? `/${locale}` : target;
+  const own = `/${locale}/${screen}`;
+  return readAs === own || readAs.startsWith(`${own}/`) ? `/${locale}` : target;
+}
+
+// For a visitor who opens the login page while already signed in.
+export function leaveLogin(next: string | null | undefined, locale: Locale): string {
+  return leaveScreen(next, locale, 'login');
+}
+
+// For a visitor who opens the sign-up form with nothing left to fill in, or who has just finished it.
+export function leaveWelcome(next: string | null | undefined, locale: Locale): string {
+  return leaveScreen(next, locale, 'welcome');
 }
 
 // The address the emailed link opens. It always holds a "?": the email template adds the token

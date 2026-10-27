@@ -50,7 +50,7 @@ export async function signIn(page: Page, email: string, origin: string): Promise
 
 // A client with the stack's secret key, which only this test process knows. Tests use it to set up
 // and clean up accounts; the site never sees the key.
-function adminClient() {
+export function adminClient() {
   return createClient(localEnv('E2E_SUPABASE_URL'), localEnv('E2E_SUPABASE_SECRET_KEY'), {
     auth: { persistSession: false, autoRefreshToken: false },
   });
@@ -63,6 +63,25 @@ export async function deleteAccount(email: string): Promise<void> {
   if (error) throw error;
   const user = data.users.find((u) => u.email === email);
   if (user) await admin.auth.admin.deleteUser(user.id);
+}
+
+// What the database holds for an account: the profile row and its consent log, oldest first. The
+// secret key reads them, so the check does not depend on what the site shows.
+export async function accountRows(email: string) {
+  const admin = adminClient();
+  const { data: profile, error } = await admin
+    .from('profiles')
+    .select('*')
+    .eq('email', email)
+    .single();
+  if (error) throw error;
+  const { data: consents, error: consentError } = await admin
+    .from('consents')
+    .select('kind, granted, policy_version, created_at')
+    .eq('user_id', profile.id)
+    .order('id');
+  if (consentError) throw consentError;
+  return { profile, consents };
 }
 
 // Creates an account that is already blocked. Its sign-in links still work, so the session it gets

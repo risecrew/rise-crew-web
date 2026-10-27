@@ -371,8 +371,10 @@ test.describe('a blocked account', () => {
     const email = `blocked-${testInfo.project.name}-${Date.now()}@example.test`;
     try {
       await createBlockedAccount(email);
-      await page.goto(await requestSignInLink(email, baseURL!));
-      await page.waitForLoadState('networkidle');
+      // The link is opened without running the page it ends on (which, for a blocked account that
+      // has not signed up, is the login page: it ends the session it finds). That leaves the
+      // session in the browser, which is what this test is about.
+      await page.request.get(await requestSignInLink(email, baseURL!));
 
       // There is a session, but no sign-in is shown for it.
       await page.goto('/ko/login');
