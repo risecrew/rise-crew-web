@@ -35,6 +35,12 @@ export function linkFailed(locale: Locale): NextResponse {
   return redirectTo(`/${locale}/login?error=link`);
 }
 
+// Where a Google sign-in that did not finish ends up (the visitor pressed Cancel, or Google or
+// Supabase refused).
+export function oauthFailed(locale: Locale): NextResponse {
+  return redirectTo(`/${locale}/login?error=oauth`);
+}
+
 // Once a link has signed the visitor in (the session cookies are already set): a new account goes
 // on to the welcome form, which brings them back to `next` afterwards; a finished account goes
 // straight to `next`. `next` comes from the query string, so safeNext vets it.

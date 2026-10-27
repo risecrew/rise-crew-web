@@ -204,5 +204,41 @@
     "title": "Page not found",
     "body": "The address may have changed, or the page is not open yet.",
     "home": "Go home"
+  },
+  "Auth": {
+    "menu": {
+      "signIn": "Sign in",
+      "account": "Account menu",
+      "myPage": "My page",
+      "admin": "Admin",
+      "signOut": "Sign out"
+    },
+    "login": {
+      "title": "Sign in",
+      "lead": "New here? Signing in creates your account",
+      "google": "Continue with Google",
+      "or": "or",
+      "emailLabel": "Email",
+      "emailPlaceholder": "name@example.com",
+      "submit": "Email me a sign-in link",
+      "sending": "Sending",
+      "emailInvalid": "Enter a valid email address.",
+      "sendFailed": "We couldn't send the link. Please try again in a moment.",
+      "tooMany": "Too many requests. Please try again in a moment.",
+      "sent": {
+        "title": "Check your inbox",
+        "body": "We sent a sign-in link to this address.",
+        "spam": "If you don't see it, check your spam folder too.",
+        "resend": "Resend the link",
+        "resendIn": "Resend the link ({seconds}s)",
+        "resent": "We sent the link again.",
+        "change": "Use a different email"
+      },
+      "errors": {
+        "link": "That link has expired or was already used. Request a new one.",
+        "blocked": "This account has been suspended.",
+        "oauth": "Google sign-in didn't finish. Please try again."
+      }
+    }
   }
 }

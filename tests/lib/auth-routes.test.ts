@@ -235,6 +235,20 @@ describe('GET /{locale}/auth/callback', () => {
     expect(auth.exchangeCodeForSession).not.toHaveBeenCalled();
   });
 
+  it('goes to login with the Google message when the provider refuses', async () => {
+    const auth = fakeSupabase();
+    for (const search of [
+      '?error=access_denied&error_description=denied&next=%2Fko%2Fabout',
+      '?error_description=denied',
+      // A code does not rescue a sign-in that also says it failed.
+      '?code=the-code&error=server_error',
+    ]) {
+      const response = await callback(request(`/en/auth/callback${search}`), params('en'));
+      expect(response.headers.get('location'), search).toBe('/en/login?error=oauth');
+    }
+    expect(auth.exchangeCodeForSession).not.toHaveBeenCalled();
+  });
+
   it('is a 404 while accounts are switched off', async () => {
     vi.mocked(isAuthEnabled).mockReturnValue(false);
     await expect(callback(request('/ko/auth/callback?code=x'), params('ko'))).rejects.toThrow(

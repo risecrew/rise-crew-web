@@ -48,16 +48,35 @@ export async function signIn(page: Page, email: string, origin: string): Promise
   await page.waitForLoadState('networkidle');
 }
 
-// Removes an account a test created (needs the stack's secret key, which only this test process
-// knows). The seeded example accounts are never deleted.
-export async function deleteAccount(email: string): Promise<void> {
-  const admin = createClient(localEnv('E2E_SUPABASE_URL'), localEnv('E2E_SUPABASE_SECRET_KEY'), {
+// A client with the stack's secret key, which only this test process knows. Tests use it to set up
+// and clean up accounts; the site never sees the key.
+function adminClient() {
+  return createClient(localEnv('E2E_SUPABASE_URL'), localEnv('E2E_SUPABASE_SECRET_KEY'), {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+}
+
+// Removes an account a test created. The seeded example accounts are never deleted.
+export async function deleteAccount(email: string): Promise<void> {
+  const admin = adminClient();
   const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 });
   if (error) throw error;
   const user = data.users.find((u) => u.email === email);
   if (user) await admin.auth.admin.deleteUser(user.id);
+}
+
+// Creates an account that is already blocked. Its sign-in links still work, so the session it gets
+// carries `blocked: true` in the token, which is how the site finds out. Remove it afterwards with
+// deleteAccount.
+export async function createBlockedAccount(email: string): Promise<void> {
+  const admin = adminClient();
+  const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true });
+  if (error) throw error;
+  const { error: blockError } = await admin
+    .from('user_roles')
+    .update({ blocked_at: new Date().toISOString() })
+    .eq('user_id', data.user.id);
+  if (blockError) throw blockError;
 }
 
 // The cookies that hold the Supabase session: `sb-<project>-auth-token`, split into `.0`, `.1`...
