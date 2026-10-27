@@ -33,7 +33,7 @@ PR을 올리면 GitHub Actions가 위 검사를 전부 실행합니다.
 계정·로그인 확인은 로컬 Supabase가 켜져 있어야 해서(`pnpm db:start`, Docker 필요) 따로 실행합니다. GitHub Actions에서는 돌리지 않습니다.
 
 ```bash
-pnpm e2e:auth       # 로그인 링크, 세션 갱신, 로그아웃 (자체 빌드 `.next-auth`, 포트 3200)
+pnpm e2e:auth       # 로그인 링크, 세션 갱신, 가입 정보, 마이페이지와 탈퇴 (자체 빌드 `.next-auth`, 포트 3200)
 ```
 
 ## 배포 주소

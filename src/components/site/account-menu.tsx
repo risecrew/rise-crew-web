@@ -111,7 +111,7 @@ function Circle({ letter, tone }: { letter: string; tone: Tone }) {
 function Who({ name, email, tone }: { name: string; email: string; tone: Tone }) {
   return (
     <div className="min-w-0">
-      <p className="font-semibold break-keep">{name}</p>
+      <p className="font-semibold wrap-anywhere break-keep">{name}</p>
       {name !== email ? (
         <p
           className={cn('text-sm break-all', tone === 'stage' ? 'text-white/60' : 'text-ink-soft')}

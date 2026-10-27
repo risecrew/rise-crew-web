@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { DeletedNotice } from '@/components/home/deleted-notice';
 import { Home } from '@/components/home/home';
 import { asLocale } from '@/i18n/as-locale';
+import { isAuthEnabled } from '@/lib/auth/config';
 import {
   applyCta,
   getMentors,
@@ -45,8 +47,13 @@ export default async function HomePage({ params }: Props) {
       getRecruitment(),
     ]);
 
+  // After an account is deleted the visitor lands here with `?deleted=1`. The page stays static:
+  // the line is added in the browser, by a component that reads the address there.
+  const deletedNotice = isAuthEnabled() ? (await getTranslations('Auth.me'))('deleted') : null;
+
   return (
     <main id="main" className="bg-stage">
+      {deletedNotice ? <DeletedNotice text={deletedNotice} /> : null}
       <Home
         locale={locale}
         stats={stats}

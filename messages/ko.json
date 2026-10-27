@@ -293,6 +293,39 @@
           "privacy": "동의해야 가입할 수 있어요."
         }
       }
+    },
+    "me": {
+      "metaTitle": "마이페이지",
+      "title": "마이페이지",
+      "editTitle": "정보 수정",
+      "edit": "정보 수정",
+      "cancel": "취소",
+      "roles": {
+        "guest": "가입자",
+        "member": "회원",
+        "operator": "운영진",
+        "admin": "관리자"
+      },
+      "rows": {
+        "affiliation": "소속",
+        "recruit": "모집 소식 이메일",
+        "recruitOn": "받아요",
+        "recruitOff": "받지 않아요"
+      },
+      "delete": {
+        "summary": "회원 탈퇴",
+        "title": "정말 탈퇴할까요?",
+        "body": "탈퇴하면 계정과 가입 정보가 모두 바로 삭제돼요. 되돌릴 수 없고, 같은 이메일로 다시 로그인하면 새로 가입해야 해요.",
+        "word": "탈퇴",
+        "prompt": "계속하려면 <strong>{word}</strong>를 입력해 주세요.",
+        "submit": "탈퇴하기",
+        "submitting": "탈퇴하는 중",
+        "errors": {
+          "confirm": "{word}를 정확히 입력해 주세요.",
+          "failed": "탈퇴하지 못했어요. 잠시 후 다시 시도해 주세요."
+        }
+      },
+      "deleted": "탈퇴가 완료됐어요. 함께해 주셔서 고마웠어요."
     }
   }
 }

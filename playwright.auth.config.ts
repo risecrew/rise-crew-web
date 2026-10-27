@@ -36,7 +36,8 @@ function readLocalSupabase(): { url: string; publishableKey: string } {
     }
     process.env.E2E_SUPABASE_URL = url;
     process.env.E2E_SUPABASE_PUBLISHABLE_KEY = publishableKey;
-    // Only the cleanup of the accounts a test creates needs this one; the site never sees it.
+    // The tests use it to set up and clean up accounts and to check what the database holds. The
+    // site is given it too (see webServer below), because deleting an account needs it.
     process.env.E2E_SUPABASE_SECRET_KEY = values.get('SECRET_KEY') ?? '';
   }
 
@@ -79,6 +80,9 @@ export default defineConfig({
       NEXT_PUBLIC_AUTH_ENABLED: 'true',
       NEXT_PUBLIC_SUPABASE_URL: supabase.url,
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: supabase.publishableKey,
+      // Server only (no NEXT_PUBLIC_ prefix): the site deletes an account with it. The local
+      // stack's key, so it can only ever act on the local stack.
+      SUPABASE_SECRET_KEY: process.env.E2E_SUPABASE_SECRET_KEY ?? '',
     },
   },
 });

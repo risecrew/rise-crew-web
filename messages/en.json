@@ -293,6 +293,39 @@
           "privacy": "You need to agree to sign up."
         }
       }
+    },
+    "me": {
+      "metaTitle": "My page",
+      "title": "My page",
+      "editTitle": "Edit your info",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "roles": {
+        "guest": "Guest",
+        "member": "Member",
+        "operator": "Operator",
+        "admin": "Admin"
+      },
+      "rows": {
+        "affiliation": "Affiliation",
+        "recruit": "Recruitment emails",
+        "recruitOn": "Subscribed",
+        "recruitOff": "Not subscribed"
+      },
+      "delete": {
+        "summary": "Delete account",
+        "title": "Delete your account?",
+        "body": "Deleting removes your account and everything you told us when you signed up, right away. This can't be undone, and signing in again with the same email starts a new sign-up.",
+        "word": "delete",
+        "prompt": "To continue, type <strong>{word}</strong> below.",
+        "submit": "Delete my account",
+        "submitting": "Deleting",
+        "errors": {
+          "confirm": "Type {word} exactly as shown.",
+          "failed": "We couldn't delete your account. Please try again in a moment."
+        }
+      },
+      "deleted": "Your account has been deleted. Thanks for being part of RISE CREW."
     }
   }
 }
