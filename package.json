@@ -16,7 +16,12 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "e2e": "playwright test",
-    "fonts:vendor": "node scripts/vendor-fonts.mjs"
+    "fonts:vendor": "node scripts/vendor-fonts.mjs",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db",
+    "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts && prettier --write src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -40,6 +45,7 @@
     "pretendard": "1.3.9",
     "prettier": "3.9.9",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "supabase": "2.122.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite-tsconfig-paths": "6.1.1",
