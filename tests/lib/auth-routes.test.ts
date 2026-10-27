@@ -122,6 +122,13 @@ describe('finishSignIn', () => {
     expect((await finishSignIn('ko', next)).headers.get('location')).toBe('/ko/welcome?next=%2Fko');
   });
 
+  it('treats a failed account lookup as a link that failed, not as a server error', async () => {
+    vi.mocked(getViewer).mockRejectedValue(new Error('connection to the database was lost'));
+    const response = await finishSignIn('ko', '/ko/about');
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toBe('/ko/login?error=link');
+  });
+
   it('treats an account with no profile as a link that failed', async () => {
     vi.mocked(getViewer).mockResolvedValue(null);
     const response = await finishSignIn('ko', '/ko/about');

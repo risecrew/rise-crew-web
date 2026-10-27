@@ -4,7 +4,7 @@ import { asLocale } from '@/i18n/as-locale';
 import type { Locale } from '@/i18n/locales';
 import { isAuthEnabled } from './config';
 import { safeNext } from './redirect';
-import { getViewer } from './viewer';
+import { getViewer, type Viewer } from './viewer';
 
 // The params every route under app/[locale]/auth/ receives.
 export type AuthRouteParams = { params: Promise<{ locale: string }> };
@@ -39,7 +39,14 @@ export function linkFailed(locale: Locale): NextResponse {
 // on to the welcome form, which brings them back to `next` afterwards; a finished account goes
 // straight to `next`. `next` comes from the query string, so safeNext vets it.
 export async function finishSignIn(locale: Locale, next: string | null): Promise<NextResponse> {
-  const viewer = await getViewer();
+  // getViewer throws when the database cannot be read. The one-time token is already spent by
+  // now, so even then the visitor lands on the login page, not on an error page.
+  let viewer: Viewer | null;
+  try {
+    viewer = await getViewer();
+  } catch {
+    return linkFailed(locale);
+  }
   if (!viewer) return linkFailed(locale);
 
   const target = safeNext(next, locale);
