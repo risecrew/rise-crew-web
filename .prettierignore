@@ -10,3 +10,5 @@ test-results
 **/*.md
 .superpowers
 public/fonts
+# Email templates keep their inline styles on one line and their {{ }} tags unbroken.
+supabase/templates

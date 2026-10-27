@@ -244,6 +244,14 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# The sign-in email: Korean first, then English. Its link carries the one-time token (token_hash),
+# so it works when opened in another browser or an in-app browser. The page asking for the link
+# passes emailRedirectTo as <origin>/<locale>/auth/confirm?next=..., which already holds a "?";
+# that is why the template appends "&token_hash=...".
+[auth.email.template.magic_link]
+subject = "RISE CREW 로그인 링크 / Sign-in link"
+content_path = "./supabase/templates/magic_link.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "e2e": "playwright test",
+    "e2e:auth": "playwright test -c playwright.auth.config.ts",
     "fonts:vendor": "node scripts/vendor-fonts.mjs",
     "db:start": "supabase start",
     "db:stop": "supabase stop",

@@ -30,6 +30,12 @@ pnpm build && pnpm e2e   # 화면·접근성 확인 (빌드 후 실행)
 
 PR을 올리면 GitHub Actions가 위 검사를 전부 실행합니다.
 
+계정·로그인 확인은 로컬 Supabase가 켜져 있어야 해서(`pnpm db:start`, Docker 필요) 따로 실행합니다. GitHub Actions에서는 돌리지 않습니다.
+
+```bash
+pnpm e2e:auth       # 로그인 링크, 세션 갱신, 로그아웃 (자체 빌드 `.next-auth`, 포트 3200)
+```
+
 ## 배포 주소
 
 - `main`에 merge하면 Vercel이 `https://rise-crew-web.vercel.app`에 배포한다. 이 주소는 **진짜 도메인을 연결하기 전까지 쓰는 임시 주소**다.
