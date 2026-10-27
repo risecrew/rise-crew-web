@@ -25,8 +25,12 @@ type QueryResult = { data: unknown; error: { message: string } | null };
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
+// What the access-token hook stamps into a token (`app_role`, `blocked`). They are display-only
+// and go stale until the token expires, so the code under test must never trust them.
+type Claims = { sub: string; email?: string; app_role?: Role; blocked?: boolean };
+
 type Scenario = {
-  claims?: { sub: string; email?: string } | null;
+  claims?: Claims | null;
   role?: Role;
   blocked?: boolean;
   onboarded?: boolean;
@@ -48,6 +52,17 @@ function profileRow(onboarded: boolean) {
     onboarded_at: onboarded ? '2026-10-27T00:00:00Z' : null,
     created_at: '2026-10-27T00:00:00Z',
     updated_at: '2026-10-27T00:00:00Z',
+  };
+}
+
+// A token that was issued before the database row changed: `tokenRole` and `tokenBlocked` are what
+// the hook wrote at issue time, whatever the `role` and `blocked` of the scenario say now.
+function staleToken(tokenRole: Role, tokenBlocked: boolean): Claims {
+  return {
+    sub: USER_ID,
+    email: 'someone@example.com',
+    app_role: tokenRole,
+    blocked: tokenBlocked,
   };
 }
 
@@ -116,6 +131,20 @@ describe('getViewer', () => {
     expect(viewer?.profile.last_name).toBe('김');
   });
 
+  it('lets the database win over the claims in a token that is still valid', async () => {
+    // Demoted since the token was issued.
+    fakeClient({ claims: staleToken('operator', false), role: 'member' });
+    expect((await getViewer())?.role).toBe('member');
+
+    // Blocked since the token was issued.
+    fakeClient({ claims: staleToken('operator', false), role: 'operator', blocked: true });
+    expect((await getViewer())?.blocked).toBe(true);
+
+    // Promoted and unblocked since the token was issued.
+    fakeClient({ claims: staleToken('member', true), role: 'operator', blocked: false });
+    expect(await getViewer()).toMatchObject({ role: 'operator', blocked: false });
+  });
+
   it('reports a profile without onboarded_at as not onboarded', async () => {
     fakeClient({ onboarded: false });
     expect((await getViewer())?.onboarded).toBe(false);
@@ -181,6 +210,22 @@ describe('requireViewer', () => {
     expect(client.auth.signOut).toHaveBeenCalledTimes(1);
   });
 
+  it('refuses an account blocked after its token was issued', async () => {
+    const client = fakeClient({
+      claims: staleToken('member', false),
+      role: 'member',
+      blocked: true,
+    });
+    await expect(requireViewer('ko')).rejects.toThrow('NEXT_REDIRECT /ko/login?error=blocked');
+    expect(client.auth.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not refuse an account unblocked after its token was issued', async () => {
+    fakeClient({ claims: staleToken('member', true), role: 'member', blocked: false });
+    expect((await requireViewer('ko')).blocked).toBe(false);
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
   it('still redirects a blocked account when signing out fails', async () => {
     const client = fakeClient({ blocked: true });
     client.auth.signOut.mockRejectedValueOnce(new Error('network'));
@@ -216,10 +261,32 @@ describe('requireRole', () => {
     expect(notFound).toHaveBeenCalledTimes(1);
   });
 
-  it('shows a blocked operator a 404, even with a still-valid token', async () => {
+  it('shows a blocked operator a 404', async () => {
     fakeClient({ role: 'operator', blocked: true });
     await expect(requireRole('ko', 'operator')).rejects.toThrow('NEXT_NOT_FOUND');
     expect(notFound).toHaveBeenCalledTimes(1);
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('shows an operator demoted to member a 404, though the token still says operator', async () => {
+    fakeClient({ claims: staleToken('operator', false), role: 'member' });
+    await expect(requireRole('ko', 'operator')).rejects.toThrow('NEXT_NOT_FOUND');
+    expect(notFound).toHaveBeenCalledTimes(1);
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('shows an operator blocked after the token was issued a 404, though the token says not blocked', async () => {
+    fakeClient({ claims: staleToken('operator', false), role: 'operator', blocked: true });
+    await expect(requireRole('ko', 'operator')).rejects.toThrow('NEXT_NOT_FOUND');
+    expect(notFound).toHaveBeenCalledTimes(1);
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('lets an operator promoted and unblocked after the token was issued in', async () => {
+    fakeClient({ claims: staleToken('member', true), role: 'operator', blocked: false });
+    const viewer = await requireRole('ko', 'operator');
+    expect(viewer).toMatchObject({ role: 'operator', blocked: false });
+    expect(notFound).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
   });
 
