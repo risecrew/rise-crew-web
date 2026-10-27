@@ -75,7 +75,7 @@ const COPY = {
     emailNote: '(your sign-in account)',
     lastName: 'Last name',
     firstName: 'First name',
-    occupations: ['Undergraduate', 'Graduate student', 'Alumni or working', 'Founder', 'Other'],
+    occupations: ['Undergraduate', 'Graduate student', 'Alumni or employed', 'Founder', 'Other'],
     occupationLegend: 'What you do now',
     school: 'School',
     major: 'Major',
@@ -335,7 +335,7 @@ test('an alumnus signs up in English, with an affiliation and the recruitment ma
 
     await page.getByLabel(t.firstName, { exact: true }).fill('Rise');
     await page.getByLabel(t.lastName, { exact: true }).fill('Kim');
-    await page.getByRole('radio', { name: 'Alumni or working' }).check();
+    await page.getByRole('radio', { name: 'Alumni or employed' }).check();
     await page.getByLabel(t.affiliation, { exact: true }).fill('Rise Labs');
     await page.getByRole('checkbox', { name: t.age14 }).check();
     await page.getByRole('checkbox', { name: t.privacy }).check();
