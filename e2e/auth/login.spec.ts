@@ -89,7 +89,10 @@ for (const locale of ['ko', 'en'] as const) {
       expect(response?.status()).toBe(200);
       await expect(page.getByRole('heading', { level: 1, name: t.title })).toBeVisible();
       await expect(page.getByText(t.lead)).toBeVisible();
-      await expect(page.getByRole('button', { name: t.google })).toBeVisible();
+      const google = page.getByRole('button', { name: t.google });
+      await expect(google).toBeVisible();
+      // Google's own mark sits before the label; it is decoration, so the name stays the label.
+      await expect(google.locator('svg[aria-hidden="true"]')).toHaveCount(1);
       await expect(page.getByText(t.or, { exact: true })).toBeVisible();
       await expect(page.getByLabel(t.emailLabel)).toBeVisible();
       await expect(page.getByRole('button', { name: t.submit })).toBeEnabled();
@@ -119,6 +122,23 @@ for (const locale of ['ko', 'en'] as const) {
       // Typing again takes the error away.
       await email.fill('someone@example.test');
       await expect(page.getByText(t.invalid)).toHaveCount(0);
+    });
+
+    test('announces the field error when the form is sent with Enter', async ({ page }) => {
+      await page.goto(`/${locale}/login`);
+      const email = page.getByLabel(t.emailLabel);
+      // The input already has focus when Enter is pressed (as with a phone keyboard's send key),
+      // so moving focus to it announces nothing: the message itself has to be an alert.
+      await email.fill('not-an-email');
+      await email.press('Enter');
+      await expect(email).toHaveAttribute('aria-invalid', 'true');
+      await expect(notice(page)).toHaveText(t.invalid);
+
+      // The same address sent again is announced again: the message is a fresh element.
+      await notice(page).evaluate((el) => el.setAttribute('data-seen', ''));
+      await email.press('Enter');
+      await expect(page.locator('main [data-seen]')).toHaveCount(0);
+      await expect(notice(page)).toHaveText(t.invalid);
     });
 
     for (const code of ['link', 'blocked', 'oauth'] as const) {

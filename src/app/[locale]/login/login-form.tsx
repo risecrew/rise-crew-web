@@ -28,13 +28,40 @@ type Notice = LoginNotice | 'sendFailed' | 'tooMany';
 const PILL =
   'inline-flex w-full items-center justify-center rounded-full px-6 py-3 font-semibold transition-transform duration-150 ease-out hover:-translate-y-0.5 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60';
 
+// Google's own "G", which their sign-in branding guidelines ask for on a custom button. It keeps
+// Google's four colours (they live only in this mark) and is decoration: the label names the button.
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 48 48" className="size-[1.15em] shrink-0">
+      <path
+        fill="#EA4335"
+        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+      />
+      <path
+        fill="#4285F4"
+        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+      />
+    </svg>
+  );
+}
+
 export function LoginForm({ locale, next, notice: initialNotice, endSession }: Props) {
   const t = useTranslations('Auth.login');
 
   const [email, setEmail] = useState('');
   // The address a link was sent to; the screen shows "check your inbox" once there is one.
   const [sentTo, setSentTo] = useState<string | null>(null);
-  const [fieldError, setFieldError] = useState(false);
+  // How many times the address has been refused since it was last edited (0 = not refused). It
+  // is a count, not a flag, so that sending the same bad address again shows the message anew.
+  const [fieldErrors, setFieldErrors] = useState(0);
   const [notice, setNotice] = useState<Notice | null>(initialNotice);
   const [busy, setBusy] = useState<'email' | 'google' | null>(null);
   const [resent, setResent] = useState(false);
@@ -110,7 +137,7 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
 
     const address = email.trim();
     if (!isEmailAddress(address)) {
-      setFieldError(true);
+      setFieldErrors((count) => count + 1);
       emailRef.current?.focus();
       return;
     }
@@ -230,8 +257,9 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
         type="button"
         onClick={continueWithGoogle}
         disabled={busy !== null}
-        className={cn(PILL, 'mt-10 bg-white text-stage')}
+        className={cn(PILL, 'mt-10 gap-3 bg-white text-stage')}
       >
+        <GoogleMark />
         {t('google')}
       </button>
 
@@ -254,7 +282,7 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);
-            setFieldError(false);
+            setFieldErrors(0);
           }}
           autoComplete="email"
           inputMode="email"
@@ -262,12 +290,20 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
           spellCheck={false}
           enterKeyHint="send"
           placeholder={t('emailPlaceholder')}
-          aria-invalid={fieldError}
-          aria-describedby={fieldError ? 'login-email-error' : undefined}
+          aria-invalid={fieldErrors > 0}
+          aria-describedby={fieldErrors > 0 ? 'login-email-error' : undefined}
           className="mt-2 w-full rounded-full border border-white/50 bg-white/5 px-5 py-3.5 text-base text-white placeholder:text-white/55 aria-invalid:border-white"
         />
-        {fieldError ? (
-          <p id="login-email-error" className="mt-2 px-2 text-base break-keep text-white">
+        {/* An alert, because focus is often on the input already (Enter, or a phone keyboard's send
+            key), and moving focus to where it is says nothing. The key makes the same message a new
+            element each time, which a screen reader reads out again. */}
+        {fieldErrors > 0 ? (
+          <p
+            key={fieldErrors}
+            id="login-email-error"
+            role="alert"
+            className="mt-2 px-2 text-base break-keep text-white"
+          >
             {t('emailInvalid')}
           </p>
         ) : null}
