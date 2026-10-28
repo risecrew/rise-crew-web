@@ -3,12 +3,15 @@ import type { ReactNode } from 'react';
 
 // The shell every account screen sits in (sign-in, sign-up, my page, members): the dark stage of
 // the rest of the site with a cobalt light shining down from the top edge, the way the 404 page
-// is lit from below. The screen's own content is centred in it.
+// is lit from below. The screen's own content is centred in it. (The light is clipped with
+// `overflow-clip`, not `hidden`: `hidden` would make this frame the scroll container that
+// `position: sticky` inside it measures against, and the members screen's buttons stick to the
+// bottom of the window.)
 export function AccountLayout({ children }: { children: ReactNode }) {
   return (
     <main
       id="main"
-      className="relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden bg-stage px-5 pt-32 pb-20 text-white md:px-10"
+      className="relative isolate flex min-h-svh flex-col items-center justify-center overflow-clip bg-stage px-5 pt-32 pb-20 text-white md:px-10"
     >
       <div
         aria-hidden

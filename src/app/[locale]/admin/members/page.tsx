@@ -121,7 +121,9 @@ export default async function MembersPage({ params, searchParams }: Props) {
 
   return (
     <AccountLayout>
-      <div className="w-full max-w-6xl flex-1">
+      {/* As wide as the header's content (its 1280px container less 40px of padding on each side), so
+          the title and the table start where the logo does. */}
+      <div className="w-full max-w-[75rem] flex-1">
         <h1 className={TITLE}>{t('title')}</h1>
 
         <form

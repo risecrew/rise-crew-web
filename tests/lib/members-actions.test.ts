@@ -237,7 +237,7 @@ describe('changeRoles', () => {
       expect(result).toMatchObject({
         ok: false,
         error: 'refused',
-        names: ['김가입'],
+        groups: [{ reason: 'authority', names: ['김가입'], more: 0 }],
         ids: [GUEST],
       });
     }
@@ -257,8 +257,7 @@ describe('changeRoles', () => {
     expect(result).toMatchObject({
       ok: false,
       error: 'refused',
-      names: ['최관리', '박운영'],
-      more: 0,
+      groups: [{ reason: 'authority', names: ['최관리', '박운영'], more: 0 }],
       ids: [GUEST, ADMIN, OPERATOR],
     });
     expect(db.roles.get(GUEST)?.role).toBe('guest');
@@ -272,12 +271,21 @@ describe('changeRoles', () => {
     adminsAre(ADMIN);
 
     const english = await changeRoles('en', [MEMBER, ADMIN], 'member');
-    // A change to the role someone already has is not allowed, and the English order is given
-    // name first.
-    expect(english).toMatchObject({ ok: false, names: ['회원 이', '관리 최'] });
+    // The English order is given name first. (The member already is one; the admin is out of an
+    // operator's reach.)
+    expect(english).toMatchObject({
+      ok: false,
+      groups: [
+        { reason: 'authority', names: ['관리 최'] },
+        { reason: 'same', names: ['회원 이'] },
+      ],
+    });
 
     const nameless = await changeRoles('ko', [GUEST_2], 'guest');
-    expect(nameless).toMatchObject({ ok: false, names: ['06@example.test'] });
+    expect(nameless).toMatchObject({
+      ok: false,
+      groups: [{ reason: 'same', names: ['06@example.test'] }],
+    });
   });
 
   it('does not list more than ten names, and counts the rest', async () => {
@@ -294,19 +302,40 @@ describe('changeRoles', () => {
       crowd.map((c) => c.id),
       'member',
     );
-    expect(result).toMatchObject({ ok: false, error: 'refused', more: 3 });
-    expect((result as { names: string[] }).names).toHaveLength(10);
+    expect(result).toMatchObject({ ok: false, error: 'refused' });
+    const [group] = (result as { groups: { names: string[]; more: number }[] }).groups;
+    expect(group.names).toHaveLength(10);
+    expect(group.more).toBe(3);
   });
 
-  it('counts a change to the role someone already has as not allowed', async () => {
+  it('counts a change to the role someone already has as not allowed, and says that is why', async () => {
     makeDb(SITE);
     actAs('operator', OPERATOR);
     adminsAre(ADMIN);
     expect(await changeRoles('ko', [GUEST, MEMBER], 'member')).toMatchObject({
       ok: false,
       error: 'refused',
-      names: ['이회원'],
+      groups: [{ reason: 'same', names: ['이회원'], more: 0 }],
     });
+  });
+
+  it('gives each person the reason of their own, one group per reason', async () => {
+    const db = makeDb(SITE);
+    actAs('operator', OPERATOR);
+    adminsAre(ADMIN, OTHER_ADMIN);
+    // The admin is out of reach, the member already is one, the guest alone would be fine.
+    const result = await changeRoles('ko', [ADMIN, GUEST, MEMBER, OTHER_ADMIN], 'member');
+    expect(result).toMatchObject({
+      ok: false,
+      error: 'refused',
+      groups: [
+        { reason: 'authority', names: ['최관리', '정관리자'], more: 0 },
+        { reason: 'same', names: ['이회원'], more: 0 },
+      ],
+    });
+    // Nothing in the batch was applied, the guest included.
+    expect(db.roles.get(GUEST)?.role).toBe('guest');
+    expect(db.log.updates).toEqual([]);
   });
 
   it('lets an admin set any role', async () => {
@@ -527,7 +556,11 @@ describe('setBlocked', () => {
       expect(result).toMatchObject({
         ok: false,
         error: 'refused',
-        names: ['최관리', '박운영'],
+        // The admin is out of an operator's reach; the operator is themselves.
+        groups: [
+          { reason: 'authority', names: ['최관리'], more: 0 },
+          { reason: 'self', names: ['박운영'], more: 0 },
+        ],
         change: { kind: 'block', blocked },
       });
     }
@@ -543,7 +576,7 @@ describe('setBlocked', () => {
     expect(await setBlocked('ko', [ADMIN], true)).toMatchObject({
       ok: false,
       error: 'refused',
-      names: ['최관리'],
+      groups: [{ reason: 'self', names: ['최관리'], more: 0 }],
     });
     expect(db.roles.get(ADMIN)?.blocked_at).toBeNull();
     expect(db.log.bans).toEqual([]);
@@ -661,6 +694,7 @@ describe('submitMemberAction', () => {
           ['locale', 'ko'],
           ['id', GUEST],
           ['blocked', 'true'],
+          ['confirm', '1'],
         ]),
       ),
     ).toMatchObject({ ok: true });
@@ -678,6 +712,132 @@ describe('submitMemberAction', () => {
     expect(db.roles.get(GUEST)?.blocked_at).toBeNull();
   });
 
+  describe('the second yes', () => {
+    const consequential: [string, [string, string]][] = [
+      ['blocking', ['blocked', 'true']],
+      ['making an operator', ['to', 'operator']],
+      ['making an admin', ['to', 'admin']],
+    ];
+
+    for (const [what, button] of consequential) {
+      it(`asks again before ${what}, and changes nothing until the answer is yes`, async () => {
+        const db = makeDb(SITE);
+        actAs('admin', ADMIN);
+        adminsAre(ADMIN, OTHER_ADMIN);
+        const asked = await submitMemberAction(
+          null,
+          form([['locale', 'ko'], ['id', GUEST], ['id', GUEST_2], button]),
+        );
+        expect(asked).toMatchObject({ ok: false, error: 'confirm', ids: [GUEST, GUEST_2] });
+        expect(db.log.updates).toEqual([]);
+        expect(db.log.bans).toEqual([]);
+        expect(refresh).not.toHaveBeenCalled();
+
+        const done = await submitMemberAction(
+          null,
+          form([['locale', 'ko'], ['id', GUEST], ['id', GUEST_2], button, ['confirm', '1']]),
+        );
+        expect(done).toMatchObject({ ok: true, count: 2 });
+        expect(db.log.updates).not.toEqual([]);
+      });
+    }
+
+    it('does not ask before the everyday changes', async () => {
+      const db = makeDb(SITE);
+      actAs('operator', OPERATOR);
+      adminsAre(ADMIN);
+      for (const [person, button] of [
+        [GUEST, ['to', 'member']],
+        [MEMBER, ['to', 'guest']],
+        [BLOCKED_MEMBER, ['blocked', 'false']],
+      ] as [string, [string, string]][]) {
+        const result = await submitMemberAction(
+          null,
+          form([['locale', 'ko'], ['id', person], button]),
+        );
+        expect(result, button.join('=')).toMatchObject({ ok: true });
+      }
+      expect(db.log.updates).not.toEqual([]);
+    });
+
+    it('tells a refusal before it asks: nobody is asked to confirm what will not happen', async () => {
+      const db = makeDb(SITE);
+      actAs('operator', OPERATOR);
+      adminsAre(ADMIN);
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', GUEST],
+            ['id', ADMIN],
+            ['blocked', 'true'],
+          ]),
+        ),
+      ).toMatchObject({
+        ok: false,
+        error: 'refused',
+        groups: [{ reason: 'authority', names: ['최관리'], more: 0 }],
+      });
+      // Nor when it would leave no admin.
+      actAs('admin', ADMIN);
+      adminsAre(ADMIN);
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', ADMIN],
+            ['to', 'operator'],
+          ]),
+        ),
+      ).toMatchObject({ ok: false, error: 'lastAdmin' });
+      expect(db.log.updates).toEqual([]);
+    });
+
+    it('does not ask a person who is not allowed to ask: signed out is still the redirect', async () => {
+      vi.mocked(getViewer).mockResolvedValue(actorViewer('member', MEMBER));
+      vi.mocked(requireRole).mockRejectedValue(new Error('NEXT_NOT_FOUND'));
+      await expect(
+        submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', GUEST],
+            ['blocked', 'true'],
+          ]),
+        ),
+      ).rejects.toThrow('NEXT_NOT_FOUND');
+    });
+
+    it('takes no for an answer: a cancelled question does nothing and says nothing', async () => {
+      const db = makeDb(SITE);
+      actAs('admin', ADMIN);
+      adminsAre(ADMIN, OTHER_ADMIN);
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', GUEST],
+            ['to', 'admin'],
+            ['cancel', '1'],
+          ]),
+        ),
+      ).toBeNull();
+      expect(db.log.updates).toEqual([]);
+    });
+
+    it('still asks nothing of the exported actions: they do what they are told', async () => {
+      const db = makeDb(SITE);
+      actAs('admin', ADMIN);
+      adminsAre(ADMIN, OTHER_ADMIN);
+      expect(await setBlocked('ko', [GUEST], true)).toMatchObject({ ok: true });
+      expect(await changeRoles('ko', [GUEST_2], 'admin')).toMatchObject({ ok: true });
+      expect(db.roles.get(GUEST)?.blocked_at).not.toBeNull();
+    });
+  });
+
   it('refuses a button the operator’s form does not have (to=operator)', async () => {
     const db = makeDb(SITE);
     actAs('operator', OPERATOR);
@@ -691,7 +851,11 @@ describe('submitMemberAction', () => {
           ['to', to],
         ]),
       );
-      expect(result).toMatchObject({ ok: false, error: 'refused', names: ['김가입'] });
+      expect(result).toMatchObject({
+        ok: false,
+        error: 'refused',
+        groups: [{ reason: 'authority', names: ['김가입'], more: 0 }],
+      });
     }
     expect(db.roles.get(GUEST)?.role).toBe('guest');
   });

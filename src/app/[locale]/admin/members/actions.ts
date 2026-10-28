@@ -7,12 +7,15 @@ import type { Locale } from '@/i18n/locales';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { unblockedAdminIds } from '@/lib/auth/last-admin';
 import {
-  REFUSED_NAMES_SHOWN,
   cleanIds,
+  groupRefusals,
   isRole,
+  needsConfirmation,
   planBlock,
   planRoleChange,
   readMemberForm,
+  refusalReason,
+  type MemberAsk,
   type MemberChange,
   type MemberFailure,
   type MemberResult,
@@ -33,9 +36,14 @@ type AdminClient = ReturnType<typeof createSupabaseAdminClient>;
 function failure(
   error: MemberFailure['error'],
   change: MemberChange | null,
-  extra: Partial<Pick<MemberFailure, 'names' | 'more' | 'ids'>> = {},
+  extra: Partial<Pick<MemberFailure, 'groups' | 'ids'>> = {},
 ): MemberFailure {
-  return { ok: false, at: Date.now(), error, change, names: [], more: 0, ids: [], ...extra };
+  return { ok: false, at: Date.now(), error, change, groups: [], ids: [], ...extra };
+}
+
+// The change would be allowed, and is not done yet: the page asks the person to say yes again.
+function ask(change: MemberChange, ids: string[]): MemberAsk {
+  return { ok: false, at: Date.now(), error: 'confirm', change, ids };
 }
 
 // Puts a ban on each account, or lifts it, ten at a time. Whether every one of them went through.
@@ -63,8 +71,12 @@ async function setBans(admin: AdminClient, ids: readonly string[], duration: str
 //    opened is refused, and below operator is a 404 like the page itself);
 //  - the people are loaded from the database with their roles as they are now, not as the list
 //    showed them;
-//  - the whole batch is refused if anyone in it may not be changed by this person, naming them, or
-//    if it would leave the site without an admin who can sign in;
+//  - the whole batch is refused if anyone in it may not be changed by this person, naming them
+//    with the reason for each, or if it would leave the site without an admin who can sign in;
+//  - a change that shuts someone out or hands over the keys (needsConfirmation) is only done when
+//    the form says it was confirmed. That is for the person's sake, not a security check: it is
+//    asked after everything above, so nobody is asked to confirm what would be refused, and the
+//    rules above do not depend on it;
 //  - the writes use the secret key, because the signed-in role has no right to write roles, and
 //    they only touch rows that are still in a state the person was allowed to change.
 //
@@ -74,6 +86,7 @@ async function applyChange(
   localeArg: Locale,
   userIds: unknown,
   change: MemberChange | null,
+  confirmed = true,
 ): Promise<MemberResult> {
   // Accounts switched off: there is no members screen, as there is no page for it.
   if (!isAuthEnabled()) notFound();
@@ -130,16 +143,20 @@ async function applyChange(
         : planBlock(actor, targets, change.blocked, adminIds);
     if (!plan.ok) {
       if (plan.error === 'lastAdmin') return failure('lastAdmin', change, { ids });
-      const names = plan.refused.map((id) => {
+      const refusals = plan.refused.map((id) => {
         const profile = profiles.get(id)!;
-        return displayName(profile, locale) || profile.email;
+        return {
+          reason: refusalReason(
+            actor,
+            targets.find((t) => t.id === id)!,
+            change,
+          ),
+          name: displayName(profile, locale) || profile.email,
+        };
       });
-      return failure('refused', change, {
-        ids,
-        names: names.slice(0, REFUSED_NAMES_SHOWN),
-        more: Math.max(0, names.length - REFUSED_NAMES_SHOWN),
-      });
+      return failure('refused', change, { ids, groups: groupRefusals(refusals) });
     }
+    if (!confirmed && needsConfirmation(change)) return ask(change, ids);
 
     const stamp = { updated_by: actor.id };
     let complete = true;
@@ -246,14 +263,19 @@ export async function setBlocked(
 
 // What the members table calls. `useActionState` hands the previous state in front of the form, and
 // everything else rides in the form: the language as `locale`, the people as `id` (one per ticked
-// row), the change as the pressed button's `to=<role>` or `blocked=<true|false>`. (Binding the
+// row), the change as the pressed button's `to=<role>` or `blocked=<true|false>`, and for a
+// consequential change the second yes as `confirm=1` (without it the answer is a question, see
+// needsConfirmation; this is how the question works with no scripts at all, so a plain click path
+// cannot skip it) or `cancel`, which drops the question. (Binding the
 // language as an argument is the usual way, but it makes React render the form forever when a
 // plain form post, with no JavaScript, is refused and the form is shown again; see submitProfile.)
 export async function submitMemberAction(
   _previous: MemberState,
   form: FormData,
-): Promise<MemberResult> {
-  const { locale, ids, change } = readMemberForm(form);
+): Promise<MemberState> {
+  const { locale, ids, change, confirmed, cancelled } = readMemberForm(form);
+  // No is the answer to the question and changes nothing: the form is shown again as it was.
+  if (cancelled) return null;
   // applyChange checks all of it (an unknown language is a 404).
-  return applyChange(locale as Locale, ids, change);
+  return applyChange(locale as Locale, ids, change, confirmed);
 }

@@ -494,7 +494,30 @@
         "admin": "Make admin",
         "block": "Block",
         "unblock": "Unblock",
-        "pending": "Working"
+        "pending": "Working",
+        "counted": {
+          "member": "{count, plural, one {Make # member} other {Make # members}}",
+          "guest": "{count, plural, one {Make # guest} other {Make # guests}}",
+          "operator": "{count, plural, one {Make # operator} other {Make # operators}}",
+          "admin": "{count, plural, one {Make # admin} other {Make # admins}}",
+          "block": "{count, plural, one {Block # person} other {Block # people}}",
+          "unblock": "{count, plural, one {Unblock # person} other {Unblock # people}}"
+        }
+      },
+      "confirm": {
+        "block": {
+          "question": "{count, plural, one {Block # person?} other {Block # people?}}",
+          "yes": "Block"
+        },
+        "operator": {
+          "question": "{count, plural, one {Make # person an operator?} other {Make # people operators?}}",
+          "yes": "Make operator"
+        },
+        "admin": {
+          "question": "{count, plural, one {Make # person an admin?} other {Make # people admins?}}",
+          "yes": "Make admin"
+        },
+        "cancel": "Cancel"
       },
       "result": {
         "done": {
@@ -507,15 +530,22 @@
         },
         "errors": {
           "none": "Choose who to change first.",
-          "refusedRole": "No one was changed. These people can't be changed this way: {names}",
-          "refusedBlock": "No one was blocked. These people can't be blocked: {names}",
-          "refusedUnblock": "No one was unblocked. These people can't be unblocked: {names}",
+          "refusedRole": "No one was changed.",
+          "refusedBlock": "No one was blocked.",
+          "refusedUnblock": "No one was unblocked.",
           "lastAdmin": "That would leave the site without an admin. Make someone else an admin first.",
           "missing": "Some of these people are no longer on the list. Reload the page and try again.",
           "stale": "Someone changed in the meantime, so only part of this may have gone through. Check the list.",
           "failed": "That didn't work. Please try again in a moment."
         },
-        "more": "and {count} more"
+        "who": "{more, plural, =0 {{names}} other {{names} and # more}}",
+        "reasons": {
+          "same": "{count, plural, one {{who} already has the {role} role.} other {{who} already have the {role} role.}} Take them off the selection and try again.",
+          "authorityRole": "{who} can't be changed with your access. Operators can only move people between Guest and Member; ask an admin for anything else.",
+          "authorityBlock": "{who} can't be blocked with your access, because they're an operator or an admin. Ask an admin to do it.",
+          "authorityUnblock": "{who} can't be unblocked with your access, because they're an operator or an admin. Ask an admin to do it.",
+          "self": "{who} is your own account, so you can't block or unblock it. Take yourself off the selection and try again."
+        }
       },
       "pages": {
         "label": "Pages",

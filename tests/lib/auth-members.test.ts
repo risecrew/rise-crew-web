@@ -2,17 +2,21 @@ import { describe, expect, it } from 'vitest';
 import {
   MEMBERS_BATCH_MAX,
   MEMBERS_PAGE_SIZE,
+  REFUSED_NAMES_SHOWN,
   canManage,
   cleanIds,
   hasFilters,
+  groupRefusals,
   leavesNoAdmin,
   membersParams,
+  needsConfirmation,
   pageCount,
   pageRange,
   parseMembersQuery,
   planBlock,
   planRoleChange,
   readMemberForm,
+  refusalReason,
   searchPattern,
   type MemberTarget,
 } from '@/lib/auth/members';
@@ -343,6 +347,124 @@ describe('planBlock', () => {
   });
 });
 
+describe('needsConfirmation', () => {
+  it('asks again before the changes that shut a person out or hand over the keys', () => {
+    expect(needsConfirmation({ kind: 'block', blocked: true })).toBe(true);
+    expect(needsConfirmation({ kind: 'role', to: 'operator' })).toBe(true);
+    expect(needsConfirmation({ kind: 'role', to: 'admin' })).toBe(true);
+  });
+
+  it('does not ask before the everyday ones, which are easy to take back', () => {
+    expect(needsConfirmation({ kind: 'block', blocked: false })).toBe(false);
+    expect(needsConfirmation({ kind: 'role', to: 'member' })).toBe(false);
+    expect(needsConfirmation({ kind: 'role', to: 'guest' })).toBe(false);
+  });
+});
+
+describe('refusalReason', () => {
+  const operator = { id: A, role: 'operator' as const };
+  const admin = { id: B, role: 'admin' as const };
+
+  it('says "already that role" for a role change that changes nothing', () => {
+    expect(refusalReason(operator, target(C, 'member'), { kind: 'role', to: 'member' })).toBe(
+      'same',
+    );
+    expect(refusalReason(admin, target(C, 'guest'), { kind: 'role', to: 'guest' })).toBe('same');
+    expect(refusalReason(admin, target(C, 'admin'), { kind: 'role', to: 'admin' })).toBe('same');
+  });
+
+  it('says "outside your authority" when an operator reaches for staff or a role above member', () => {
+    expect(refusalReason(operator, target(C, 'guest'), { kind: 'role', to: 'operator' })).toBe(
+      'authority',
+    );
+    expect(refusalReason(operator, target(C, 'member'), { kind: 'role', to: 'admin' })).toBe(
+      'authority',
+    );
+    expect(refusalReason(operator, target(D, 'admin'), { kind: 'role', to: 'member' })).toBe(
+      'authority',
+    );
+    expect(refusalReason(operator, target(C, 'operator'), { kind: 'role', to: 'guest' })).toBe(
+      'authority',
+    );
+    // An operator's own row too: they cannot change themselves.
+    expect(refusalReason(operator, target(A, 'operator'), { kind: 'role', to: 'member' })).toBe(
+      'authority',
+    );
+  });
+
+  it('says "yourself" when somebody blocks or unblocks themselves, whatever their role', () => {
+    for (const blocked of [true, false]) {
+      expect(refusalReason(admin, target(B, 'admin'), { kind: 'block', blocked })).toBe('self');
+      expect(refusalReason(operator, target(A, 'operator'), { kind: 'block', blocked })).toBe(
+        'self',
+      );
+    }
+  });
+
+  it('says "outside your authority" when an operator blocks staff or an admin', () => {
+    for (const blocked of [true, false]) {
+      expect(refusalReason(operator, target(C, 'operator'), { kind: 'block', blocked })).toBe(
+        'authority',
+      );
+      expect(refusalReason(operator, target(D, 'admin'), { kind: 'block', blocked })).toBe(
+        'authority',
+      );
+    }
+  });
+
+  it('gives a reason for every person that planRoleChange and planBlock refuse', () => {
+    const everyone = ROLE_ORDER.map((role, i) =>
+      target(`5eed0000-0000-4000-8000-0000000001${i}0`, role),
+    );
+    for (const actor of [operator, admin]) {
+      for (const to of ROLE_ORDER) {
+        const plan = planRoleChange(actor, everyone, to, []);
+        if (plan.ok || plan.error !== 'refused') continue;
+        for (const id of plan.refused) {
+          const who = everyone.find((t) => t.id === id)!;
+          expect(refusalReason(actor, who, { kind: 'role', to }), `${actor.role} ${to}`).toMatch(
+            /^(same|authority)$/,
+          );
+        }
+      }
+    }
+  });
+});
+
+describe('groupRefusals', () => {
+  it('puts people with the same reason in one group, groups in a fixed order', () => {
+    expect(
+      groupRefusals([
+        { reason: 'same', name: '이회원' },
+        { reason: 'authority', name: '최관리' },
+        { reason: 'same', name: '김가입' },
+        { reason: 'self', name: '박운영' },
+        { reason: 'authority', name: '정관리자' },
+      ]),
+    ).toEqual([
+      { reason: 'authority', names: ['최관리', '정관리자'], more: 0 },
+      { reason: 'self', names: ['박운영'], more: 0 },
+      { reason: 'same', names: ['이회원', '김가입'], more: 0 },
+    ]);
+  });
+
+  it('leaves out a reason nobody has, and has nothing for nobody', () => {
+    expect(groupRefusals([{ reason: 'same', name: 'a' }]).map((g) => g.reason)).toEqual(['same']);
+    expect(groupRefusals([])).toEqual([]);
+  });
+
+  it('lists at most ten names per group and counts the rest', () => {
+    const crowd = Array.from({ length: REFUSED_NAMES_SHOWN + 3 }, (_, i) => ({
+      reason: 'authority' as const,
+      name: `n${i}`,
+    }));
+    const [group] = groupRefusals([...crowd, { reason: 'same', name: 'x' }]);
+    expect(group.names).toHaveLength(REFUSED_NAMES_SHOWN);
+    expect(group.names[0]).toBe('n0');
+    expect(group.more).toBe(3);
+  });
+});
+
 describe('cleanIds', () => {
   it('keeps a list of account ids, each once', () => {
     expect(cleanIds([A, B, A])).toEqual([A, B]);
@@ -387,7 +509,46 @@ describe('readMemberForm', () => {
           ['to', 'member'],
         ]),
       ),
-    ).toEqual({ locale: 'ko', ids: [A, B], change: { kind: 'role', to: 'member' } });
+    ).toEqual({
+      locale: 'ko',
+      ids: [A, B],
+      change: { kind: 'role', to: 'member' },
+      confirmed: false,
+      cancelled: false,
+    });
+  });
+
+  it('knows a second yes from the confirm button, and a cancel', () => {
+    const asked = readMemberForm(
+      form([
+        ['id', A],
+        ['to', 'admin'],
+        ['confirm', '1'],
+      ]),
+    );
+    expect(asked).toMatchObject({ change: { kind: 'role', to: 'admin' }, confirmed: true });
+    // Anything but the exact value is no yes.
+    for (const value of ['', '0', 'true', 'yes']) {
+      expect(
+        readMemberForm(
+          form([
+            ['id', A],
+            ['to', 'admin'],
+            ['confirm', value],
+          ]),
+        ).confirmed,
+        value,
+      ).toBe(false);
+    }
+    expect(
+      readMemberForm(
+        form([
+          ['id', A],
+          ['cancel', '1'],
+        ]),
+      ).cancelled,
+    ).toBe(true);
+    expect(readMemberForm(form([['id', A]])).cancelled).toBe(false);
   });
 
   it('reads the block and unblock buttons', () => {

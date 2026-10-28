@@ -60,8 +60,39 @@ const COPY = {
       block: (n: number) => `${n}명을 차단했어요.`,
       unblock: (n: number) => `${n}명의 차단을 풀었어요.`,
     },
-    refusedRole: '아무도 바꾸지 않았어요. 바꿀 수 없는 사람이 있어요: ',
-    refusedBlock: '아무도 차단하지 않았어요. 차단할 수 없는 사람이 있어요: ',
+    // The button names once people are ticked.
+    counted: {
+      member: (n: number) => `${n}명을 회원으로`,
+      guest: (n: number) => `${n}명을 가입자로`,
+      operator: (n: number) => `${n}명을 운영진으로`,
+      admin: (n: number) => `${n}명을 관리자로`,
+      block: (n: number) => `${n}명 차단`,
+      unblock: (n: number) => `${n}명 차단 해제`,
+    },
+    // The question that replaces the buttons of a consequential change.
+    confirm: {
+      block: { question: (n: number) => `${n}명을 차단할까요?`, yes: '차단하기' },
+      operator: {
+        question: (n: number) => `${n}명을 운영진으로 바꿀까요?`,
+        yes: '운영진으로 바꾸기',
+      },
+      admin: { question: (n: number) => `${n}명을 관리자로 바꿀까요?`, yes: '관리자로 바꾸기' },
+      cancel: '취소',
+    },
+    selected: (n: number) => `${n}명 선택`,
+    refusedRole: '아무도 바꾸지 않았어요.',
+    refusedBlock: '아무도 차단하지 않았어요.',
+    // One sentence for each reason; `who` is a name and "님".
+    reason: {
+      same: (who: string, role: string) =>
+        `${who}은 이미 ${role} 역할이에요. 선택에서 빼고 다시 눌러 주세요.`,
+      authorityRole: (who: string) =>
+        `${who}은 내 권한으로 바꿀 수 없어요. 운영진은 가입자와 회원 사이만 바꿀 수 있어요. 그 밖의 변경은 관리자에게 부탁해 주세요.`,
+      authorityBlock: (who: string) =>
+        `${who}은 운영진이나 관리자라서 내 권한으로 차단할 수 없어요. 관리자에게 부탁해 주세요.`,
+      self: (who: string) =>
+        `${who}은 본인 계정이라 직접 차단하거나 풀 수 없어요. 선택에서 빼고 다시 눌러 주세요.`,
+    },
     lastAdmin: '관리자가 한 명도 남지 않게 돼서 할 수 없어요. 먼저 다른 관리자를 지정해 주세요.',
     chooseFirst: '바꿀 사람을 먼저 골라 주세요.',
     empty: '조건에 맞는 회원이 없어요.',
@@ -121,8 +152,43 @@ const COPY = {
       block: (n: number) => (n === 1 ? '1 person was blocked.' : `${n} people were blocked.`),
       unblock: (n: number) => (n === 1 ? '1 person was unblocked.' : `${n} people were unblocked.`),
     },
-    refusedRole: "No one was changed. These people can't be changed this way: ",
-    refusedBlock: "No one was blocked. These people can't be blocked: ",
+    counted: {
+      member: (n: number) => (n === 1 ? 'Make 1 member' : `Make ${n} members`),
+      guest: (n: number) => (n === 1 ? 'Make 1 guest' : `Make ${n} guests`),
+      operator: (n: number) => (n === 1 ? 'Make 1 operator' : `Make ${n} operators`),
+      admin: (n: number) => (n === 1 ? 'Make 1 admin' : `Make ${n} admins`),
+      block: (n: number) => (n === 1 ? 'Block 1 person' : `Block ${n} people`),
+      unblock: (n: number) => (n === 1 ? 'Unblock 1 person' : `Unblock ${n} people`),
+    },
+    confirm: {
+      block: {
+        question: (n: number) => (n === 1 ? 'Block 1 person?' : `Block ${n} people?`),
+        yes: 'Block',
+      },
+      operator: {
+        question: (n: number) =>
+          n === 1 ? 'Make 1 person an operator?' : `Make ${n} people operators?`,
+        yes: 'Make operator',
+      },
+      admin: {
+        question: (n: number) => (n === 1 ? 'Make 1 person an admin?' : `Make ${n} people admins?`),
+        yes: 'Make admin',
+      },
+      cancel: 'Cancel',
+    },
+    selected: (n: number) => `${n} selected`,
+    refusedRole: 'No one was changed.',
+    refusedBlock: 'No one was blocked.',
+    reason: {
+      same: (who: string, role: string, n = 1) =>
+        `${who} ${n === 1 ? 'already has' : 'already have'} the ${role} role. Take them off the selection and try again.`,
+      authorityRole: (who: string) =>
+        `${who} can't be changed with your access. Operators can only move people between Guest and Member; ask an admin for anything else.`,
+      authorityBlock: (who: string) =>
+        `${who} can't be blocked with your access, because they're an operator or an admin. Ask an admin to do it.`,
+      self: (who: string) =>
+        `${who} is your own account, so you can't block or unblock it. Take yourself off the selection and try again.`,
+    },
     lastAdmin: 'That would leave the site without an admin. Make someone else an admin first.',
     chooseFirst: 'Choose who to change first.',
     empty: 'No one matches.',
@@ -185,8 +251,34 @@ function tickOf(page: Page, email: string): Locator {
   return rowOf(page, email).getByRole('checkbox');
 }
 
-function button(page: Page, locale: Locale, name: keyof (typeof COPY)['ko']['button']) {
-  return table(page).getByRole('button', { name: COPY[locale].button[name], exact: true });
+type ButtonName = keyof (typeof COPY)['ko']['button'];
+// The changes that ask "are you sure?" first.
+type AskedName = keyof (typeof COPY)['ko']['confirm'] & ButtonName;
+const ASKED: readonly ButtonName[] = ['block', 'operator', 'admin'];
+
+// An action button. Once people are ticked its name says how many ("3명을 회원으로"); with nobody
+// ticked it is the plain name.
+function button(page: Page, locale: Locale, name: ButtonName, count = 0) {
+  const label = count > 0 ? COPY[locale].counted[name](count) : COPY[locale].button[name];
+  return table(page).getByRole('button', { name: label, exact: true });
+}
+
+function confirmButton(page: Page, locale: Locale, name: AskedName) {
+  return table(page).getByRole('button', { name: COPY[locale].confirm[name].yes, exact: true });
+}
+
+function cancelButton(page: Page, locale: Locale) {
+  return table(page).getByRole('button', { name: COPY[locale].confirm.cancel, exact: true });
+}
+
+// The question that takes the buttons' place, found by its words.
+function question(page: Page, locale: Locale, name: AskedName, count: number) {
+  return table(page).getByRole('group', { name: COPY[locale].confirm[name].question(count) });
+}
+
+// The strip with the answer and the buttons (it floats at the bottom of a phone's screen).
+function actionBar(page: Page) {
+  return table(page).locator('[data-action-bar]');
 }
 
 // The page's own messages (Next also keeps an empty alert in the page for route announcements).
@@ -197,15 +289,18 @@ function alert(page: Page) {
   return page.locator('main').getByRole('alert');
 }
 
-// Ticks the people with these addresses and presses a button, then waits for the answer.
+// Ticks the people with these addresses and presses a button, then waits for the answer. A change
+// that asks "are you sure?" is confirmed too, unless `confirm` is false.
 async function apply(
   page: Page,
   locale: Locale,
   emails: string[],
-  name: keyof (typeof COPY)['ko']['button'],
+  name: ButtonName,
+  { confirm = true }: { confirm?: boolean } = {},
 ) {
   for (const email of emails) await tickOf(page, email).check();
-  await button(page, locale, name).click();
+  await button(page, locale, name, emails.length).click();
+  if (confirm && ASKED.includes(name)) await confirmButton(page, locale, name as AskedName).click();
 }
 
 async function signedInPage(
@@ -462,9 +557,8 @@ test.describe('changing roles as an operator', () => {
       await signIn(page, SEEDED.operator, baseURL!);
       await openList(page, 'ko', { q: email });
 
-      // Nobody chosen yet: the answer says to choose first, and nothing changes.
-      await button(page, 'ko', 'member').click();
-      await expect(alert(page)).toHaveText(t.chooseFirst);
+      // Nobody chosen yet: the buttons wait, and nothing changes.
+      await expect(button(page, 'ko', 'member')).toBeDisabled();
       expect((await roleRow(id)).role).toBe('guest');
 
       await apply(page, 'ko', [email], 'member');
@@ -533,7 +627,8 @@ test.describe('changing roles as an operator', () => {
         await page.locator('#crafted').click();
 
         await expect(alert(page)).toContainText(t.refusedRole);
-        await expect(alert(page)).toContainText('정시험');
+        // What is wrong and what to do about it, in the person's own words.
+        await expect(alert(page)).toContainText(t.reason.authorityRole('정시험 님'));
         // The person stays ticked, so the operator can see who was meant.
         await expect(tickOf(page, email)).toBeChecked();
         await expect(status(page)).toHaveText('');
@@ -576,9 +671,9 @@ test.describe('changing roles as an operator', () => {
       // refused, and the admin is named.
       await tickOf(page, email).check();
       await add(adminId);
-      await button(page, 'ko', 'member').click();
+      await button(page, 'ko', 'member', 1).click();
       await expect(alert(page)).toContainText(t.refusedRole);
-      await expect(alert(page)).toContainText(t.adminName);
+      await expect(alert(page)).toContainText(t.reason.authorityRole(`${t.adminName} 님`));
       expect((await roleRow(adminId)).role).toBe('admin');
       expect((await roleRow(guestId)).role).toBe('guest');
 
@@ -588,8 +683,14 @@ test.describe('changing roles as an operator', () => {
         await hydrated(page);
         await tickOf(page, email).check();
         await add(other);
-        await button(page, 'ko', 'block').click();
+        await button(page, 'ko', 'block', 1).click();
         await expect(alert(page)).toContainText(t.refusedBlock);
+        // The admin is out of the operator's reach; the operator in the form is themselves.
+        await expect(alert(page)).toContainText(
+          other === adminId
+            ? t.reason.authorityBlock(`${t.adminName} 님`)
+            : t.reason.self(`${t.operatorName} 님`),
+        );
         expect((await roleRow(other)).blocked_at).toBeNull();
         expect((await roleRow(guestId)).blocked_at).toBeNull();
       }
@@ -620,7 +721,7 @@ test.describe('changing roles as an operator', () => {
         input.value = "x'; delete from user_roles; --";
         document.querySelector('main form[data-members-form]')!.append(input);
       });
-      await button(page, 'ko', 'member').click();
+      await button(page, 'ko', 'member', 1).click();
       await expect(alert(page)).toBeVisible();
       expect((await roleRow(id)).role).toBe('guest');
 
@@ -635,7 +736,7 @@ test.describe('changing roles as an operator', () => {
         input.value = '5eed0000-0000-4000-8000-0000000000ff';
         document.querySelector('main form[data-members-form]')!.append(input);
       });
-      await button(page, 'ko', 'member').click();
+      await button(page, 'ko', 'member', 1).click();
       await expect(alert(page)).toBeVisible();
       expect((await roleRow(id)).role).toBe('guest');
 
@@ -856,7 +957,7 @@ test.describe('the site is never left without an admin', () => {
 
       for (const name of ['member', 'guest', 'operator'] as const) {
         await tickOf(page, email).check();
-        await button(page, 'ko', name).click();
+        await button(page, 'ko', name, 1).click();
         await expect(alert(page)).toHaveText(t.lastAdmin);
         expect((await roleRow(id)).role, name).toBe('admin');
       }
@@ -877,7 +978,7 @@ test.describe('the site is never left without an admin', () => {
       await openList(page, 'ko', { q: 'example.test', role: 'admin' });
       await expect(rowOf(page, SEEDED.admin)).toBeVisible();
       await tickOf(page, email).check();
-      await button(page, 'ko', 'guest').click();
+      await button(page, 'ko', 'guest', 1).click();
       await expect(alert(page)).toHaveText(t.lastAdmin);
       expect((await roleRow(id)).role).toBe('admin');
     });
@@ -889,9 +990,9 @@ test.describe('the site is never left without an admin', () => {
       await signIn(page, email, baseURL!);
       await openList(page, 'ko', { q: email });
       await tickOf(page, email).check();
-      await button(page, 'ko', 'block').click();
+      await button(page, 'ko', 'block', 1).click();
       await expect(alert(page)).toContainText(t.refusedBlock);
-      await expect(alert(page)).toContainText('단독');
+      await expect(alert(page)).toContainText(t.reason.self('단독 님'));
       expect((await roleRow(id)).blocked_at).toBeNull();
       expect(await bannedUntil(id)).toBeNull();
     });
@@ -927,7 +1028,7 @@ test.describe('the site is never left without an admin', () => {
       await signIn(page, email, baseURL!);
       await openList(page, 'en', { q: email });
       await tickOf(page, email).check();
-      await button(page, 'en', 'member').click();
+      await button(page, 'en', 'member', 1).click();
       await expect(alert(page)).toHaveText(t.lastAdmin);
     });
   });
@@ -972,6 +1073,491 @@ test.describe('the site is never left without an admin', () => {
       for (const context of contexts) await context.close();
       await deleteAccount(stepDown);
       await deleteAccount(leave);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Asking before the changes that matter, saying why when one is refused, and the strip at the
+// bottom of a phone
+// ---------------------------------------------------------------------------
+
+test.describe('the buttons say how many, and wait for somebody', () => {
+  for (const locale of ['ko', 'en'] as const) {
+    test(`are disabled with nobody ticked and carry the count after (${locale})`, async ({
+      page,
+      baseURL,
+    }, testInfo) => {
+      const t = COPY[locale];
+      const emails = [newAddress(testInfo, 'a'), newAddress(testInfo, 'b')];
+      try {
+        await Promise.all(emails.map((email) => createOnboardedAccount(email)));
+        await signIn(page, SEEDED.admin, baseURL!);
+        await openList(page, locale, { q: `-${testInfo.project.name}-` });
+
+        const all = ['member', 'guest', 'operator', 'admin', 'block', 'unblock'] as const;
+        // Nobody ticked: every button is there, dimmed and not pressable, under its plain name.
+        for (const name of all) await expect(button(page, locale, name)).toBeDisabled();
+
+        await tickOf(page, emails[0]).check();
+        for (const name of all) await expect(button(page, locale, name, 1)).toBeEnabled();
+
+        await tickOf(page, emails[1]).check();
+        for (const name of all) await expect(button(page, locale, name, 2)).toBeEnabled();
+
+        // And back to nobody.
+        await tickOf(page, emails[0]).uncheck();
+        await tickOf(page, emails[1]).uncheck();
+        for (const name of all) await expect(button(page, locale, name)).toBeDisabled();
+        await expect(table(page).getByText(t.selected(0))).toBeVisible();
+      } finally {
+        for (const email of emails) await deleteAccount(email);
+      }
+    });
+  }
+});
+
+test.describe('asking before a change that matters', () => {
+  test('blocking asks in the same place, and cancelling or Escape changes nothing', async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    const t = COPY.ko;
+    const email = newAddress(testInfo);
+    try {
+      const id = await createOnboardedAccount(email, { role: 'member' });
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'ko', { q: email });
+      await tickOf(page, email).check();
+
+      // The button turns the row into the question; the role buttons are gone from it, and the
+      // focus is on the answer that does the thing.
+      await button(page, 'ko', 'block', 1).click();
+      await expect(question(page, 'ko', 'block', 1)).toBeVisible();
+      await expect(confirmButton(page, 'ko', 'block')).toBeFocused();
+      await expect(cancelButton(page, 'ko')).toBeVisible();
+      await expect(button(page, 'ko', 'member', 1)).toHaveCount(0);
+      await expect(alert(page)).toHaveCount(0);
+      // Nothing has been done, and the person is still ticked.
+      expect((await roleRow(id)).blocked_at).toBeNull();
+      expect(await bannedUntil(id)).toBeNull();
+      await expect(tickOf(page, email)).toBeChecked();
+      await expectAccessible(page);
+
+      // Escape says no: the buttons are back, the focus is on the one that asked.
+      await page.keyboard.press('Escape');
+      await expect(question(page, 'ko', 'block', 1)).toHaveCount(0);
+      await expect(button(page, 'ko', 'block', 1)).toBeFocused();
+      await expect(button(page, 'ko', 'member', 1)).toBeVisible();
+      await expect(tickOf(page, email)).toBeChecked();
+      expect((await roleRow(id)).blocked_at).toBeNull();
+
+      // So does the cancel button.
+      await button(page, 'ko', 'block', 1).click();
+      await cancelButton(page, 'ko').click();
+      await expect(question(page, 'ko', 'block', 1)).toHaveCount(0);
+      await expect(button(page, 'ko', 'block', 1)).toBeFocused();
+      expect((await roleRow(id)).blocked_at).toBeNull();
+
+      // Saying yes does it.
+      await button(page, 'ko', 'block', 1).click();
+      await confirmButton(page, 'ko', 'block').click();
+      await expect(status(page)).toHaveText(t.done.block(1));
+      await expect(question(page, 'ko', 'block', 1)).toHaveCount(0);
+      expect((await roleRow(id)).blocked_at).not.toBeNull();
+      expect(await bannedUntil(id)).not.toBeNull();
+      await expectNoHorizontalScroll(page);
+    } finally {
+      await deleteAccount(email);
+    }
+  });
+
+  test('unblocking, members and guests are one click', async ({ page, baseURL }, testInfo) => {
+    const t = COPY.ko;
+    const email = newAddress(testInfo);
+    try {
+      const id = await createOnboardedAccount(email);
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'ko', { q: email });
+      await apply(page, 'ko', [email], 'member', { confirm: false });
+      await expect(status(page)).toHaveText(t.done.member(1));
+      await tickOf(page, email).check();
+      await button(page, 'ko', 'guest', 1).click();
+      await expect(status(page)).toHaveText(t.done.guest(1));
+
+      await apply(page, 'ko', [email], 'block');
+      await expect(status(page)).toHaveText(t.done.block(1));
+      await tickOf(page, email).check();
+      await button(page, 'ko', 'unblock', 1).click();
+      await expect(status(page)).toHaveText(t.done.unblock(1));
+      await expect(table(page).getByRole('group', { name: /\?$/ })).toHaveCount(0);
+      expect((await roleRow(id)).blocked_at).toBeNull();
+    } finally {
+      await deleteAccount(email);
+    }
+  });
+
+  for (const locale of ['ko', 'en'] as const) {
+    test(`making an operator or an admin asks first (${locale})`, async ({
+      page,
+      baseURL,
+    }, testInfo) => {
+      const t = COPY[locale];
+      const email = newAddress(testInfo);
+      try {
+        const id = await createOnboardedAccount(email, { role: 'member' });
+        await signIn(page, SEEDED.admin, baseURL!);
+        await openList(page, locale, { q: email });
+
+        for (const name of ['operator', 'admin'] as const) {
+          await tickOf(page, email).check();
+          await button(page, locale, name, 1).click();
+          await expect(question(page, locale, name, 1)).toBeVisible();
+          await expect(confirmButton(page, locale, name)).toBeFocused();
+          expect((await roleRow(id)).role).toBe('member');
+          await cancelButton(page, locale).click();
+          await expect(button(page, locale, name, 1)).toBeFocused();
+          expect((await roleRow(id)).role).toBe('member');
+        }
+
+        await button(page, locale, 'admin', 1).click();
+        await confirmButton(page, locale, 'admin').click();
+        await expect(status(page)).toHaveText(t.done.admin(1));
+        expect((await roleRow(id)).role).toBe('admin');
+        await expectAccessible(page);
+      } finally {
+        await deleteAccount(email);
+      }
+    });
+  }
+
+  test('changing who is ticked takes the question back', async ({ page, baseURL }, testInfo) => {
+    const emails = [newAddress(testInfo, 'a'), newAddress(testInfo, 'b')];
+    try {
+      await Promise.all(emails.map((email) => createOnboardedAccount(email)));
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'ko', { q: `-${testInfo.project.name}-` });
+      await tickOf(page, emails[0]).check();
+      await button(page, 'ko', 'block', 1).click();
+      await expect(question(page, 'ko', 'block', 1)).toBeVisible();
+
+      // The question was about one person; with another ticked it would be about two.
+      await tickOf(page, emails[1]).check();
+      await expect(question(page, 'ko', 'block', 1)).toHaveCount(0);
+      await expect(button(page, 'ko', 'block', 2)).toBeVisible();
+    } finally {
+      for (const email of emails) await deleteAccount(email);
+    }
+  });
+
+  test('refuses before it asks, so nobody confirms what cannot happen', async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    const t = COPY.ko;
+    const email = newAddress(testInfo);
+    try {
+      await createOnboardedAccount(email, { names: ['정', '시험'] });
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'ko', { q: email });
+      await tickOf(page, email).check();
+      // The operator's form has no such button; this one is added by hand.
+      await page.evaluate(() => {
+        const crafted = document.createElement('button');
+        crafted.type = 'submit';
+        crafted.name = 'to';
+        crafted.value = 'admin';
+        crafted.id = 'crafted';
+        crafted.textContent = 'admin';
+        document.querySelector('main form[data-members-form]')!.append(crafted);
+      });
+      await page.locator('#crafted').click();
+      await expect(alert(page)).toContainText(t.reason.authorityRole('정시험 님'));
+      await expect(table(page).getByRole('group', { name: /\?$/ })).toHaveCount(0);
+    } finally {
+      await deleteAccount(email);
+    }
+  });
+
+  test('works with the page’s scripts switched off, and the question cannot be skipped', async ({
+    browser,
+    baseURL,
+  }, testInfo) => {
+    const t = COPY.ko;
+    const email = newAddress(testInfo);
+    const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
+    try {
+      const id = await createOnboardedAccount(email, { role: 'member' });
+      const page = await context.newPage();
+      await page.goto(await requestSignInLink(SEEDED.operator, baseURL!));
+      await openList(page, 'ko', { q: email }, { scripts: false });
+
+      // Without scripts the buttons cannot know who is ticked, so none of them is dimmed.
+      await expect(button(page, 'ko', 'block')).toBeEnabled();
+
+      // The click goes to the server, which answers with the question and does nothing.
+      await tickOf(page, email).check();
+      await button(page, 'ko', 'block').click();
+      await expect(question(page, 'ko', 'block', 1)).toBeVisible();
+      await expect(tickOf(page, email)).toBeChecked();
+      expect((await roleRow(id)).blocked_at).toBeNull();
+      expect(await bannedUntil(id)).toBeNull();
+
+      // No: the form is shown as it was.
+      await cancelButton(page, 'ko').click();
+      await expect(question(page, 'ko', 'block', 1)).toHaveCount(0);
+      await expect(button(page, 'ko', 'block')).toBeVisible();
+      expect((await roleRow(id)).blocked_at).toBeNull();
+
+      // Yes: it is done.
+      await tickOf(page, email).check();
+      await button(page, 'ko', 'block').click();
+      await confirmButton(page, 'ko', 'block').click();
+      await expect(status(page)).toHaveText(t.done.block(1));
+      expect((await roleRow(id)).blocked_at).not.toBeNull();
+    } finally {
+      await context.close();
+      await deleteAccount(email);
+    }
+  });
+});
+
+test.describe('saying why a change was refused', () => {
+  for (const locale of ['ko', 'en'] as const) {
+    test(`someone who already has the role is named with the reason (${locale})`, async ({
+      page,
+      baseURL,
+    }, testInfo) => {
+      const t = COPY[locale];
+      const guest = newAddress(testInfo, 'g');
+      const member = newAddress(testInfo, 'm');
+      try {
+        const guestId = await createOnboardedAccount(guest, { names: ['정', '시험'] });
+        await createOnboardedAccount(member, { names: ['한', '회원'], role: 'member' });
+        await signIn(page, SEEDED.admin, baseURL!);
+        await openList(page, locale, { q: `-${testInfo.project.name}-` });
+        await tickOf(page, guest).check();
+        await tickOf(page, member).check();
+        await button(page, locale, 'member', 2).click();
+
+        const who = locale === 'ko' ? '한회원 님' : '회원 한';
+        await expect(alert(page)).toContainText(t.refusedRole);
+        await expect(alert(page)).toContainText(t.reason.same(who, t.roles.member));
+        // Nothing in the batch was applied, the guest who could have been included; both stay
+        // ticked, so it shows who was meant.
+        expect((await roleRow(guestId)).role).toBe('guest');
+        await expect(tickOf(page, guest)).toBeChecked();
+        await expect(tickOf(page, member)).toBeChecked();
+        await expectNoHorizontalScroll(page);
+        await expectAccessible(page);
+      } finally {
+        await deleteAccount(guest);
+        await deleteAccount(member);
+      }
+    });
+  }
+
+  test('says it once for each reason, the most serious first', async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    const t = COPY.ko;
+    const member = newAddress(testInfo, 'm');
+    try {
+      await createOnboardedAccount(member, { names: ['한', '회원'], role: 'member' });
+      const adminId = await accountId(SEEDED.admin);
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'ko', { q: member });
+      await tickOf(page, member).check();
+      // An admin the operator cannot tick is added by hand.
+      await page.evaluate((value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'id';
+        input.value = value;
+        document.querySelector('main form[data-members-form]')!.append(input);
+      }, adminId);
+      await button(page, 'ko', 'member', 1).click();
+
+      const text = (await alert(page).innerText()).replace(/\s+/g, ' ');
+      const first = text.indexOf(t.reason.authorityRole(`${t.adminName} 님`));
+      const second = text.indexOf(t.reason.same('한회원 님', t.roles.member));
+      expect(first).toBeGreaterThan(-1);
+      expect(second).toBeGreaterThan(first);
+      expect(text.startsWith(t.refusedRole)).toBe(true);
+    } finally {
+      await deleteAccount(member);
+    }
+  });
+
+  test('says an admin cannot block themselves, in English too', async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    const t = COPY.en;
+    const email = newAddress(testInfo, 'sole');
+    try {
+      await createOnboardedAccount(email, { role: 'admin', names: ['단', '독'] });
+      await signIn(page, email, baseURL!);
+      await openList(page, 'en', { q: email });
+      await tickOf(page, email).check();
+      await button(page, 'en', 'block', 1).click();
+      await expect(alert(page)).toContainText(t.refusedBlock);
+      await expect(alert(page)).toContainText(t.reason.self('독 단'));
+      await expect(table(page).getByRole('group', { name: /\?$/ })).toHaveCount(0);
+    } finally {
+      await deleteAccount(email);
+    }
+  });
+
+  test('an operator is told a crafted change is outside their authority, in English', async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    const t = COPY.en;
+    const email = newAddress(testInfo);
+    try {
+      await createOnboardedAccount(email, { names: ['정', '시험'] });
+      const adminId = await accountId(SEEDED.admin);
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'en', { q: email });
+      await tickOf(page, email).check();
+      await page.evaluate((value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'id';
+        input.value = value;
+        document.querySelector('main form[data-members-form]')!.append(input);
+      }, adminId);
+      await button(page, 'en', 'block', 1).click();
+      await expect(alert(page)).toContainText(t.refusedBlock);
+      await expect(alert(page)).toContainText(t.reason.authorityBlock(t.adminName));
+    } finally {
+      await deleteAccount(email);
+    }
+  });
+});
+
+test.describe('the width of the page', () => {
+  test('lines up with the header at 1440, and fits at 1024', async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'the width is a desktop matter');
+    await signIn(page, SEEDED.operator, baseURL!);
+    await openList(page, 'ko');
+
+    const left = async (locator: Locator) => (await locator.boundingBox())!.x;
+    const logo = page
+      .locator('header')
+      .getByRole('link', { name: /RISE CREW/ })
+      .first();
+    const edge = await left(logo);
+    // The title and the table start where the logo does (to the pixel).
+    expect(Math.abs((await left(page.getByRole('heading', { level: 1 }))) - edge)).toBeLessThan(
+      1.5,
+    );
+    expect(Math.abs((await left(page.getByRole('table'))) - edge)).toBeLessThan(1.5);
+    // And end where the header's content ends.
+    const nav = page.locator('header nav').first();
+    const navBox = (await nav.boundingBox())!;
+    const tableBox = (await page.getByRole('table').boundingBox())!;
+    expect(Math.abs(tableBox.x + tableBox.width - (navBox.x + navBox.width))).toBeLessThan(1.5);
+
+    // The narrowest wide layout: every column inside the screen.
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await expectNoHorizontalScroll(page);
+    const last = page.getByRole('columnheader').last();
+    const box = (await last.boundingBox())!;
+    expect(box.x + box.width).toBeLessThanOrEqual(1024);
+    await expectAccessible(page);
+  });
+});
+
+test.describe('the strip of buttons on a phone', () => {
+  test('stays in view once somebody is ticked, and does not hide the last row', async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'the strip floats on a phone only');
+    const t = COPY.ko;
+    const emails = Array.from({ length: 6 }, (_, i) => newAddress(testInfo, `p${i}`));
+    try {
+      await Promise.all(emails.map((email) => createOnboardedAccount(email)));
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'ko', { q: `-${testInfo.project.name}-` });
+      const height = page.viewportSize()!.height;
+      const inView = async () => {
+        const box = (await actionBar(page).boundingBox())!;
+        return box.y >= 0 && box.y + box.height <= height + 0.5;
+      };
+
+      // Nobody ticked: the buttons are after the whole list, off the screen.
+      expect(await inView()).toBe(false);
+      await expect(actionBar(page)).toHaveCSS('position', 'static');
+
+      // Tick the first person at the top of the list: the strip is on the screen without any
+      // scrolling, says how many, and has the buttons.
+      await page.locator('main tbody tr').first().getByRole('checkbox').check();
+      await expect(actionBar(page)).toHaveCSS('position', 'sticky');
+      // (The people were made at the same moment, so which of the six is first is not known.)
+      expect(await page.evaluate(() => window.scrollY)).toBeLessThan(height / 2);
+      expect(await inView()).toBe(true);
+      await expect(actionBar(page).getByText(t.selected(1))).toBeVisible();
+      await expect(button(page, 'ko', 'block', 1)).toBeInViewport({ ratio: 1 });
+
+      // The question opens inside it, and is in view too.
+      await button(page, 'ko', 'block', 1).click();
+      await expect(question(page, 'ko', 'block', 1)).toBeInViewport({ ratio: 1 });
+      await expect(confirmButton(page, 'ko', 'block')).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(button(page, 'ko', 'block', 1)).toBeFocused();
+
+      // A change that went through leaves its answer in view too, not at the foot of the list, and
+      // with nobody ticked any more the strip offers no buttons.
+      await button(page, 'ko', 'member', 1).click();
+      await expect(status(page)).toHaveText(t.done.member(1));
+      await expect(status(page)).toBeInViewport({ ratio: 1 });
+      expect(await inView()).toBe(true);
+      await expect(button(page, 'ko', 'member')).toBeHidden();
+      await page.locator('main tbody tr').nth(1).getByRole('checkbox').check();
+      await expect(button(page, 'ko', 'member', 1)).toBeVisible();
+
+      // A refusal is in view as well, next to the buttons that were pressed.
+      await page.evaluate(() => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'id';
+        input.value = '5eed0000-0000-4000-8000-0000000000ff';
+        document.querySelector('main form[data-members-form]')!.append(input);
+      });
+      await button(page, 'ko', 'member', 1).click();
+      await expect(alert(page)).toBeVisible();
+      expect(await inView()).toBe(true);
+      await expectAccessible(page);
+
+      // At the very end it sits below the last row instead of over it.
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      const lastRow = (await page.locator('main tbody tr').last().boundingBox())!;
+      const bar = (await actionBar(page).boundingBox())!;
+      expect(bar.y).toBeGreaterThanOrEqual(lastRow.y + lastRow.height - 0.5);
+      await expectNoHorizontalScroll(page);
+    } finally {
+      for (const email of emails) await deleteAccount(email);
+    }
+  });
+
+  test('does not float on a wide screen', async ({ page, baseURL }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'the strip floats on a phone only');
+    const email = newAddress(testInfo);
+    try {
+      await createOnboardedAccount(email);
+      await signIn(page, SEEDED.operator, baseURL!);
+      await openList(page, 'ko', { q: email });
+      await tickOf(page, email).check();
+      await expect(actionBar(page)).toHaveCSS('position', 'static');
+    } finally {
+      await deleteAccount(email);
     }
   });
 });

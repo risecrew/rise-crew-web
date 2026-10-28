@@ -494,7 +494,30 @@
         "admin": "관리자로",
         "block": "차단",
         "unblock": "차단 해제",
-        "pending": "처리하는 중"
+        "pending": "처리하는 중",
+        "counted": {
+          "member": "{count}명을 회원으로",
+          "guest": "{count}명을 가입자로",
+          "operator": "{count}명을 운영진으로",
+          "admin": "{count}명을 관리자로",
+          "block": "{count}명 차단",
+          "unblock": "{count}명 차단 해제"
+        }
+      },
+      "confirm": {
+        "block": {
+          "question": "{count}명을 차단할까요?",
+          "yes": "차단하기"
+        },
+        "operator": {
+          "question": "{count}명을 운영진으로 바꿀까요?",
+          "yes": "운영진으로 바꾸기"
+        },
+        "admin": {
+          "question": "{count}명을 관리자로 바꿀까요?",
+          "yes": "관리자로 바꾸기"
+        },
+        "cancel": "취소"
       },
       "result": {
         "done": {
@@ -507,15 +530,22 @@
         },
         "errors": {
           "none": "바꿀 사람을 먼저 골라 주세요.",
-          "refusedRole": "아무도 바꾸지 않았어요. 바꿀 수 없는 사람이 있어요: {names}",
-          "refusedBlock": "아무도 차단하지 않았어요. 차단할 수 없는 사람이 있어요: {names}",
-          "refusedUnblock": "아무도 차단 해제하지 않았어요. 차단을 풀 수 없는 사람이 있어요: {names}",
+          "refusedRole": "아무도 바꾸지 않았어요.",
+          "refusedBlock": "아무도 차단하지 않았어요.",
+          "refusedUnblock": "아무도 차단 해제하지 않았어요.",
           "lastAdmin": "관리자가 한 명도 남지 않게 돼서 할 수 없어요. 먼저 다른 관리자를 지정해 주세요.",
           "missing": "목록에 없는 사람이 있어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.",
           "stale": "그사이 바뀐 사람이 있어서 일부만 반영됐을 수 있어요. 목록을 확인해 주세요.",
           "failed": "처리하지 못했어요. 잠시 후 다시 시도해 주세요."
         },
-        "more": "외 {count}명"
+        "who": "{more, plural, =0 {{names} 님} other {{names} 외 #명}}",
+        "reasons": {
+          "same": "{who}은 이미 {role} 역할이에요. 선택에서 빼고 다시 눌러 주세요.",
+          "authorityRole": "{who}은 내 권한으로 바꿀 수 없어요. 운영진은 가입자와 회원 사이만 바꿀 수 있어요. 그 밖의 변경은 관리자에게 부탁해 주세요.",
+          "authorityBlock": "{who}은 운영진이나 관리자라서 내 권한으로 차단할 수 없어요. 관리자에게 부탁해 주세요.",
+          "authorityUnblock": "{who}은 운영진이나 관리자라서 내 권한으로 차단을 풀 수 없어요. 관리자에게 부탁해 주세요.",
+          "self": "{who}은 본인 계정이라 직접 차단하거나 풀 수 없어요. 선택에서 빼고 다시 눌러 주세요."
+        }
       },
       "pages": {
         "label": "페이지 이동",
