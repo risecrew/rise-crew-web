@@ -36,3 +36,23 @@ test('?deleted=1 shows nothing on the home page while accounts are off', async (
   await expect(page.getByText('탈퇴가 완료됐어요')).toHaveCount(0);
   await expect(page.getByRole('status')).toHaveCount(0);
 });
+
+// So is the members screen, with or without a search, in either language.
+for (const path of [
+  '/ko/admin/members',
+  '/en/admin/members',
+  '/ko/admin/members?q=kim&role=guest&optin=1&page=2',
+]) {
+  test(`${path} is a 404 while accounts are off`, async ({ request }) => {
+    expect((await request.get(path, { maxRedirects: 0 })).status()).toBe(404);
+  });
+}
+
+// Nor can its actions be reached: a post to the page is not an action while the page is not there.
+test('posting to the members screen is a 404 while accounts are off', async ({ request }) => {
+  const response = await request.post('/ko/admin/members', {
+    maxRedirects: 0,
+    form: { to: 'admin' },
+  });
+  expect(response.status()).toBe(404);
+});

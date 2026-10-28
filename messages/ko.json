@@ -322,10 +322,89 @@
         "submitting": "탈퇴하는 중",
         "errors": {
           "confirm": "{word}를 정확히 입력해 주세요.",
-          "failed": "탈퇴하지 못했어요. 잠시 후 다시 시도해 주세요."
+          "failed": "탈퇴하지 못했어요. 잠시 후 다시 시도해 주세요.",
+          "lastAdmin": "마지막 관리자라서 지금은 탈퇴할 수 없어요. 다른 관리자를 지정한 뒤 탈퇴할 수 있어요."
         }
       },
       "deleted": "탈퇴가 완료됐어요. 함께해 주셔서 고마웠어요."
+    }
+  },
+  "Admin": {
+    "members": {
+      "metaTitle": "회원 관리",
+      "title": "회원 관리",
+      "search": {
+        "label": "이름 또는 이메일 검색",
+        "placeholder": "이름이나 이메일",
+        "submit": "검색"
+      },
+      "filters": {
+        "role": "역할",
+        "allRoles": "모든 역할",
+        "optIn": "모집 소식 동의만",
+        "clear": "필터 지우기"
+      },
+      "count": "총 {count}명",
+      "empty": "조건에 맞는 회원이 없어요.",
+      "table": {
+        "label": "회원 목록",
+        "columns": {
+          "name": "이름",
+          "email": "이메일",
+          "occupation": "하고 있는 일",
+          "detail": "학교·전공 / 소속",
+          "optIn": "모집 소식",
+          "role": "역할"
+        },
+        "optInYes": "동의",
+        "optInNo": "미동의",
+        "none": "정보 없음",
+        "unfinished": "가입 미완료",
+        "blocked": "차단됨"
+      },
+      "select": {
+        "all": "이 페이지 모두 선택",
+        "row": "{name} 선택",
+        "count": "{count}명 선택",
+        "header": "선택"
+      },
+      "actions": {
+        "label": "선택한 사람에게",
+        "member": "회원으로",
+        "guest": "가입자로",
+        "operator": "운영진으로",
+        "admin": "관리자로",
+        "block": "차단",
+        "unblock": "차단 해제",
+        "pending": "처리하는 중"
+      },
+      "result": {
+        "done": {
+          "member": "{count}명을 회원으로 바꿨어요.",
+          "guest": "{count}명을 가입자로 바꿨어요.",
+          "operator": "{count}명을 운영진으로 바꿨어요.",
+          "admin": "{count}명을 관리자로 바꿨어요.",
+          "block": "{count}명을 차단했어요.",
+          "unblock": "{count}명의 차단을 풀었어요."
+        },
+        "errors": {
+          "none": "바꿀 사람을 먼저 골라 주세요.",
+          "refusedRole": "아무도 바꾸지 않았어요. 바꿀 수 없는 사람이 있어요: {names}",
+          "refusedBlock": "아무도 차단하지 않았어요. 차단할 수 없는 사람이 있어요: {names}",
+          "refusedUnblock": "아무도 차단 해제하지 않았어요. 차단을 풀 수 없는 사람이 있어요: {names}",
+          "lastAdmin": "관리자가 한 명도 남지 않게 돼서 할 수 없어요. 먼저 다른 관리자를 지정해 주세요.",
+          "missing": "목록에 없는 사람이 있어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.",
+          "stale": "그사이 바뀐 사람이 있어서 일부만 반영됐을 수 있어요. 목록을 확인해 주세요.",
+          "failed": "처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+        },
+        "more": "외 {count}명"
+      },
+      "pages": {
+        "label": "페이지 이동",
+        "previous": "이전",
+        "next": "다음",
+        "position": "{page} / {total} 페이지"
+      }
     }
   }
 }

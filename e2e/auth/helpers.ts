@@ -98,6 +98,103 @@ export async function createBlockedAccount(email: string): Promise<void> {
   if (blockError) throw blockError;
 }
 
+// Creates an account with a finished sign-up (names, an occupation, the privacy and age14 consents
+// and optionally the recruit one) and, if asked, a role. It does the sign-up the way the form
+// does: as the account itself, with its own session, because the secret key may not write
+// profiles or consents. The session comes from a link made by the Auth admin API, so no email is
+// sent. Remove it afterwards with deleteAccount. Returns the account's id.
+export async function createOnboardedAccount(
+  email: string,
+  {
+    role = 'guest',
+    names = ['시험', '계정'],
+    recruit = false,
+    details = {},
+  }: {
+    role?: 'guest' | 'member' | 'operator' | 'admin';
+    names?: [string, string];
+    recruit?: boolean;
+    // A student gives a school and a major; anyone else may give an affiliation.
+    details?: {
+      occupation?: 'undergrad' | 'grad' | 'alumni' | 'founder' | 'other';
+      school?: string;
+      major?: string;
+      affiliation?: string;
+    };
+  } = {},
+): Promise<string> {
+  const admin = adminClient();
+  const created = await admin.auth.admin.createUser({ email, email_confirm: true });
+  if (created.error) throw created.error;
+  const id = created.data.user.id;
+
+  const link = await admin.auth.admin.generateLink({ type: 'magiclink', email });
+  if (link.error) throw link.error;
+  const own = anonymousClient();
+  const verified = await own.auth.verifyOtp({
+    token_hash: link.data.properties.hashed_token,
+    type: 'magiclink',
+  });
+  if (verified.error) throw verified.error;
+
+  const consent = (kind: 'privacy' | 'age14' | 'recruit', granted: boolean) => ({
+    user_id: id,
+    kind,
+    granted,
+    policy_version: 'e2e',
+  });
+  const consents = await own
+    .from('consents')
+    .insert([consent('privacy', true), consent('age14', true), consent('recruit', recruit)]);
+  if (consents.error) throw consents.error;
+  const profile = await own
+    .from('profiles')
+    .update({
+      last_name: names[0],
+      first_name: names[1],
+      occupation: 'founder',
+      ...details,
+      onboarded_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+  if (profile.error) throw profile.error;
+
+  if (role !== 'guest') {
+    const set = await admin.from('user_roles').update({ role }).eq('user_id', id);
+    if (set.error) throw set.error;
+  }
+  return id;
+}
+
+// The role row of an account: what the members screen is supposed to have written.
+export async function roleRow(id: string) {
+  const { data, error } = await adminClient()
+    .from('user_roles')
+    .select('role, blocked_at, updated_by')
+    .eq('user_id', id)
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// The id of the account with this address.
+export async function accountId(email: string): Promise<string> {
+  const { data, error } = await adminClient()
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .single();
+  if (error) throw error;
+  return data.id;
+}
+
+// Until when Auth refuses to sign this account in (null when it does not).
+export async function bannedUntil(id: string): Promise<string | null> {
+  const { data, error } = await adminClient().auth.admin.getUserById(id);
+  if (error) throw error;
+  return data.user.banned_until ?? null;
+}
+
 // The cookies that hold the Supabase session: `sb-<project>-auth-token`, split into `.0`, `.1`...
 // when too long for one cookie.
 export function authCookies(cookies: Cookie[]): Cookie[] {

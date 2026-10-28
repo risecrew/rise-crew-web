@@ -322,10 +322,89 @@
         "submitting": "Deleting",
         "errors": {
           "confirm": "Type {word} exactly as shown.",
-          "failed": "We couldn't delete your account. Please try again in a moment."
+          "failed": "We couldn't delete your account. Please try again in a moment.",
+          "lastAdmin": "You're the only admin, so you can't delete your account yet. Make someone else an admin before deleting your account."
         }
       },
       "deleted": "Your account has been deleted. Thanks for being part of RISE CREW."
+    }
+  },
+  "Admin": {
+    "members": {
+      "metaTitle": "Members",
+      "title": "Members",
+      "search": {
+        "label": "Search by name or email",
+        "placeholder": "Name or email",
+        "submit": "Search"
+      },
+      "filters": {
+        "role": "Role",
+        "allRoles": "All roles",
+        "optIn": "Recruitment opt-in only",
+        "clear": "Clear filters"
+      },
+      "count": "{count, plural, one {# person} other {# people}}",
+      "empty": "No one matches.",
+      "table": {
+        "label": "Member list",
+        "columns": {
+          "name": "Name",
+          "email": "Email",
+          "occupation": "What they do",
+          "detail": "School · major / Affiliation",
+          "optIn": "Recruitment emails",
+          "role": "Role"
+        },
+        "optInYes": "Yes",
+        "optInNo": "No",
+        "none": "No info",
+        "unfinished": "Sign-up not finished",
+        "blocked": "Blocked"
+      },
+      "select": {
+        "all": "Select everyone on this page",
+        "row": "Select {name}",
+        "count": "{count} selected",
+        "header": "Select"
+      },
+      "actions": {
+        "label": "For the people selected",
+        "member": "Make member",
+        "guest": "Make guest",
+        "operator": "Make operator",
+        "admin": "Make admin",
+        "block": "Block",
+        "unblock": "Unblock",
+        "pending": "Working"
+      },
+      "result": {
+        "done": {
+          "member": "{count, plural, one {# person is now a member.} other {# people are now members.}}",
+          "guest": "{count, plural, one {# person is now a guest.} other {# people are now guests.}}",
+          "operator": "{count, plural, one {# person is now an operator.} other {# people are now operators.}}",
+          "admin": "{count, plural, one {# person is now an admin.} other {# people are now admins.}}",
+          "block": "{count, plural, one {# person was blocked.} other {# people were blocked.}}",
+          "unblock": "{count, plural, one {# person was unblocked.} other {# people were unblocked.}}"
+        },
+        "errors": {
+          "none": "Choose who to change first.",
+          "refusedRole": "No one was changed. These people can't be changed this way: {names}",
+          "refusedBlock": "No one was blocked. These people can't be blocked: {names}",
+          "refusedUnblock": "No one was unblocked. These people can't be unblocked: {names}",
+          "lastAdmin": "That would leave the site without an admin. Make someone else an admin first.",
+          "missing": "Some of these people are no longer on the list. Reload the page and try again.",
+          "stale": "Someone changed in the meantime, so only part of this may have gone through. Check the list.",
+          "failed": "That didn't work. Please try again in a moment."
+        },
+        "more": "and {count} more"
+      },
+      "pages": {
+        "label": "Pages",
+        "previous": "Previous",
+        "next": "Next",
+        "position": "Page {page} of {total}"
+      }
     }
   }
 }

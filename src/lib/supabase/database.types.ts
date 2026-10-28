@@ -124,7 +124,26 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      member_list: {
+        Row: {
+          affiliation: string | null;
+          blocked_at: string | null;
+          created_at: string;
+          email: string;
+          first_name: string | null;
+          id: string;
+          last_name: string | null;
+          major: string | null;
+          occupation: Database['public']['Enums']['occupation'] | null;
+          onboarded_at: string | null;
+          recruit_opt_in: boolean;
+          role: Database['public']['Enums']['app_role'];
+          school: string | null;
+          search_text: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
     };
     Functions: {
       custom_access_token_hook: { Args: { event: Json }; Returns: Json };

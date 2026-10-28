@@ -7,6 +7,7 @@ import { asLocale } from '@/i18n/as-locale';
 import type { Locale } from '@/i18n/locales';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { confirmsDeletion, type DeletionFailure, type DeletionState } from '@/lib/auth/deletion';
+import { wouldLeaveNoAdmin } from '@/lib/auth/last-admin';
 import { getViewer, requireViewer } from '@/lib/auth/viewer';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -42,8 +43,9 @@ async function endSession(): Promise<void> {
 //
 // Nothing here is taken on trust from the page. Who is asking is read again from the session and
 // the database (a visitor who was signed out or blocked since the page opened is refused), the
-// word is checked against the language's own, and only the visitor's own account can be named:
-// the id comes from the session, never from the form.
+// word is checked against the language's own, the last admin who can sign in is kept (the site
+// would have nobody to hand the role on), and only the visitor's own account can be named: the id
+// comes from the session, never from the form.
 //
 // A refused attempt comes back as a value for the form to show. A deleted account never returns:
 // the visitor is redirected.
@@ -66,6 +68,16 @@ export async function deleteAccount(localeArg: Locale, form: FormData): Promise<
 
   const word = (await getTranslations({ locale, namespace: 'Auth.me.delete' }))('word');
   if (!confirmsDeletion(typedValue, word)) return refused('confirm', typed);
+
+  // The site must never be left without an admin who can sign in, so the last one cannot leave.
+  // If that cannot be found out, the account stays: a refusal can be tried again, a deletion
+  // cannot be taken back.
+  try {
+    if (await wouldLeaveNoAdmin([viewer.id])) return refused('lastAdmin', typed);
+  } catch (error) {
+    console.error('Could not check the admins:', error instanceof Error ? error.message : error);
+    return refused('failed', typed);
+  }
 
   try {
     const { error } = await createSupabaseAdminClient().auth.admin.deleteUser(viewer.id);
