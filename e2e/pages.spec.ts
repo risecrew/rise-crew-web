@@ -126,7 +126,10 @@ const POLICY = {
     // The sign-in emails go out through the club's Gmail account, so Google is more than the
     // Google sign-in button.
     googleSender: /Gmail 계정이 로그인 이메일을 보냅니다/,
-    sentCopies: /보낸 편지함에 남을 수 있으며, 운영진이 주기적으로 지웁니다/,
+    // A Gmail filter on the sending account moves every sign-in email to Trash when it is sent,
+    // and Gmail empties Trash after 30 days. Nobody deletes anything by hand.
+    sentCopies: /30일 안에 자동으로 삭제됩니다/,
+    oldChore: /보낸 편지함|운영진이 주기적으로/,
     languageCookie: /언어를 기억하는 쿠키/,
     passiveProfile: /기본 프로필/,
     passiveLogs: /접속 기록\(IP 주소, 브라우저 정보, 접속 시각\)/,
@@ -151,8 +154,8 @@ const POLICY = {
     notCollected: /We do not collect phone numbers or student IDs/,
     footerLink: 'Privacy policy',
     googleSender: /Gmail account sends the sign-in emails/,
-    sentCopies:
-      /Sent folder of the Gmail account that sent them; operators delete them periodically/,
+    sentCopies: /deleted automatically within 30 days/,
+    oldChore: /Sent folder|operators delete them periodically/,
     languageCookie: /remembers that language/,
     passiveProfile: /basic profile Google shares/,
     passiveLogs: /access logs automatically \(IP address, browser, and times\)/,
@@ -213,10 +216,14 @@ for (const locale of LOCALES) {
       .filter({ has: page.locator('dt', { hasText: /^Google$/ }) });
     await expect(google).toHaveCount(1);
     await expect(google).toContainText(copy.googleSender);
-    // Deleting an account does not reach the copies in the sending mailbox, and the text says so.
-    await expect(main.locator('section[aria-labelledby="privacy-retention"]')).toContainText(
-      copy.sentCopies,
-    );
+    // The copies in the sending mailbox are not touched by deleting an account. They go away on their
+    // own within 30 days, and both places that mention them say so: the Google row and retention.
+    await expect(google).toContainText(copy.sentCopies);
+    const retention = main.locator('section[aria-labelledby="privacy-retention"]');
+    await expect(retention).toContainText(copy.sentCopies);
+    // No operator chore and no Sent folder are promised any more: the filter does the deleting.
+    await expect(google).not.toContainText(copy.oldChore);
+    await expect(retention).not.toContainText(copy.oldChore);
     // Cookies: the language cookie is named next to the sign-in one.
     const items = main.locator('section[aria-labelledby="privacy-items"]');
     await expect(items).toContainText(copy.languageCookie);

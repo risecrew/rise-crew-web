@@ -270,7 +270,7 @@
     "retention": {
       "title": "How long we keep it",
       "keep": "We keep your information until you delete your account.",
-      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) can stay in the Sent folder of the Gmail account that sent them; operators delete them periodically. Access logs that the companies keep automatically are held under each company’s own policy."
+      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy."
     },
     "processors": {
       "title": "Who processes it for us",
@@ -285,7 +285,7 @@
       },
       "google": {
         "label": "Google",
-        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails (for now, a RISE CREW Gmail account sends the sign-in emails; the recipient address and the one-time sign-in link pass through Google, and a copy stays in the Sent folder)"
+        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails (for now, a RISE CREW Gmail account sends the sign-in emails; the recipient address and the one-time sign-in link pass through Google, and the copy is deleted automatically within 30 days)"
       }
     },
     "visibility": {
