@@ -56,6 +56,7 @@ pnpm e2e:auth       # 로그인과 계정 화면 e2e (위 "검사" 참고)
 
 - 시드 계정은 `guest@example.test`, `member@example.test`, `operator@example.test`, `admin@example.test`입니다. 역할은 앞의 이름과 같고, 모두 가짜 값이며 비밀번호가 없습니다.
 - 로컬에서 보낸 로그인 메일은 실제로 나가지 않고 Mailpit(http://127.0.0.1:54324)에 쌓입니다. 로그인 화면에서 이메일 링크를 요청한 뒤 거기서 링크를 엽니다.
+- **로컬에서는 구글 로그인이 설정되어 있지 않습니다.** `supabase/config.toml`에서 Google 제공자를 켜지 않았습니다(켜려면 OAuth 클라이언트의 ID와 Secret이 필요한데, 그 값은 저장소에 둘 수 없습니다). 그래서 로컬에서는 이메일 링크(Mailpit)로만 로그인할 수 있고, "구글로 계속하기"는 눌러도 로그인이 되지 않습니다. 구글 로그인은 클라우드 개발용 프로젝트의 미리보기 주소에서 확인합니다.
 - 로컬 Supabase 설정은 `supabase/config.toml`, DB 변경은 `supabase/migrations/`에 있습니다. DB를 바꿀 때는 마이그레이션 파일을 새로 만들고, 권한 규칙에는 `supabase/tests/database/`에 테스트를 붙입니다.
 
 `pnpm dev`로 계정 기능을 직접 써 보려면 `.env.example`을 `.env.local`로 복사하고 값을 채웁니다. 주소와 키는 `pnpm exec supabase status -o env`에서 `API_URL`, `PUBLISHABLE_KEY`, `SECRET_KEY`를 가져오고, `NEXT_PUBLIC_AUTH_ENABLED`는 `true`로 둡니다. `.env.local`은 커밋되지 않습니다.
@@ -86,7 +87,7 @@ pnpm e2e:auth       # 로그인과 계정 화면 e2e (위 "검사" 참고)
 운영진과 ANCHOR 사업단 담당자가 개인정보 처리방침(`/ko/privacy`)을 확인해 **승인한 뒤에만** 켭니다. 처리방침 초안은 표준 양식에 맞춘 것이고 법률 검토가 아닙니다.
 
 1. 승인한 날짜(`YYYY-MM-DD`)를 `src/lib/auth/profile.ts`의 `PRIVACY_POLICY_VERSION`에 넣고, `tests/lib/auth-profile.test.ts`가 가진 같은 값도 고쳐 PR로 merge한다. 이 값이 처리방침 맨 아래의 시행일이고 동의 기록에 남는 버전이다. 승인 전에 글이 바뀌는 동안은 값을 그대로 두고, 승인한 날에만 바꾼다. 켠 뒤 글을 고치면 새 날짜로 바꾼다.
-2. Vercel의 **Production** 환경변수에 `NEXT_PUBLIC_AUTH_ENABLED=true`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`를 운영용 Supabase 프로젝트 값으로 넣는다.
+2. Vercel의 **Production** 환경변수에 `NEXT_PUBLIC_AUTH_ENABLED=true` **하나만** 더한다. `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`는 이 PR을 merge하기 **전에** 이미 운영용 Supabase 프로젝트의 값으로 Production에 넣어 두었어야 한다(아래 "7. Vercel 환경변수"). 스위치가 없으면 이 세 값이 있어도 계정 기능은 꺼진 채라서, merge해도 공개 사이트는 그대로다. 출시 때 새로 더하는 것은 스위치 하나뿐이다.
 3. 다시 배포한다.
 4. 실제 주소에서 구글 로그인과 이메일 링크 로그인이 끝까지 되는지 확인한다.
 
@@ -132,7 +133,9 @@ pnpm exec supabase migration list --linked   # 로컬과 원격의 목록이 같
 
 - **URL Configuration**
   - Site URL은 개발용 프로젝트는 `http://localhost:3000`, 운영용 프로젝트는 `https://rise-crew-web.vercel.app`(진짜 도메인이 생기면 교체)입니다.
-  - Redirect URLs에는 `http://localhost:3000/**`와 **정확한 미리보기 주소** `https://rise-crew-web-git-<브랜치>-rise-crew1.vercel.app/**`를 하나씩 넣습니다. 운영용에는 `https://rise-crew-web.vercel.app/**`를 넣습니다. 브랜치 이름의 `/`는 주소에서 `-`로 바뀌니, 실제 주소는 Vercel 배포 화면에서 복사합니다.
+  - Redirect URLs는 프로젝트마다 다릅니다.
+    - **개발용 프로젝트**: `http://localhost:3000/**`와 **정확한 미리보기 주소** `https://rise-crew-web-git-<브랜치>-rise-crew1.vercel.app/**`를 하나씩 넣습니다. 브랜치 이름의 `/`는 주소에서 `-`로 바뀌니, 실제 주소는 Vercel 배포 화면에서 복사합니다.
+    - **운영용 프로젝트**: 실제 사이트 주소만 넣습니다(지금은 `https://rise-crew-web.vercel.app/**`). localhost와 미리보기 주소는 **넣지 않습니다.** 미리보기는 개발용 DB에 연결되므로 운영용에는 필요 없고, 넣으면 운영 계정의 로그인 링크가 미리보기로 돌아갈 길이 열립니다.
   - **와일드카드로 팀 이름까지 걸치지 않습니다.** `https://rise-crew-web-git-*-rise-crew1.vercel.app/**`처럼 쓰면 `-rise-crew1`로 끝나는 다른 Vercel 팀의 주소도 맞아서, 그 팀이 로그인 링크의 토큰을 받을 수 있습니다. 로그인 화면은 링크를 요청할 때 자기 주소를 돌아올 곳으로 넘기므로, 이 허용 목록이 그 주소를 지키는 유일한 문입니다.
 - **Custom Access Token 훅**: Authentication의 Auth Hooks에서 Custom Access Token을 켭니다. 유형은 **Postgres**, 함수는 `public.custom_access_token_hook`입니다. 토큰의 `app_role`과 `blocked`는 메뉴 표시용이고 권한 판단에는 쓰지 않습니다(RLS는 `user_roles` 테이블을 직접 읽습니다).
 
@@ -145,7 +148,9 @@ pnpm exec supabase migration list --linked   # 로컬과 원격의 목록이 같
 Vercel의 Settings → Environment Variables에 `NEXT_PUBLIC_AUTH_ENABLED=true`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`를 넣습니다. `SUPABASE_SECRET_KEY`는 비밀 값(Secret)으로 저장합니다.
 
 - **Preview**에는 개발용 프로젝트의 값을 넣습니다. Preview는 **브랜치마다** 지정하는 값이라서, 새 작업 브랜치에서 로그인을 쓰려면 그 브랜치를 추가해야 합니다(5번의 Redirect URLs도 함께). 절차는 [CONTRIBUTING.md](CONTRIBUTING.md)에 있습니다.
-- **Production**은 출시 전까지 **체크하지 않습니다.** 위 "Production에서 켜기"를 거친 뒤에만 넣습니다.
+- **Production**은 두 단계로 나눠 넣습니다.
+  - **PR을 merge하기 전에**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`를 **운영용** 프로젝트의 값으로 넣습니다. `NEXT_PUBLIC_AUTH_ENABLED`는 **만들지 않고 비워 둡니다.** 스위치가 꺼져 있으면 값이 있어도 계정 기능은 꺼진 채라서(위 "계정 기능 스위치"), merge해도 사이트는 그대로입니다.
+  - **출시할 때**: 위 "Production에서 켜기"를 거친 뒤 `NEXT_PUBLIC_AUTH_ENABLED=true` 하나만 더하고 다시 배포합니다.
 - 값을 바꾼 뒤에는 다시 배포해야 반영됩니다.
 
 ### 8. 확인

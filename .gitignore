@@ -66,3 +66,6 @@ Thumbs.db
 .impeccable/build/
 .impeccable/questions/
 /.superpowers/
+
+# Google 백업 코드 파일은 절대 커밋하지 않는다
+Backup-codes-*.txt
