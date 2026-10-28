@@ -61,6 +61,8 @@ const COPY = {
     age14: '[필수] 만 14세 이상이에요',
     privacy: '[필수] 개인정보 수집·이용에 동의해요',
     privacyLink: /내용 보기/,
+    policyTitle: '개인정보 처리방침',
+    myPage: '마이페이지',
     recruit: '[선택] 모집 소식을 이메일로 받을래요',
     submit: '가입 완료',
     lastNameMissing: '성을 입력해 주세요.',
@@ -83,6 +85,8 @@ const COPY = {
     age14: '[Required] I am 14 or older',
     privacy: '[Required] I agree to the collection and use of my personal information',
     privacyLink: /read/i,
+    policyTitle: 'Privacy policy',
+    myPage: 'My page',
     recruit: '[Optional] Email me about recruitment',
     submit: 'Finish sign-up',
     lastNameMissing: 'Enter your last name.',
@@ -134,6 +138,33 @@ for (const locale of ['ko', 'en'] as const) {
 
         // Account screens stay out of search results.
         await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+      } finally {
+        await deleteAccount(email);
+      }
+    });
+
+    test('the policy link opens the policy, not a missing page', async ({
+      page,
+      baseURL,
+    }, testInfo) => {
+      const email = newAddress(testInfo);
+      try {
+        await startSignUp(page, email, baseURL!, { locale });
+        const [policy] = await Promise.all([
+          page.context().waitForEvent('page'),
+          page.getByRole('link', { name: t.privacyLink }).click(),
+        ]);
+        await policy.waitForLoadState();
+        await expect(policy).toHaveURL(`${baseURL}/${locale}/privacy`);
+        await expect(policy.getByRole('heading', { level: 1, name: t.policyTitle })).toBeVisible();
+        expect((await page.request.get(`${baseURL}/${locale}/privacy`)).status()).toBe(200);
+        // With accounts on, the policy sends the reader on to My page, where they view, edit and
+        // delete what they gave.
+        await expect(policy.locator('main').getByRole('link', { name: t.myPage })).toHaveAttribute(
+          'href',
+          `/${locale}/me`,
+        );
+        await expectAccessible(policy);
       } finally {
         await deleteAccount(email);
       }

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PRIVACY_POLICY_VERSION } from '@/lib/auth/profile';
 import {
   collectConsoleErrors,
   expectAccessible,
@@ -96,5 +97,105 @@ for (const locale of LOCALES) {
     expect(response?.status()).toBe(404);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByLabel(/이메일|Email/)).toHaveCount(0);
+  });
+}
+
+// The privacy policy. It is a draft until the operators and the ANCHOR Division approve it, and it
+// is reviewed on the site with accounts off, so it has to be there in this suite. It stays out of
+// the sitemap (see e2e/seo.spec.ts) until the accounts are launched.
+const POLICY = {
+  ko: {
+    title: '개인정보 처리방침',
+    officer: [
+      '개인정보 보호책임자: RISE CREW 회장 (risecrew4@gmail.com)',
+      '개인정보 처리 담당: 웹사이트 관리자',
+    ],
+    headings: [
+      '개인정보 수집·이용 목적',
+      '수집하는 항목',
+      '보유 기간',
+      '처리를 맡기는 곳',
+      '열람할 수 있는 사람',
+      '이용자의 권리',
+      '만 14세 미만',
+      '개인정보 보호책임자',
+      '시행일과 버전',
+    ],
+    notCollected: /전화번호와 학번은 받지 않습니다/,
+    footerLink: '개인정보 처리방침',
+  },
+  en: {
+    title: 'Privacy policy',
+    officer: [
+      'Privacy officer: RISE CREW President (risecrew4@gmail.com)',
+      'Data handling: Website administrator',
+    ],
+    headings: [
+      'Why we use your information',
+      'What we collect',
+      'How long we keep it',
+      'Who processes it for us',
+      'Who can see it',
+      'Your rights',
+      'People under 14',
+      'Privacy officer',
+      'Effective date and version',
+    ],
+    notCollected: /We do not collect phone numbers or student IDs/,
+    footerLink: 'Privacy policy',
+  },
+} as const;
+
+for (const locale of LOCALES) {
+  const copy = POLICY[locale];
+
+  test(`/${locale}/privacy renders cleanly while accounts are off`, async ({ page }) => {
+    const errors = collectConsoleErrors(page);
+    const response = await page.goto(`/${locale}/privacy`);
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(page.getByRole('heading', { level: 1, name: copy.title })).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await expectAccessible(page);
+    expect(errors).toEqual([]);
+  });
+
+  test(`/${locale}/privacy gives the officer lines and the version date`, async ({ page }) => {
+    await page.goto(`/${locale}/privacy`);
+    const main = page.locator('main');
+    for (const line of copy.officer) {
+      await expect(main.getByText(line, { exact: true })).toBeVisible();
+    }
+    // The officer's address is a link, so it can be written to straight from the page.
+    await expect(main.getByRole('link', { name: 'risecrew4@gmail.com' }).first()).toHaveAttribute(
+      'href',
+      'mailto:risecrew4@gmail.com',
+    );
+    const date = main.locator('time');
+    await expect(date).toHaveText(PRIVACY_POLICY_VERSION);
+    await expect(date).toHaveAttribute('datetime', PRIVACY_POLICY_VERSION);
+  });
+
+  test(`/${locale}/privacy covers every section of the spec, in its order`, async ({ page }) => {
+    await page.goto(`/${locale}/privacy`);
+    const headings = await page.locator('main h2').allTextContents();
+    // Each heading starts with its number ("1."), which the copy above leaves out.
+    expect(headings.map((h) => h.replace(/^\d+\.\s*/, ''))).toEqual(copy.headings);
+    // Said plainly, as the spec asks: no phone numbers and no student IDs.
+    await expect(page.locator('main')).toContainText(copy.notCollected);
+    await expect(page.locator('main')).toContainText('Supabase');
+    await expect(page.locator('main')).toContainText('Vercel');
+    await expect(page.locator('main')).toContainText('Google');
+  });
+
+  test(`/${locale}/privacy is reachable from the footer of every page`, async ({ page }) => {
+    for (const path of PAGES) {
+      await page.goto(`/${locale}${path}`);
+      const link = page.locator('footer').getByRole('link', { name: copy.footerLink });
+      await expect(link).toHaveAttribute('href', `/${locale}/privacy`);
+    }
+    await page.locator('footer').getByRole('link', { name: copy.footerLink }).click();
+    await page.waitForURL(`**/${locale}/privacy`);
+    await expect(page.getByRole('heading', { level: 1, name: copy.title })).toBeVisible();
   });
 }

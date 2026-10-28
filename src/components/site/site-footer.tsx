@@ -34,9 +34,16 @@ export async function SiteFooter() {
           <p className="mt-2 break-keep">{t('address')}</p>
         </div>
       </div>
-      <p className="border-t border-white/15 px-5 py-5 text-center text-xs tracking-[0.12em] text-white/75">
-        {t('rights', { year: new Date().getFullYear() })}
-      </p>
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-0 border-t border-white/15 px-5 py-2 text-xs tracking-[0.12em] text-white/75">
+        <p>{t('rights', { year: new Date().getFullYear() })}</p>
+        {/* Reachable with accounts off too: the policy is reviewed before they are switched on. */}
+        <Link
+          href="/privacy"
+          className="py-2 text-sm tracking-normal text-white/85 underline-offset-4 hover:underline"
+        >
+          {t('privacy')}
+        </Link>
+      </div>
     </footer>
   );
 }

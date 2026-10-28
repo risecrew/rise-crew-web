@@ -22,6 +22,10 @@
     },
     "notFound": {
       "title": "Page not found | RISE CREW"
+    },
+    "privacy": {
+      "title": "Privacy policy | RISE CREW",
+      "description": "What RISE CREW collects when you create an account on this website, why, how long we keep it, and your rights."
     }
   },
   "Nav": {
@@ -40,7 +44,8 @@
     "tagline": "From campus to the world.",
     "supportedBy": "Official startup club of the SKKU ANCHOR Division",
     "address": "Room 50322, Hoam Hall, 25-2 Sungkyunkwan-ro, Jongno-gu, Seoul",
-    "rights": "© {year} RISE CREW"
+    "rights": "© {year} RISE CREW",
+    "privacy": "Privacy policy"
   },
   "Common": {
     "upcoming": "Upcoming",
@@ -204,6 +209,118 @@
     "title": "Page not found",
     "body": "The address may have changed, or the page is not open yet.",
     "home": "Go home"
+  },
+  "Privacy": {
+    "title": "Privacy policy",
+    "lead": "What personal information RISE CREW collects when you create and use an account on this website, why, and how we handle it.",
+    "purpose": {
+      "title": "Why we use your information",
+      "intro": "RISE CREW (“the club”) is responsible for the personal information collected on this website. We use it only for the purposes below, and if a purpose changes we will tell you first and ask for your consent.",
+      "account": {
+        "label": "Account management",
+        "body": "Confirming who has signed up, signing you in, managing roles (guest, member, operator, admin), and limiting the use of accounts that cause problems."
+      },
+      "community": {
+        "label": "Community use",
+        "body": "Showing content that only signed-in people can see, and giving members features such as posting and replying."
+      },
+      "recruit": {
+        "label": "Recruitment notices",
+        "body": "Emailing recruitment dates and application guides, only to people who agreed to receive recruitment emails."
+      }
+    },
+    "items": {
+      "title": "What we collect",
+      "intro": "We ask for the information below when you sign up. We do not collect phone numbers or student IDs.",
+      "email": {
+        "label": "Email",
+        "body": "Required. Taken automatically from the account you sign in with (a Google account or an emailed link). You do not type it in."
+      },
+      "name": {
+        "label": "Last name, first name",
+        "body": "Required. Saved exactly as you type it, and never translated."
+      },
+      "occupation": {
+        "label": "What you do now",
+        "body": "Required. One of undergraduate, graduate student, alumni or employed, founder, or other."
+      },
+      "school": {
+        "label": "School, major",
+        "body": "Asked only if you choose undergraduate or graduate student, and required then."
+      },
+      "affiliation": {
+        "label": "Affiliation",
+        "body": "Optional. If you are not a student, you can give the name of a company or team, for example."
+      },
+      "age14": {
+        "label": "Confirmation that you are 14 or older",
+        "body": "Required. Recorded with the time you confirmed and the version of this policy."
+      },
+      "privacy": {
+        "label": "Consent to collect and use personal information",
+        "body": "Required. Recorded with the time you agreed and the version of this policy."
+      },
+      "recruit": {
+        "label": "Consent to recruitment emails",
+        "body": "Optional. Whether you agreed is recorded with the time and the version of this policy."
+      },
+      "cookies": "While you are signed in, a cookie in your browser keeps you signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in."
+    },
+    "retention": {
+      "title": "How long we keep it",
+      "keep": "We keep your information until you delete your account.",
+      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents."
+    },
+    "processors": {
+      "title": "Who processes it for us",
+      "intro": "We rely on the companies below to run the website. Their servers may be outside South Korea.",
+      "supabase": {
+        "label": "Supabase",
+        "body": "The database (where sign-up information is stored) and sign-in (account verification)"
+      },
+      "vercel": {
+        "label": "Vercel",
+        "body": "Hosting (running the website)"
+      },
+      "google": {
+        "label": "Google",
+        "body": "Only if you sign in with Google: confirming who you are through your Google account"
+      }
+    },
+    "visibility": {
+      "title": "Who can see it",
+      "self": {
+        "label": "You",
+        "body": "You see your own sign-up information on My page. You cannot see anyone else’s."
+      },
+      "staff": {
+        "label": "Operators and admins",
+        "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) on the member management screen. They look at it only to manage members and, for people who agreed, to send recruitment notices."
+      },
+      "outro": "There is no way to download the member list as a file. The club does not give personal information to anyone outside the companies above and the operators and admins."
+    },
+    "rights": {
+      "title": "Your rights",
+      "manage": "On <me>My page</me> you can view your sign-up information at any time, edit it, and delete it by deleting your account. You can change your choice about recruitment emails there too.",
+      "decline": "You may decline to consent to the collection and use of your information, but without the required items you cannot sign up.",
+      "unfinished": "If you signed in but did not finish the sign-up form, you cannot reach My page. To delete such an account, email <mail>risecrew4@gmail.com</mail> and ask us."
+    },
+    "under14": {
+      "title": "People under 14",
+      "body": "People under 14 cannot sign up. Under the Personal Information Protection Act, handling the information of a child under 14 needs the consent of a legal guardian, so sign-up is limited to people 14 or older, and we ask you to confirm it when you sign up. If we find that an account belongs to someone under 14, we delete it."
+    },
+    "officer": {
+      "title": "Privacy officer",
+      "intro": "For questions about personal information, requests to view, correct or delete it, and complaints, contact:",
+      "responsible": "Privacy officer: RISE CREW President (<mail>risecrew4@gmail.com</mail>)",
+      "handler": "Data handling: Website administrator",
+      "note": "The president changes with each cohort, so we give the position instead of a name."
+    },
+    "version": {
+      "title": "Effective date and version",
+      "body": "This policy applies from the date below. When it changes, we publish the new version on this page, and the version you agreed to is kept in your consent record.",
+      "label": "Effective date · version"
+    }
   },
   "Auth": {
     "menu": {
