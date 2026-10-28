@@ -225,7 +225,7 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
             type="button"
             onClick={onResend}
             disabled={secondsLeft > 0 || busy !== null}
-            className={cn(PILL, 'border border-white/25 text-white hover:bg-white/10')}
+            className={cn(PILL, 'border border-white/50 text-white hover:bg-white/10')}
           >
             {secondsLeft > 0 ? t('sent.resendIn', { seconds: secondsLeft }) : t('sent.resend')}
           </button>
@@ -236,7 +236,7 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
           <button
             type="button"
             onClick={changeAddress}
-            className="mx-auto mt-5 block text-base text-white underline underline-offset-4"
+            className="mx-auto mt-5 flex min-h-11 items-center text-base text-white underline underline-offset-4"
           >
             {t('sent.change')}
           </button>

@@ -254,6 +254,34 @@ test('the resend button works once a minute has passed, and the address can be c
   await expect(page.getByLabel('이메일')).toHaveValue('guest@example.test');
 });
 
+test('after the link is sent, the resend pill has the Outline border and the other-address button is a 44px target', async ({
+  page,
+}, testInfo) => {
+  // A new address, so the sign-in mail limit of an address the other tests use is not in the way.
+  const email = `outline-${testInfo.project.name}-${Date.now()}@example.test`;
+  try {
+    await page.goto('/ko/login');
+    await page.getByLabel('이메일').fill(email);
+    await page.getByRole('button', { name: '로그인 링크 받기' }).click();
+    await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
+
+    // DESIGN.md's Outline pill: a 50% white border (0.5, not 0.25).
+    const resend = page.getByRole('button', { name: /링크 다시 받기/ });
+    await expect(resend).toHaveCSS('border-top-color', /\/ 0\.5\)$|, 0\.5\)$/);
+
+    // The text button is as tall as a finger, and still centred under the pill.
+    const change = page.getByRole('button', { name: '다른 이메일로 받기' });
+    const changeBox = (await change.boundingBox())!;
+    const resendBox = (await resend.boundingBox())!;
+    expect(changeBox.height).toBeGreaterThanOrEqual(44);
+    const centre = (box: { x: number; width: number }) => box.x + box.width / 2;
+    expect(Math.abs(centre(changeBox) - centre(resendBox))).toBeLessThan(1.5);
+    await expectNoHorizontalScroll(page);
+  } finally {
+    await deleteAccount(email);
+  }
+});
+
 test('the Google button starts the sign-in with a way back to this site', async ({
   page,
   baseURL,
