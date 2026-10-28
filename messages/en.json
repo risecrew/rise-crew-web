@@ -264,12 +264,13 @@
         "label": "Consent to recruitment emails",
         "body": "Optional. Whether you agreed is recorded with the time and the version of this policy."
       },
-      "cookies": "While you are signed in, a cookie in your browser keeps you signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in."
+      "passive": "If you sign in with Google, Supabase also stores the basic profile Google shares (display name, profile picture URL, account identifier and the like) with your sign-in details. Supabase and Vercel keep access logs automatically (IP address, browser, and times), held under each company’s own policy.",
+      "cookies": "This site stores cookies in your browser. While you are signed in, a cookie keeps you signed in. When the language you view the site in differs from your browser’s (for example after you switch language), a cookie remembers that language, whether or not you are signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in and your language choice is not remembered."
     },
     "retention": {
       "title": "How long we keep it",
       "keep": "We keep your information until you delete your account.",
-      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents."
+      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) can stay in the Sent folder of the Gmail account that sent them; operators delete them periodically. Access logs that the companies keep automatically are held under each company’s own policy."
     },
     "processors": {
       "title": "Who processes it for us",
@@ -284,7 +285,7 @@
       },
       "google": {
         "label": "Google",
-        "body": "Only if you sign in with Google: confirming who you are through your Google account"
+        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails (for now, a RISE CREW Gmail account sends the sign-in emails; the recipient address and the one-time sign-in link pass through Google, and a copy stays in the Sent folder)"
       }
     },
     "visibility": {

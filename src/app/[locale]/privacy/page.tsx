@@ -129,6 +129,7 @@ export default async function PrivacyPage({ params }: Props) {
                 </Row>
               ))}
             </Rows>
+            <p>{t('items.passive')}</p>
             <p>{t('items.cookies')}</p>
           </Section>
 

@@ -123,6 +123,13 @@ const POLICY = {
     ],
     notCollected: /전화번호와 학번은 받지 않습니다/,
     footerLink: '개인정보 처리방침',
+    // The sign-in emails go out through the club's Gmail account, so Google is more than the
+    // Google sign-in button.
+    googleSender: /Gmail 계정이 로그인 이메일을 보냅니다/,
+    sentCopies: /보낸 편지함에 남을 수 있으며, 운영진이 주기적으로 지웁니다/,
+    languageCookie: /언어를 기억하는 쿠키/,
+    passiveProfile: /기본 프로필/,
+    passiveLogs: /접속 기록\(IP 주소, 브라우저 정보, 접속 시각\)/,
   },
   en: {
     title: 'Privacy policy',
@@ -143,6 +150,12 @@ const POLICY = {
     ],
     notCollected: /We do not collect phone numbers or student IDs/,
     footerLink: 'Privacy policy',
+    googleSender: /Gmail account sends the sign-in emails/,
+    sentCopies:
+      /Sent folder of the Gmail account that sent them; operators delete them periodically/,
+    languageCookie: /remembers that language/,
+    passiveProfile: /basic profile Google shares/,
+    passiveLogs: /access logs automatically \(IP address, browser, and times\)/,
   },
 } as const;
 
@@ -186,6 +199,30 @@ for (const locale of LOCALES) {
     await expect(page.locator('main')).toContainText('Supabase');
     await expect(page.locator('main')).toContainText('Vercel');
     await expect(page.locator('main')).toContainText('Google');
+  });
+
+  test(`/${locale}/privacy tells the whole story of who sends mail, what is stored and what is kept`, async ({
+    page,
+  }) => {
+    await page.goto(`/${locale}/privacy`);
+    const main = page.locator('main');
+    // Google is one processor row that covers both of its jobs: the sign-in button and the Gmail
+    // account the sign-in emails are sent from.
+    const google = main
+      .locator('dl > div')
+      .filter({ has: page.locator('dt', { hasText: /^Google$/ }) });
+    await expect(google).toHaveCount(1);
+    await expect(google).toContainText(copy.googleSender);
+    // Deleting an account does not reach the copies in the sending mailbox, and the text says so.
+    await expect(main.locator('section[aria-labelledby="privacy-retention"]')).toContainText(
+      copy.sentCopies,
+    );
+    // Cookies: the language cookie is named next to the sign-in one.
+    const items = main.locator('section[aria-labelledby="privacy-items"]');
+    await expect(items).toContainText(copy.languageCookie);
+    // What arrives without being asked for: the Google profile and the providers' access logs.
+    await expect(items).toContainText(copy.passiveProfile);
+    await expect(items).toContainText(copy.passiveLogs);
   });
 
   test(`/${locale}/privacy is reachable from the footer of every page`, async ({ page }) => {
