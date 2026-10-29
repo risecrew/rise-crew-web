@@ -7,11 +7,12 @@
 -- view must show each person exactly what the tables under it show them.
 --
 -- Fake accounts only (example.test). The ids do not collide with seed.sql.
---   guest     7e580000-0000-4000-8000-000000000001
+--   guest     7e580000-0000-4000-8000-000000000001  (has not finished signing up)
 --   member    7e580000-0000-4000-8000-000000000002  (name 이 + 회원)
 --   operator  7e580000-0000-4000-8000-000000000003
 --   blocked   7e580000-0000-4000-8000-000000000004  (operator, blocked)
 --   admin     7e580000-0000-4000-8000-000000000005
+-- Everyone but the guest has finished signing up.
 
 begin;
 
@@ -40,14 +41,38 @@ update public.user_roles set blocked_at = now()
 update public.user_roles set role = 'admin'
  where user_id = '7e580000-0000-4000-8000-000000000005';
 
-update public.profiles
-   set last_name = '이', first_name = '회원', recruit_opt_in = true
- where id = '7e580000-0000-4000-8000-000000000002';
+-- Everyone but the guest finishes signing up, the way the sign-up form does:
+-- consents first, then the form.
+insert into public.consents (user_id, kind, granted, policy_version)
+select u.id, k.kind, true, 'pgtap'
+from (values
+  ('7e580000-0000-4000-8000-000000000002'::uuid),
+  ('7e580000-0000-4000-8000-000000000003'::uuid),
+  ('7e580000-0000-4000-8000-000000000004'::uuid),
+  ('7e580000-0000-4000-8000-000000000005'::uuid)
+) as u (id)
+cross join (values ('privacy'), ('age14')) as k (kind);
 
--- How many profiles there are, as postgres sees them (seed rows included).
+update public.profiles
+   set last_name = '시', first_name = '험', occupation = 'founder', onboarded_at = now()
+ where id in ('7e580000-0000-4000-8000-000000000003',
+              '7e580000-0000-4000-8000-000000000004',
+              '7e580000-0000-4000-8000-000000000005');
+update public.profiles
+   set last_name = '이', first_name = '회원', occupation = 'founder', recruit_opt_in = true,
+       onboarded_at = now()
+ where id = '7e580000-0000-4000-8000-000000000002';
+-- The guest gave a name but never finished.
+update public.profiles
+   set last_name = '김', first_name = '미완'
+ where id = '7e580000-0000-4000-8000-000000000001';
+
+-- How many finished sign-ups there are, as postgres sees them (seed rows
+-- included).
 do $$
 begin
-  perform set_config('tests.profile_count', (select count(*)::text from public.profiles), true);
+  perform set_config('tests.finished_count',
+    (select count(*)::text from public.profiles where onboarded_at is not null), true);
 end
 $$;
 
@@ -81,10 +106,9 @@ select table_privs_are('public', 'member_list', 'service_role', array[]::text[],
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"7e580000-0000-4000-8000-000000000001","role":"authenticated"}';
 
-select results_eq(
+select is_empty(
   'select id from public.member_list',
-  $$values ('7e580000-0000-4000-8000-000000000001'::uuid)$$,
-  'a guest sees one row in the list, their own'
+  'an account that has not finished signing up sees no row in the list, not even its own'
 );
 
 set local request.jwt.claims = '{"sub":"7e580000-0000-4000-8000-000000000002","role":"authenticated"}';
@@ -108,8 +132,8 @@ set local request.jwt.claims = '{"sub":"7e580000-0000-4000-8000-000000000003","r
 
 select is(
   (select count(*) from public.member_list),
-  current_setting('tests.profile_count')::bigint,
-  'an operator sees every row in the list'
+  current_setting('tests.finished_count')::bigint,
+  'an operator sees a row for every finished sign-up'
 );
 select results_eq(
   $$select role::text, blocked_at is not null from public.member_list
@@ -125,17 +149,17 @@ select results_eq(
 );
 select is(
   (select count(*) from public.member_list
-    where id in (select id from public.profiles)),
-  current_setting('tests.profile_count')::bigint,
-  'every profile has exactly one row in the list'
+    where id in (select id from public.profiles where onboarded_at is not null)),
+  current_setting('tests.finished_count')::bigint,
+  'every finished profile has exactly one row in the list'
 );
 
 set local request.jwt.claims = '{"sub":"7e580000-0000-4000-8000-000000000005","role":"authenticated","app_role":"admin"}';
 
 select is(
   (select count(*) from public.member_list),
-  current_setting('tests.profile_count')::bigint,
-  'an admin sees every row in the list'
+  current_setting('tests.finished_count')::bigint,
+  'an admin sees a row for every finished sign-up'
 );
 
 -- ---------------------------------------------------------------------------
@@ -158,11 +182,10 @@ select ok(
     where id = '7e580000-0000-4000-8000-000000000002'),
   'the name in the English order (given name first) can be searched'
 );
-select is(
-  (select search_text from public.member_list
-    where id = '7e580000-0000-4000-8000-000000000001'),
-  'pgtap-list-guest@example.test',
-  'an account that has not signed up fully is found by its email, in lower case'
+select is_empty(
+  $$select id from public.member_list
+     where search_text like '%pgtap-list-guest%' or search_text like '%김미완%'$$,
+  'an account that has not finished signing up is found neither by its email nor its name'
 );
 
 -- ---------------------------------------------------------------------------

@@ -119,7 +119,14 @@ async function applyChange(
     const admin = createSupabaseAdminClient();
     const [roleResult, profileResult, adminIds] = await Promise.all([
       admin.from('user_roles').select('user_id, role, blocked_at').in('user_id', ids),
-      admin.from('profiles').select('id, email, last_name, first_name').in('id', ids),
+      // Finished sign-ups only, as the list shows them: an account that never finished agreed to
+      // nothing and is not the staff's to change (the secret key would read it, so it is left out
+      // here and counts as not there).
+      admin
+        .from('profiles')
+        .select('id, last_name, first_name')
+        .in('id', ids)
+        .not('onboarded_at', 'is', null),
       unblockedAdminIds(),
     ]);
     if (roleResult.error) throw new Error(roleResult.error.message);
@@ -151,7 +158,8 @@ async function applyChange(
             targets.find((t) => t.id === id)!,
             change,
           ),
-          name: displayName(profile, locale) || profile.email,
+          // A finished sign-up always has both names (the database checks it).
+          name: displayName(profile, locale),
         };
       });
       return failure('refused', change, { ids, groups: groupRefusals(refusals) });

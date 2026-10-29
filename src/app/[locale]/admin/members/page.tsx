@@ -51,9 +51,10 @@ const COLUMNS =
 // state from the address (`?q=...&role=...&optin=1&page=2`) so a search is a link and works
 // without scripts.
 //
-// The list is read with the visitor's own session: the database shows every account to an
-// operator or admin and only their own to anyone else. Changes go through the server actions next
-// to this file, which check everything again.
+// The list is read with the visitor's own session: the database shows every finished sign-up to an
+// operator or admin and only their own to anyone else. An account that never finished signing up
+// is on nobody's list (it is deleted after 7 days). Changes go through the server actions next to
+// this file, which check everything again.
 export default async function MembersPage({ params, searchParams }: Props) {
   // With accounts switched off there is no members screen, exactly as before it existed.
   if (!isAuthEnabled()) notFound();

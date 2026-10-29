@@ -87,7 +87,7 @@ select table_privs_are('public', 'user_roles', 'supabase_auth_admin', array['SEL
   'the auth server reads user_roles for the token hook');
 
 select policies_are('public', 'profiles',
-  array['profiles_select_own_or_operator', 'profiles_update_own'],
+  array['profiles_select_own_or_finished_for_operator', 'profiles_update_own'],
   'profiles has exactly the expected policies');
 select policies_are('public', 'user_roles',
   array['user_roles_select_own_or_operator', 'user_roles_select_auth_admin'],
@@ -169,7 +169,6 @@ update public.user_roles set role = 'admin'
 -- Totals as seen by postgres (seed rows included), for the operator checks.
 do $$
 begin
-  perform set_config('tests.profile_count', (select count(*)::text from public.profiles), true);
   perform set_config('tests.role_count', (select count(*)::text from public.user_roles), true);
 end
 $$;
@@ -448,12 +447,24 @@ select is(
 -- Operator and admin
 -- ---------------------------------------------------------------------------
 
+-- What an operator or an admin should see of profiles, counted as postgres
+-- (seed rows included): every finished sign-up, and their own row. The two
+-- below have not finished theirs, so their own row is one more.
+reset role;
+do $$
+begin
+  perform set_config('tests.staff_profile_count',
+    (select (count(*) + 1)::text from public.profiles where onboarded_at is not null), true);
+end
+$$;
+set local role authenticated;
+
 set local request.jwt.claims = '{"sub":"7e570000-0000-4000-8000-000000000003","role":"authenticated","app_role":"operator"}';
 
 select is(
   (select count(*) from public.profiles),
-  current_setting('tests.profile_count')::bigint,
-  'an operator sees every profile'
+  current_setting('tests.staff_profile_count')::bigint,
+  'an operator sees every finished profile, and their own'
 );
 select is(
   (select count(*) from public.user_roles),
@@ -475,8 +486,8 @@ set local request.jwt.claims = '{"sub":"7e570000-0000-4000-8000-000000000006","r
 
 select is(
   (select count(*) from public.profiles),
-  current_setting('tests.profile_count')::bigint,
-  'an admin sees every profile'
+  current_setting('tests.staff_profile_count')::bigint,
+  'an admin sees every finished profile, and their own'
 );
 
 -- ---------------------------------------------------------------------------

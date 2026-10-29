@@ -35,6 +35,8 @@ const GUEST = id(4);
 const MEMBER = id(5);
 const GUEST_2 = id(6);
 const BLOCKED_MEMBER = id(7);
+// Signed in once and never finished the sign-up form.
+const UNFINISHED = id(8);
 
 type RoleRow = { user_id: string; role: AppRole; blocked_at: string | null; updated_by?: string };
 type ProfileRow = {
@@ -42,6 +44,7 @@ type ProfileRow = {
   email: string;
   last_name: string | null;
   first_name: string | null;
+  onboarded_at: string | null;
 };
 
 type Filter =
@@ -52,7 +55,14 @@ type Filter =
 // A small stand-in for the database and the secret-key client: tables the action reads and writes,
 // with the filters it uses applied for real, so the tests can look at what is left in the "tables".
 function makeDb(
-  people: { id: string; role: AppRole; blocked?: boolean; name?: [string, string] }[],
+  people: {
+    id: string;
+    role: AppRole;
+    blocked?: boolean;
+    name?: [string, string];
+    // Everyone has finished signing up unless said otherwise.
+    unfinished?: boolean;
+  }[],
 ) {
   const roles = new Map<string, RoleRow>();
   const profiles = new Map<string, ProfileRow>();
@@ -63,6 +73,7 @@ function makeDb(
       email: `${p.id.slice(-2)}@example.test`,
       last_name: p.name?.[0] ?? null,
       first_name: p.name?.[1] ?? null,
+      onboarded_at: p.unfinished ? null : 'before',
     });
   }
 
@@ -75,9 +86,9 @@ function makeDb(
     banThrows: false,
   };
 
-  function matches(row: RoleRow, filters: Filter[]) {
+  function matches<Row extends object>(row: Row, filters: Filter[]) {
     return filters.every((f) => {
-      const value = row[f.column as keyof RoleRow];
+      const value = row[f.column as keyof Row];
       if (f.kind === 'in') return f.values.includes(value);
       if (f.kind === 'is') return value === f.value;
       return value !== f.value;
@@ -124,10 +135,12 @@ function makeDb(
             error: null,
           });
         }
-        const idFilter = filters.find((f) => f.kind === 'in' && f.column === 'id');
-        const wanted = idFilter && idFilter.kind === 'in' ? idFilter.values : [];
+        // Profiles are always asked for by id; with no id filter, nobody.
+        if (!filters.some((f) => f.kind === 'in' && f.column === 'id')) {
+          return resolve({ data: [], error: null });
+        }
         return resolve({
-          data: [...profiles.values()].filter((row) => wanted.includes(row.id)),
+          data: [...profiles.values()].filter((row) => matches(row, filters)),
           error: null,
         });
       },
@@ -181,13 +194,14 @@ const SITE = [
   { id: OPERATOR, role: 'operator' as const, name: ['박', '운영'] as [string, string] },
   { id: GUEST, role: 'guest' as const, name: ['김', '가입'] as [string, string] },
   { id: MEMBER, role: 'member' as const, name: ['이', '회원'] as [string, string] },
-  { id: GUEST_2, role: 'guest' as const },
+  { id: GUEST_2, role: 'guest' as const, name: ['한', '둘'] as [string, string] },
   {
     id: BLOCKED_MEMBER,
     role: 'member' as const,
     blocked: true,
     name: ['오', '차단'] as [string, string],
   },
+  { id: UNFINISHED, role: 'guest' as const, unfinished: true },
 ];
 
 beforeEach(() => {
@@ -265,7 +279,7 @@ describe('changeRoles', () => {
     expect(db.log.updates).toEqual([]);
   });
 
-  it('writes names in the language of the page, and the address for an account without a name', async () => {
+  it('writes names in the language of the page', async () => {
     makeDb(SITE);
     actAs('operator', OPERATOR);
     adminsAre(ADMIN);
@@ -281,11 +295,8 @@ describe('changeRoles', () => {
       ],
     });
 
-    const nameless = await changeRoles('ko', [GUEST_2], 'guest');
-    expect(nameless).toMatchObject({
-      ok: false,
-      groups: [{ reason: 'same', names: ['06@example.test'] }],
-    });
+    const korean = await changeRoles('ko', [GUEST_2], 'guest');
+    expect(korean).toMatchObject({ ok: false, groups: [{ reason: 'same', names: ['한둘'] }] });
   });
 
   it('does not list more than ten names, and counts the rest', async () => {
@@ -432,6 +443,36 @@ describe('changeRoles', () => {
       ids: [GUEST, id(999)],
     });
     expect(db.roles.get(GUEST)?.role).toBe('guest');
+  });
+
+  it('treats an account that has not finished signing up as not there, and changes nobody', async () => {
+    const db = makeDb(SITE);
+    // Whoever asks and whatever the change: the members screen does not list such an account,
+    // so an id of one can only come from a crafted request.
+    for (const [role, actor] of [
+      ['operator', OPERATOR],
+      ['admin', ADMIN],
+    ] as const) {
+      actAs(role, actor);
+      adminsAre(ADMIN, OTHER_ADMIN);
+      expect(await changeRoles('ko', [GUEST, UNFINISHED], 'member')).toMatchObject({
+        ok: false,
+        error: 'missing',
+        ids: [GUEST, UNFINISHED],
+      });
+      expect(await changeRoles('ko', [UNFINISHED], 'admin')).toMatchObject({
+        ok: false,
+        error: 'missing',
+      });
+      expect(await setBlocked('ko', [UNFINISHED], true)).toMatchObject({
+        ok: false,
+        error: 'missing',
+      });
+    }
+    expect(db.roles.get(GUEST)?.role).toBe('guest');
+    expect(db.roles.get(UNFINISHED)).toMatchObject({ role: 'guest', blocked_at: null });
+    expect(db.log.updates).toEqual([]);
+    expect(db.log.bans).toEqual([]);
   });
 
   it('does not overwrite a role that was raised after the list was read', async () => {

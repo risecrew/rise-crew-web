@@ -43,7 +43,6 @@ const COPY = {
     yes: '동의',
     no: '미동의',
     none: '정보 없음',
-    unfinished: '가입 미완료',
     button: {
       member: '회원으로',
       guest: '가입자로',
@@ -95,6 +94,7 @@ const COPY = {
     },
     lastAdmin: '관리자가 한 명도 남지 않게 돼서 할 수 없어요. 먼저 다른 관리자를 지정해 주세요.',
     chooseFirst: '바꿀 사람을 먼저 골라 주세요.',
+    missing: '목록에 없는 사람이 있어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.',
     empty: '조건에 맞는 회원이 없어요.',
     clear: '필터 지우기',
     next: '다음',
@@ -133,7 +133,6 @@ const COPY = {
     yes: 'Yes',
     no: 'No',
     none: 'No info',
-    unfinished: 'Sign-up not finished',
     button: {
       member: 'Make member',
       guest: 'Make guest',
@@ -191,6 +190,7 @@ const COPY = {
     },
     lastAdmin: 'That would leave the site without an admin. Make someone else an admin first.',
     chooseFirst: 'Choose who to change first.',
+    missing: 'Some of these people are no longer on the list. Reload the page and try again.',
     empty: 'No one matches.',
     clear: 'Clear filters',
     next: 'Next',
@@ -511,7 +511,7 @@ for (const locale of ['ko', 'en'] as const) {
 }
 
 test.describe('an account that has not finished signing up', () => {
-  test('is on the list under its address, and a name is searched for in either order', async ({
+  test('is not on the list, a crafted request for it changes nobody, and names are found in either order', async ({
     page,
     baseURL,
   }, testInfo) => {
@@ -521,16 +521,34 @@ test.describe('an account that has not finished signing up', () => {
     try {
       const created = await adminClient().auth.admin.createUser({ email, email_confirm: true });
       expect(created.error).toBeNull();
-      await createOnboardedAccount(done, { names: ['한', '지민'] });
+      const unfinishedId = created.data.user!.id;
+      const doneId = await createOnboardedAccount(done, { names: ['한', '지민'] });
 
-      await signIn(page, SEEDED.operator, baseURL!);
-      await openList(page, 'ko', { q: email });
-      const row = rowOf(page, email);
-      await expect(row).toHaveCount(1);
-      await expect(row).toContainText(t.unfinished);
-      await expect(row.locator('[data-col="role"]')).toContainText(t.roles.guest);
-      // Its checkbox is named after the address, the only name it has.
-      await expect(row.getByRole('checkbox', { name: new RegExp(email) })).toBeEnabled();
+      // Even an admin does not see it: not under its own address, and not among the others made
+      // by this test.
+      await signIn(page, SEEDED.admin, baseURL!);
+      // (An empty list has no form for the page's scripts to take over.)
+      await openList(page, 'ko', { q: email }, { scripts: false });
+      await expect(page.locator('main').getByText(t.empty)).toBeVisible();
+      await expect(table(page)).toHaveCount(0);
+      await openList(page, 'ko', { q: `-${testInfo.project.name}-` });
+      await expect(rowOf(page, done)).toHaveCount(1);
+      await expect(rowOf(page, email)).toHaveCount(0);
+
+      // Its id, added to the form by hand, is somebody who is not there: the whole batch is
+      // refused and nobody changes.
+      await tickOf(page, done).check();
+      await page.evaluate((value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'id';
+        input.value = value;
+        document.querySelector('main form[data-members-form]')!.append(input);
+      }, unfinishedId);
+      await button(page, 'ko', 'member', 1).click();
+      await expect(alert(page)).toHaveText(t.missing);
+      expect((await roleRow(unfinishedId)).role).toBe('guest');
+      expect((await roleRow(doneId)).role).toBe('guest');
 
       // Family name first, no space (Korean); the given name alone; the English order.
       for (const q of ['한지민', '지민', '지민 한', '한 지민']) {
@@ -1570,17 +1588,9 @@ test.describe('pages of 50', () => {
     const stamp = `${Date.now()}`;
     const emails = Array.from({ length: 52 }, (_, i) => `pg${stamp}-${i}@example.test`);
     try {
-      // Plain accounts (no sign-up form): 52 of them, found by the stamp in their address.
+      // 52 finished sign-ups (the list shows no other kind), found by the stamp in their address.
       for (let i = 0; i < emails.length; i += 13) {
-        await Promise.all(
-          emails.slice(i, i + 13).map(async (email) => {
-            const { error } = await adminClient().auth.admin.createUser({
-              email,
-              email_confirm: true,
-            });
-            if (error) throw error;
-          }),
-        );
+        await Promise.all(emails.slice(i, i + 13).map((email) => createOnboardedAccount(email)));
       }
       await signIn(page, SEEDED.operator, baseURL!);
       await openList(page, 'ko', { q: `pg${stamp}` });

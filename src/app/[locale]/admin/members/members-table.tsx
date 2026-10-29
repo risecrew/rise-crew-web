@@ -21,7 +21,7 @@ import { Tick } from './tick';
 // One person, with everything the table shows already put into words by the page.
 export type MemberRowView = {
   id: string;
-  // Empty until the person has finished signing up.
+  // The list holds finished sign-ups only, and every one of them has a name.
   name: string;
   email: string;
   occupation: string;
@@ -243,7 +243,6 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
         </thead>
         <tbody role="rowgroup" className="block lg:table-row-group">
           {rows.map((row) => {
-            const label = row.name || row.email;
             return (
               <tr
                 key={row.id}
@@ -264,7 +263,7 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
                       checked={selected.has(row.id)}
                       onChange={(event) => toggle(row.id, event.target.checked)}
                       disabled={!row.selectable}
-                      aria-label={t('select.row', { name: label })}
+                      aria-label={t('select.row', { name: row.name })}
                     />
                   </label>
                 </td>
@@ -273,15 +272,9 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
                   data-col="name"
                   className="col-start-2 row-start-1 min-w-0 pt-2 lg:table-cell lg:px-3 lg:py-4"
                 >
-                  {row.name ? (
-                    <span className="text-lg font-semibold wrap-anywhere break-keep text-white lg:text-base">
-                      {row.name}
-                    </span>
-                  ) : (
-                    <span className="text-base break-keep text-white/60">
-                      {t('table.unfinished')}
-                    </span>
-                  )}
+                  <span className="text-lg font-semibold wrap-anywhere break-keep text-white lg:text-base">
+                    {row.name}
+                  </span>
                 </td>
                 <td
                   role="cell"
