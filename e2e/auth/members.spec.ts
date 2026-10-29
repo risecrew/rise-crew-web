@@ -95,6 +95,8 @@ const COPY = {
     lastAdmin: '관리자가 한 명도 남지 않게 돼서 할 수 없어요. 먼저 다른 관리자를 지정해 주세요.',
     chooseFirst: '바꿀 사람을 먼저 골라 주세요.',
     missing: '목록에 없는 사람이 있어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.',
+    // The login page's notice for a blocked account.
+    blockedNotice: '이용이 제한된 계정이에요.',
     empty: '조건에 맞는 회원이 없어요.',
     clear: '필터 지우기',
     next: '다음',
@@ -191,6 +193,7 @@ const COPY = {
     lastAdmin: 'That would leave the site without an admin. Make someone else an admin first.',
     chooseFirst: 'Choose who to change first.',
     missing: 'Some of these people are no longer on the list. Reload the page and try again.',
+    blockedNotice: 'This account has been suspended.',
     empty: 'No one matches.',
     clear: 'Clear filters',
     next: 'Next',
@@ -829,10 +832,12 @@ test.describe('blocking', () => {
       await them.page.goto('/ko/me');
       await expect(them.page).toHaveURL(`${baseURL}/ko/login?error=blocked`);
 
-      // A fresh sign-in attempt fails as well: the emailed link no longer signs anyone in.
+      // A fresh sign-in attempt fails as well: the emailed link no longer signs anyone in, and the
+      // login page says why (not that the link expired).
       const fresh = await member.newPage();
       await fresh.goto(await requestSignInLink(email, baseURL!));
-      await expect(fresh).toHaveURL(`${baseURL}/ko/login?error=link`);
+      await expect(fresh).toHaveURL(`${baseURL}/ko/login?error=blocked`);
+      await expect(alert(fresh)).toHaveText(t.blockedNotice);
       await fresh.goto('/ko/me');
       await expect(fresh).toHaveURL(/\/ko\/login/);
 

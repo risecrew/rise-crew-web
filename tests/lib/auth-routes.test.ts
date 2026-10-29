@@ -1,3 +1,4 @@
+import { AuthApiError } from '@supabase/supabase-js';
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -16,7 +17,14 @@ vi.mock('@/lib/auth/viewer', () => ({ getViewer: vi.fn() }));
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: vi.fn() }));
 
 import { isAuthEnabled } from '@/lib/auth/config';
-import { authRouteLocale, finishSignIn, linkFailed, redirectTo } from '@/lib/auth/routes';
+import {
+  authRouteLocale,
+  blockedSignIn,
+  finishSignIn,
+  isBannedError,
+  linkFailed,
+  redirectTo,
+} from '@/lib/auth/routes';
 import { getViewer, type Viewer } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { GET as callback } from '@/app/[locale]/auth/callback/route';
@@ -71,6 +79,44 @@ describe('redirectTo', () => {
 describe('linkFailed', () => {
   it('goes to the login page of the same language, with the link error', () => {
     expect(linkFailed('en').headers.get('location')).toBe('/en/login?error=link');
+  });
+});
+
+describe('blockedSignIn', () => {
+  it('goes to the login page of the same language, with the blocked notice', () => {
+    expect(blockedSignIn('en').headers.get('location')).toBe('/en/login?error=blocked');
+    expect(blockedSignIn('ko').headers.get('cache-control')).toBe(NO_STORE);
+  });
+});
+
+// What Supabase Auth (GoTrue) answers for an account with a ban on it. Found on the local stack
+// (verifyOtp of an emailed link: HTTP 403, code `user_banned`, "User is banned") and in GoTrue's
+// provider callback, which sends the same code and message back as query parameters next to
+// `error=access_denied`.
+describe('isBannedError', () => {
+  it('knows the ban by its code', () => {
+    // As supabase-js hands it over from verifyOtp.
+    expect(isBannedError(new AuthApiError('User is banned', 403, 'user_banned'))).toBe(true);
+    expect(isBannedError({ code: 'user_banned' })).toBe(true);
+  });
+
+  it('knows it by the message when there is no code', () => {
+    expect(isBannedError({ message: 'User is banned' })).toBe(true);
+    expect(isBannedError({ code: null, message: 'user is banned' })).toBe(true);
+  });
+
+  it('does not mistake anything else for it', () => {
+    for (const error of [
+      null,
+      undefined,
+      {},
+      { code: 'otp_expired', message: 'Email link is invalid or has expired' },
+      new AuthApiError('invalid JWT', 403, 'bad_jwt'),
+      { message: 'Token has expired or is invalid' },
+      { code: 'user_not_found', message: 'User is banned or something' },
+    ]) {
+      expect(isBannedError(error), JSON.stringify(error)).toBe(false);
+    }
   });
 });
 
@@ -170,6 +216,27 @@ describe('GET /{locale}/auth/confirm', () => {
     expect(getViewer).not.toHaveBeenCalled();
   });
 
+  it('goes to login with the blocked notice when Auth refuses a banned account', async () => {
+    // Exactly what the local stack answers for a banned account's emailed link.
+    fakeSupabase({
+      verifyOtp: {
+        data: { user: null, session: null },
+        error: {
+          name: 'AuthApiError',
+          status: 403,
+          code: 'user_banned',
+          message: 'User is banned',
+        },
+      },
+    });
+    const response = await confirm(
+      request('/en/auth/confirm?next=%2Fen%2Fabout&token_hash=abc&type=email'),
+      params('en'),
+    );
+    expect(response.headers.get('location')).toBe('/en/login?error=blocked');
+    expect(getViewer).not.toHaveBeenCalled();
+  });
+
   it.each([
     ['no token', '/ko/auth/confirm?type=email'],
     ['an empty token', '/ko/auth/confirm?token_hash=&type=email'],
@@ -247,6 +314,31 @@ describe('GET /{locale}/auth/callback', () => {
       expect(response.headers.get('location'), search).toBe('/en/login?error=oauth');
     }
     expect(auth.exchangeCodeForSession).not.toHaveBeenCalled();
+  });
+
+  it('goes to login with the blocked notice when Auth turns a banned account away', async () => {
+    const auth = fakeSupabase();
+    for (const search of [
+      // What GoTrue sends back for a banned account.
+      '?error=access_denied&error_code=user_banned&error_description=User+is+banned&next=%2Fko%2Fabout',
+      // The same without the code, as an older Auth would send it.
+      '?error=access_denied&error_description=User%20is%20banned',
+    ]) {
+      const response = await callback(request(`/ko/auth/callback${search}`), params('ko'));
+      expect(response.headers.get('location'), search).toBe('/ko/login?error=blocked');
+    }
+    expect(auth.exchangeCodeForSession).not.toHaveBeenCalled();
+  });
+
+  it('goes to login with the blocked notice when the code is refused for a banned account', async () => {
+    fakeSupabase({
+      exchangeCodeForSession: {
+        error: { status: 403, code: 'user_banned', message: 'User is banned' },
+      },
+    });
+    const response = await callback(request('/en/auth/callback?code=the-code'), params('en'));
+    expect(response.headers.get('location')).toBe('/en/login?error=blocked');
+    expect(getViewer).not.toHaveBeenCalled();
   });
 
   it('is a 404 while accounts are switched off', async () => {

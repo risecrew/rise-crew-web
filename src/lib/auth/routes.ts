@@ -41,6 +41,30 @@ export function oauthFailed(locale: Locale): NextResponse {
   return redirectTo(`/${locale}/login?error=oauth`);
 }
 
+// Where a sign-in ends up when Auth refuses it because the account is blocked (the members screen
+// puts a ban on it in Auth): the login page says the account is restricted, so a person blocked by
+// mistake knows to ask the club, instead of being told the link expired.
+export function blockedSignIn(locale: Locale): NextResponse {
+  return redirectTo(`/${locale}/login?error=blocked`);
+}
+
+// How Supabase Auth says an account is banned: the code `user_banned` with the message "User is
+// banned". A token check (verifyOtp) answers with it as an error (HTTP 403, seen on the local
+// stack); the provider callback sends the same code and message back to the site as
+// `?error=access_denied&error_code=user_banned&error_description=User is banned`. The message is
+// the fallback for an answer without a code.
+const BANNED_CODE = 'user_banned';
+const BANNED_MESSAGE = /^user is banned$/i;
+
+export function isBannedError(
+  // An Auth error, or the code and message a callback was sent back with.
+  error: { code?: string | null; message?: string | null } | null | undefined,
+): boolean {
+  if (!error) return false;
+  if (error.code === BANNED_CODE) return true;
+  return !error.code && typeof error.message === 'string' && BANNED_MESSAGE.test(error.message);
+}
+
 // Once a link has signed the visitor in (the session cookies are already set): a new account goes
 // on to the welcome form, which brings them back to `next` afterwards; a finished account goes
 // straight to `next`. `next` comes from the query string, so safeNext vets it.

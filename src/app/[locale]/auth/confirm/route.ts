@@ -1,5 +1,12 @@
 import type { NextRequest } from 'next/server';
-import { authRouteLocale, finishSignIn, linkFailed, type AuthRouteParams } from '@/lib/auth/routes';
+import {
+  authRouteLocale,
+  blockedSignIn,
+  finishSignIn,
+  isBannedError,
+  linkFailed,
+  type AuthRouteParams,
+} from '@/lib/auth/routes';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 // Where the emailed sign-in link lands: `?next=...&token_hash=...&type=email`. The one-time token
@@ -15,7 +22,8 @@ export async function GET(request: NextRequest, context: AuthRouteParams) {
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.verifyOtp({ type: 'email', token_hash: tokenHash });
-  if (error) return linkFailed(locale);
+  // A blocked account's link is refused by Auth itself; the person is told why.
+  if (error) return isBannedError(error) ? blockedSignIn(locale) : linkFailed(locale);
 
   return finishSignIn(locale, searchParams.get('next'));
 }

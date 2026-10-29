@@ -1,7 +1,9 @@
 import type { NextRequest } from 'next/server';
 import {
   authRouteLocale,
+  blockedSignIn,
   finishSignIn,
+  isBannedError,
   linkFailed,
   oauthFailed,
   type AuthRouteParams,
@@ -15,9 +17,15 @@ export async function GET(request: NextRequest, context: AuthRouteParams) {
   const locale = await authRouteLocale(context);
   const { searchParams } = request.nextUrl;
 
-  // The provider's own refusal comes back as `?error=...&error_description=...` with no code.
+  // The provider's own refusal comes back as `?error=...&error_description=...` with no code. Auth
+  // turns a blocked account away the same way, with `error_code=user_banned`; that person is told
+  // the account is restricted rather than asked to try again.
   if (searchParams.has('error') || searchParams.has('error_description')) {
-    return oauthFailed(locale);
+    const banned = isBannedError({
+      code: searchParams.get('error_code'),
+      message: searchParams.get('error_description'),
+    });
+    return banned ? blockedSignIn(locale) : oauthFailed(locale);
   }
 
   const code = searchParams.get('code');
@@ -25,7 +33,7 @@ export async function GET(request: NextRequest, context: AuthRouteParams) {
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error) return linkFailed(locale);
+  if (error) return isBannedError(error) ? blockedSignIn(locale) : linkFailed(locale);
 
   return finishSignIn(locale, searchParams.get('next'));
 }

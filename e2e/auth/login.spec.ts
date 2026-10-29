@@ -347,6 +347,20 @@ test('a failed Google sign-in comes back to the login page with its own message'
   expect(location.pathname + location.search).toBe('/ko/login?error=oauth');
 });
 
+test('a Google sign-in that Auth refuses because the account is blocked says so', async ({
+  request,
+  baseURL,
+}) => {
+  // What Supabase Auth sends back to the callback for a banned account: no code, and the reason.
+  const response = await request.get(
+    '/en/auth/callback?next=%2Fen%2Fabout&error=access_denied&error_code=user_banned&error_description=User+is+banned',
+    { maxRedirects: 0 },
+  );
+  expect(response.status()).toBe(307);
+  const location = new URL(response.headers()['location'], baseURL!);
+  expect(location.pathname + location.search).toBe('/en/login?error=blocked');
+});
+
 test.describe('a visitor who is already signed in', () => {
   test('is sent on to where they were heading', async ({ page, baseURL }) => {
     await signIn(page, 'member@example.test', baseURL!);
