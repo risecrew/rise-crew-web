@@ -1,4 +1,4 @@
-import { ROLE_ORDER, canBlock, canChangeRole, type AppRole } from './roles';
+import { ROLE_ORDER, atLeast, canBlock, canChangeRole, type AppRole } from './roles';
 
 // The rules of the members screen that do not need a database: reading the address, what a batch
 // of changes may and may not do, and the shape of what the server sends back to the form. This
@@ -155,14 +155,28 @@ export function planBlock(
 // One change for the whole batch: everyone becomes `to`, or everyone is blocked / unblocked.
 export type MemberChange = { kind: 'role'; to: AppRole } | { kind: 'block'; blocked: boolean };
 
-// Whether the screen asks "are you sure?" before doing this: blocking shuts a person out, and
-// handing out operator or admin hands over keys. The rest (member, guest, unblock) are everyday
-// moves that are as easy to take back as to make. This is for the person's sake, not a security
-// check: the server's rules below do not depend on it.
-export function needsConfirmation(change: MemberChange): boolean {
-  return change.kind === 'block'
-    ? change.blocked
-    : change.to === 'operator' || change.to === 'admin';
+// The people in `targets` that a role change takes from operator or above to below it: operators
+// and admins who would lose the members screen and everything else that comes with the role
+// (possibly the person making the change). Nobody for a block, or for a change to operator or
+// admin.
+export function staffLosingRole(
+  change: MemberChange,
+  targets: readonly MemberTarget[],
+): MemberTarget[] {
+  if (change.kind !== 'role' || atLeast(change.to, 'operator')) return [];
+  return targets.filter((t) => atLeast(t.role, 'operator'));
+}
+
+// Whether the screen asks "are you sure?" before doing this to these people (their roles as they
+// are now): blocking shuts a person out, handing out operator or admin hands over keys, and taking
+// an operator or an admin below operator takes the keys away, maybe from yourself. The rest
+// (member and guest among non-staff, unblock) are everyday moves that are as easy to take back as
+// to make. This is for the person's sake, not a security check: the server's rules below do not
+// depend on it.
+export function needsConfirmation(change: MemberChange, targets: readonly MemberTarget[]): boolean {
+  if (change.kind === 'block') return change.blocked;
+  if (atLeast(change.to, 'operator')) return true;
+  return staffLosingRole(change, targets).length > 0;
 }
 
 // Why a person in a refused batch cannot be changed. These are the rules planRoleChange and
@@ -275,13 +289,15 @@ export type MemberFailure = {
 };
 // Not a failure and not yet a success: the change would be allowed, nothing has been done, and
 // the page asks "are you sure?" (see needsConfirmation). The confirm button sends the same form
-// again with `confirm=1`.
+// again with `confirm=1`. `staff` is what the question adds when operators or admins would lose
+// their role (see staffLosingRole): how many, and whether the person asking is one of them.
 export type MemberAsk = {
   ok: false;
   at: number;
   error: 'confirm';
   change: MemberChange;
   ids: string[];
+  staff: { count: number; self: boolean } | null;
 };
 export type MemberResult = MemberSuccess | MemberFailure | MemberAsk;
 export type MemberState = MemberResult | null;

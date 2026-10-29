@@ -519,6 +519,16 @@
           "question": "{count, plural, one {Make # person an admin?} other {Make # people admins?}}",
           "yes": "Make admin"
         },
+        "member": {
+          "question": "{count, plural, one {Make # person a member?} other {Make # people members?}}",
+          "yes": "Make member"
+        },
+        "guest": {
+          "question": "{count, plural, one {Make # person a guest?} other {Make # people guests?}}",
+          "yes": "Make guest"
+        },
+        "staffLoss": "{staff, plural, one {# operator or admin will lose that role.} other {# operators or admins will lose those roles.}}",
+        "selfLoss": "Your own account is one of them, so you will lose access to this screen.",
         "cancel": "Cancel"
       },
       "result": {

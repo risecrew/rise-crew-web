@@ -783,6 +783,125 @@ describe('submitMemberAction', () => {
       });
     }
 
+    it('asks before taking staff below operator, and says how many lose a role and whether one is you', async () => {
+      const db = makeDb(SITE);
+      actAs('admin', ADMIN);
+      adminsAre(ADMIN, OTHER_ADMIN);
+
+      // The operator with somebody who is not staff (and not already in the role asked for).
+      for (const [to, other] of [
+        ['member', GUEST_2],
+        ['guest', MEMBER],
+      ]) {
+        const asked = await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', OPERATOR],
+            ['id', other],
+            ['to', to],
+          ]),
+        );
+        expect(asked, to).toMatchObject({
+          ok: false,
+          error: 'confirm',
+          change: { kind: 'role', to },
+          ids: [OPERATOR, other],
+          staff: { count: 1, self: false },
+        });
+      }
+
+      // Stepping down yourself, with another admin: the question says it is you.
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', ADMIN],
+            ['id', OTHER_ADMIN],
+            ['id', OPERATOR],
+            ['to', 'member'],
+          ]),
+        ),
+      ).toMatchObject({ ok: false, error: 'lastAdmin' });
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', ADMIN],
+            ['id', OPERATOR],
+            ['to', 'member'],
+          ]),
+        ),
+      ).toMatchObject({ ok: false, error: 'confirm', staff: { count: 2, self: true } });
+      expect(db.log.updates).toEqual([]);
+      expect(refresh).not.toHaveBeenCalled();
+
+      // With the second yes it is done (and the admin who stepped down goes to My page).
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', OPERATOR],
+            ['to', 'member'],
+            ['confirm', '1'],
+          ]),
+        ),
+      ).toMatchObject({ ok: true, count: 1 });
+      expect(db.roles.get(OPERATOR)?.role).toBe('member');
+      await expect(
+        submitMemberAction(
+          null,
+          form([
+            ['locale', 'en'],
+            ['id', ADMIN],
+            ['to', 'guest'],
+            ['confirm', '1'],
+          ]),
+        ),
+      ).rejects.toThrow('NEXT_REDIRECT /en/me');
+      expect(db.roles.get(ADMIN)?.role).toBe('guest');
+    });
+
+    it('says nothing about lost roles in the questions that hand roles out', async () => {
+      makeDb(SITE);
+      actAs('admin', ADMIN);
+      adminsAre(ADMIN, OTHER_ADMIN);
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', GUEST],
+            ['to', 'operator'],
+          ]),
+        ),
+      ).toMatchObject({ ok: false, error: 'confirm', staff: null });
+    });
+
+    it('refuses an operator who tries to take an admin down before it asks anything', async () => {
+      const db = makeDb(SITE);
+      actAs('operator', OPERATOR);
+      adminsAre(ADMIN, OTHER_ADMIN);
+      expect(
+        await submitMemberAction(
+          null,
+          form([
+            ['locale', 'ko'],
+            ['id', ADMIN],
+            ['to', 'member'],
+          ]),
+        ),
+      ).toMatchObject({
+        ok: false,
+        error: 'refused',
+        groups: [{ reason: 'authority', names: ['최관리'], more: 0 }],
+      });
+      expect(db.log.updates).toEqual([]);
+    });
+
     it('does not ask before the everyday changes', async () => {
       const db = makeDb(SITE);
       actAs('operator', OPERATOR);

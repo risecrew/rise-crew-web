@@ -76,6 +76,11 @@ const COPY = {
         yes: '운영진으로 바꾸기',
       },
       admin: { question: (n: number) => `${n}명을 관리자로 바꿀까요?`, yes: '관리자로 바꾸기' },
+      // Asked only when the people include staff, who would lose their role.
+      member: { question: (n: number) => `${n}명을 회원으로 바꿀까요?`, yes: '회원으로 바꾸기' },
+      guest: { question: (n: number) => `${n}명을 가입자로 바꿀까요?`, yes: '가입자로 바꾸기' },
+      staffLoss: (n: number) => `운영진이나 관리자 ${n}명이 그 역할을 잃어요.`,
+      selfLoss: '내 계정도 포함돼 있어서, 바꾸면 회원 관리 화면을 더 쓸 수 없어요.',
       cancel: '취소',
     },
     selected: (n: number) => `${n}명 선택`,
@@ -175,6 +180,20 @@ const COPY = {
         question: (n: number) => (n === 1 ? 'Make 1 person an admin?' : `Make ${n} people admins?`),
         yes: 'Make admin',
       },
+      member: {
+        question: (n: number) =>
+          n === 1 ? 'Make 1 person a member?' : `Make ${n} people members?`,
+        yes: 'Make member',
+      },
+      guest: {
+        question: (n: number) => (n === 1 ? 'Make 1 person a guest?' : `Make ${n} people guests?`),
+        yes: 'Make guest',
+      },
+      staffLoss: (n: number) =>
+        n === 1
+          ? '1 operator or admin will lose that role.'
+          : `${n} operators or admins will lose those roles.`,
+      selfLoss: 'Your own account is one of them, so you will lose access to this screen.',
       cancel: 'Cancel',
     },
     selected: (n: number) => `${n} selected`,
@@ -255,8 +274,10 @@ function tickOf(page: Page, email: string): Locator {
 }
 
 type ButtonName = keyof (typeof COPY)['ko']['button'];
-// The changes that ask "are you sure?" first.
+// The changes that can ask "are you sure?" first.
 type AskedName = keyof (typeof COPY)['ko']['confirm'] & ButtonName;
+// The ones that always ask. "Member" and "guest" ask only when the people include staff, who
+// would lose their role.
 const ASKED: readonly ButtonName[] = ['block', 'operator', 'admin'];
 
 // An action button. Once people are ticked its name says how many ("3명을 회원으로"); with nobody
@@ -293,17 +314,18 @@ function alert(page: Page) {
 }
 
 // Ticks the people with these addresses and presses a button, then waits for the answer. A change
-// that asks "are you sure?" is confirmed too, unless `confirm` is false.
+// that asks "are you sure?" (`asks`: the ones in ASKED, unless said otherwise) is confirmed too,
+// unless `confirm` is false.
 async function apply(
   page: Page,
   locale: Locale,
   emails: string[],
   name: ButtonName,
-  { confirm = true }: { confirm?: boolean } = {},
+  { confirm = true, asks = ASKED.includes(name) }: { confirm?: boolean; asks?: boolean } = {},
 ) {
   for (const email of emails) await tickOf(page, email).check();
   await button(page, locale, name, emails.length).click();
-  if (confirm && ASKED.includes(name)) await confirmButton(page, locale, name as AskedName).click();
+  if (confirm && asks) await confirmButton(page, locale, name as AskedName).click();
 }
 
 async function signedInPage(
@@ -902,8 +924,9 @@ test.describe('the list as an admin', () => {
       await expect(status(page)).toHaveText(t.done.admin(1));
       expect((await roleRow(id)).role).toBe('admin');
 
-      // Another admin stays, so this one can be taken down.
-      await apply(page, 'ko', [email], 'member');
+      // Another admin stays, so this one can be taken down (after the question: they lose a staff
+      // role).
+      await apply(page, 'ko', [email], 'member', { asks: true });
       await expect(status(page)).toHaveText(t.done.member(1));
       expect((await roleRow(id)).role).toBe('member');
     } finally {
@@ -929,7 +952,7 @@ test.describe('the list as an admin', () => {
       const boss = await signedInPage(browser, baseURL!, SEEDED.admin);
       admin = boss.context;
       await openList(boss.page, 'ko', { q: email });
-      await apply(boss.page, 'ko', [email], 'member');
+      await apply(boss.page, 'ko', [email], 'member', { asks: true });
       await expect(status(boss.page)).toHaveText(t.done.member(1));
       expect((await roleRow(id)).role).toBe('member');
 
@@ -1069,11 +1092,20 @@ test.describe('the site is never left without an admin', () => {
       const stepId = await createOnboardedAccount(stepDown, { role: 'admin' });
       const leaveId = await createOnboardedAccount(leave, { role: 'admin' });
 
-      // The first demotes themselves.
+      // The first demotes themselves. The question says so, since it ends their own access.
       const one = await signedInPage(browser, baseURL!, stepDown);
       contexts.push(one.context);
       await openList(one.page, 'ko', { q: stepDown });
-      await apply(one.page, 'ko', [stepDown], 'member');
+      await apply(one.page, 'ko', [stepDown], 'member', { confirm: false, asks: true });
+      const asked = question(one.page, 'ko', 'member', 1);
+      await expect(asked).toBeVisible();
+      await expect(asked).toContainText(t.confirm.staffLoss(1));
+      await expect(asked).toContainText(t.confirm.selfLoss);
+      await expect(asked).toHaveAccessibleDescription(
+        `${t.confirm.staffLoss(1)} ${t.confirm.selfLoss}`,
+      );
+      expect((await roleRow(stepId)).role).toBe('admin');
+      await confirmButton(one.page, 'ko', 'member').click();
       // Their members screen is gone with the role, so they are taken to My page, which says so.
       await expect(one.page).toHaveURL(`${baseURL}/ko/me`);
       await expect(
@@ -1250,6 +1282,58 @@ test.describe('asking before a change that matters', () => {
         await expectAccessible(page);
       } finally {
         await deleteAccount(email);
+      }
+    });
+  }
+
+  for (const locale of ['ko', 'en'] as const) {
+    test(`taking staff below operator asks first and says who loses a role (${locale})`, async ({
+      page,
+      baseURL,
+    }, testInfo) => {
+      const t = COPY[locale];
+      const staff = newAddress(testInfo, 'op');
+      const guest = newAddress(testInfo, 'g');
+      try {
+        const staffId = await createOnboardedAccount(staff, { role: 'operator' });
+        const guestId = await createOnboardedAccount(guest);
+        await signIn(page, SEEDED.admin, baseURL!);
+        await openList(page, locale, { q: `-${testInfo.project.name}-` });
+
+        // An operator and a guest, both to member: the operator would lose the staff role.
+        await tickOf(page, staff).check();
+        await tickOf(page, guest).check();
+        await button(page, locale, 'member', 2).click();
+        const asked = question(page, locale, 'member', 2);
+        await expect(asked).toBeVisible();
+        await expect(asked).toContainText(t.confirm.staffLoss(1));
+        await expect(asked).not.toContainText(t.confirm.selfLoss);
+        await expect(asked).toHaveAccessibleDescription(t.confirm.staffLoss(1));
+        await expect(confirmButton(page, locale, 'member')).toBeFocused();
+        await expectAccessible(page);
+        expect((await roleRow(staffId)).role).toBe('operator');
+        expect((await roleRow(guestId)).role).toBe('guest');
+
+        // No: nothing changes, and the focus is back on the button that asked.
+        await cancelButton(page, locale).click();
+        await expect(asked).toHaveCount(0);
+        await expect(button(page, locale, 'member', 2)).toBeFocused();
+        expect((await roleRow(staffId)).role).toBe('operator');
+
+        // Yes: both are members.
+        await button(page, locale, 'member', 2).click();
+        await confirmButton(page, locale, 'member').click();
+        await expect(status(page)).toHaveText(t.done.member(2));
+        expect((await roleRow(staffId)).role).toBe('member');
+        expect((await roleRow(guestId)).role).toBe('member');
+
+        // Two people who are not staff (any more): one click, no question.
+        await apply(page, locale, [staff, guest], 'guest', { asks: false });
+        await expect(status(page)).toHaveText(t.done.guest(2));
+        expect((await roleRow(staffId)).role).toBe('guest');
+      } finally {
+        await deleteAccount(staff);
+        await deleteAccount(guest);
       }
     });
   }

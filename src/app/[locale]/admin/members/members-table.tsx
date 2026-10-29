@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { defaultLocale, isLocale, type Locale } from '@/i18n/locales';
 import type { MemberChange, MemberFailure, MemberState } from '@/lib/auth/members';
+import type { AppRole } from '@/lib/auth/roles';
 import { cn } from '@/lib/utils';
 import { submitMemberAction } from './actions';
 import { Tick } from './tick';
@@ -327,15 +328,46 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
           <div
             role="group"
             aria-labelledby={questionId}
+            // What the change costs, when it takes staff roles away, is the question's description.
+            aria-describedby={
+              asked.staff
+                ? asked.staff.self
+                  ? `${questionId}-staff ${questionId}-self`
+                  : `${questionId}-staff`
+                : undefined
+            }
             onKeyDown={onQuestionKeyDown}
             className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 lg:mt-4"
           >
             {/* The second yes: the form goes to the server again with this, and the server does
                 the change only because of it. */}
             <input type="hidden" name="confirm" value="1" />
-            <p id={questionId} className="text-lg font-semibold text-pretty break-keep text-white">
-              {t(`confirm.${askName(asked.change)}.question`, { count })}
-            </p>
+            <div className="min-w-0">
+              <p
+                id={questionId}
+                className="text-lg font-semibold text-pretty break-keep text-white"
+              >
+                {t(`confirm.${askName(asked.change)}.question`, { count })}
+              </p>
+              {asked.staff ? (
+                <>
+                  <p
+                    id={`${questionId}-staff`}
+                    className="mt-1 text-base text-pretty break-keep text-white/85"
+                  >
+                    {t('confirm.staffLoss', { staff: asked.staff.count })}
+                  </p>
+                  {asked.staff.self ? (
+                    <p
+                      id={`${questionId}-self`}
+                      className="mt-1 text-base text-pretty break-keep text-white/85"
+                    >
+                      {t('confirm.selfLoss')}
+                    </p>
+                  ) : null}
+                </>
+              ) : null}
+            </div>
             <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <button
                 ref={confirmRef}
@@ -486,10 +518,10 @@ function changeKey(change: MemberChange): string {
   return change.kind === 'role' ? `to=${change.to}` : `blocked=${change.blocked}`;
 }
 
-// Which question a change asks (only the changes of needsConfirmation ever do).
-function askName(change: MemberChange): 'block' | 'operator' | 'admin' {
-  if (change.kind === 'block') return 'block';
-  return change.to === 'operator' ? 'operator' : 'admin';
+// Which question a change asks (only the changes of needsConfirmation ever do: blocking, and a
+// role change, which for member or guest asks only when staff would lose their role).
+function askName(change: MemberChange): 'block' | AppRole {
+  return change.kind === 'block' ? 'block' : change.to;
 }
 
 // What the last press did. A change that went through is a status, said politely; a refusal is an

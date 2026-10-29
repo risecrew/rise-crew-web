@@ -519,6 +519,16 @@
           "question": "{count}명을 관리자로 바꿀까요?",
           "yes": "관리자로 바꾸기"
         },
+        "member": {
+          "question": "{count}명을 회원으로 바꿀까요?",
+          "yes": "회원으로 바꾸기"
+        },
+        "guest": {
+          "question": "{count}명을 가입자로 바꿀까요?",
+          "yes": "가입자로 바꾸기"
+        },
+        "staffLoss": "운영진이나 관리자 {staff}명이 그 역할을 잃어요.",
+        "selfLoss": "내 계정도 포함돼 있어서, 바꾸면 회원 관리 화면을 더 쓸 수 없어요.",
         "cancel": "취소"
       },
       "result": {

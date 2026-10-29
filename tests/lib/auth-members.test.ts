@@ -18,6 +18,7 @@ import {
   readMemberForm,
   refusalReason,
   searchPattern,
+  staffLosingRole,
   type MemberTarget,
 } from '@/lib/auth/members';
 import { ROLE_ORDER } from '@/lib/auth/roles';
@@ -348,16 +349,51 @@ describe('planBlock', () => {
 });
 
 describe('needsConfirmation', () => {
+  const people = [target(A, 'guest'), target(B, 'member')];
+
   it('asks again before the changes that shut a person out or hand over the keys', () => {
-    expect(needsConfirmation({ kind: 'block', blocked: true })).toBe(true);
-    expect(needsConfirmation({ kind: 'role', to: 'operator' })).toBe(true);
-    expect(needsConfirmation({ kind: 'role', to: 'admin' })).toBe(true);
+    expect(needsConfirmation({ kind: 'block', blocked: true }, people)).toBe(true);
+    expect(needsConfirmation({ kind: 'role', to: 'operator' }, people)).toBe(true);
+    expect(needsConfirmation({ kind: 'role', to: 'admin' }, people)).toBe(true);
   });
 
   it('does not ask before the everyday ones, which are easy to take back', () => {
-    expect(needsConfirmation({ kind: 'block', blocked: false })).toBe(false);
-    expect(needsConfirmation({ kind: 'role', to: 'member' })).toBe(false);
-    expect(needsConfirmation({ kind: 'role', to: 'guest' })).toBe(false);
+    expect(needsConfirmation({ kind: 'block', blocked: false }, people)).toBe(false);
+    expect(needsConfirmation({ kind: 'role', to: 'member' }, people)).toBe(false);
+    expect(needsConfirmation({ kind: 'role', to: 'guest' }, people)).toBe(false);
+  });
+
+  it('asks before taking anyone at operator or above below operator', () => {
+    for (const role of ['operator', 'admin'] as const) {
+      for (const to of ['member', 'guest'] as const) {
+        expect(needsConfirmation({ kind: 'role', to }, [target(C, role)]), `${role} to ${to}`).toBe(
+          true,
+        );
+        // One of them in a batch is enough.
+        expect(needsConfirmation({ kind: 'role', to }, [...people, target(C, role)])).toBe(true);
+      }
+    }
+  });
+
+  it('does not ask again for unblocking staff, which takes no role away', () => {
+    expect(needsConfirmation({ kind: 'block', blocked: false }, [target(C, 'admin', true)])).toBe(
+      false,
+    );
+  });
+});
+
+describe('staffLosingRole', () => {
+  it('names the operators and admins a change takes below operator, in the order chosen', () => {
+    const batch = [target(A, 'admin'), target(B, 'guest'), target(C, 'operator')];
+    expect(staffLosingRole({ kind: 'role', to: 'member' }, batch).map((t) => t.id)).toEqual([A, C]);
+    expect(staffLosingRole({ kind: 'role', to: 'guest' }, batch).map((t) => t.id)).toEqual([A, C]);
+  });
+
+  it('names nobody for a change to operator or above, or for blocking', () => {
+    const batch = [target(A, 'admin'), target(C, 'operator')];
+    expect(staffLosingRole({ kind: 'role', to: 'operator' }, batch)).toEqual([]);
+    expect(staffLosingRole({ kind: 'role', to: 'admin' }, batch)).toEqual([]);
+    expect(staffLosingRole({ kind: 'block', blocked: true }, batch)).toEqual([]);
   });
 });
 

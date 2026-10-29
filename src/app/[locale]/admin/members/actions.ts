@@ -15,6 +15,7 @@ import {
   planRoleChange,
   readMemberForm,
   refusalReason,
+  staffLosingRole,
   type MemberAsk,
   type MemberChange,
   type MemberFailure,
@@ -41,9 +42,18 @@ function failure(
   return { ok: false, at: Date.now(), error, change, groups: [], ids: [], ...extra };
 }
 
-// The change would be allowed, and is not done yet: the page asks the person to say yes again.
-function ask(change: MemberChange, ids: string[]): MemberAsk {
-  return { ok: false, at: Date.now(), error: 'confirm', change, ids };
+// The change would be allowed, and is not done yet: the page asks the person to say yes again,
+// naming what it costs when staff would lose their role (and whether `actorId` is among them).
+function ask(
+  change: MemberChange,
+  ids: string[],
+  targets: readonly MemberTarget[],
+  actorId: string,
+): MemberAsk {
+  const losing = staffLosingRole(change, targets);
+  const staff =
+    losing.length > 0 ? { count: losing.length, self: losing.some((t) => t.id === actorId) } : null;
+  return { ok: false, at: Date.now(), error: 'confirm', change, ids, staff };
 }
 
 // Puts a ban on each account, or lifts it, ten at a time. Whether every one of them went through.
@@ -73,10 +83,11 @@ async function setBans(admin: AdminClient, ids: readonly string[], duration: str
 //    showed them;
 //  - the whole batch is refused if anyone in it may not be changed by this person, naming them
 //    with the reason for each, or if it would leave the site without an admin who can sign in;
-//  - a change that shuts someone out or hands over the keys (needsConfirmation) is only done when
-//    the form says it was confirmed. That is for the person's sake, not a security check: it is
-//    asked after everything above, so nobody is asked to confirm what would be refused, and the
-//    rules above do not depend on it;
+//  - a change that shuts someone out, hands over the keys or takes them away from staff
+//    (needsConfirmation, judged on the roles just loaded) is only done when the form says it was
+//    confirmed. That is for the person's sake, not a security check: it is asked after everything
+//    above, so nobody is asked to confirm what would be refused, and the rules above do not
+//    depend on it;
 //  - the writes use the secret key, because the signed-in role has no right to write roles, and
 //    they only touch rows that are still in a state the person was allowed to change.
 //
@@ -164,7 +175,9 @@ async function applyChange(
       });
       return failure('refused', change, { ids, groups: groupRefusals(refusals) });
     }
-    if (!confirmed && needsConfirmation(change)) return ask(change, ids);
+    if (!confirmed && needsConfirmation(change, targets)) {
+      return ask(change, ids, targets, actor.id);
+    }
 
     const stamp = { updated_by: actor.id };
     let complete = true;
