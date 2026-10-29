@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { Locale } from '@/i18n/locales';
+import { Link } from '@/i18n/navigation';
 import {
   RESEND_SECONDS,
   callbackUrl,
@@ -315,6 +316,20 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
           {busy === 'email' ? t('sending') : t('submit')}
         </button>
       </form>
+
+      {/* What signing in keeps before anything is agreed to, said once, quietly, under both ways
+          in. The link is small text with a finger-sized target; when the sentence fills its line
+          the link takes the next one rather than stretching a line in the middle of it. */}
+      <p className="mt-8 flex flex-wrap items-center gap-x-2 text-sm text-pretty break-keep text-white/75">
+        <span>{t('storage')}</span>
+        <Link
+          href="/privacy"
+          prefetch={false}
+          className="inline-flex min-h-11 items-center underline underline-offset-4 hover:text-white"
+        >
+          {t('policyLink')}
+        </Link>
+      </p>
     </div>
   );
 }

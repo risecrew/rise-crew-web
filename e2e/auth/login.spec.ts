@@ -41,6 +41,10 @@ const COPY = {
       blocked: '이용이 제한된 계정이에요.',
       oauth: '구글 로그인을 마치지 못했어요. 다시 시도해 주세요.',
     },
+    // The quiet line under the sign-in options, and its link.
+    storage: '로그인하면 이메일 주소가 저장돼요. 가입을 마치지 않으면 7일 뒤 삭제돼요.',
+    policyLink: '개인정보 처리방침',
+    policyTitle: '개인정보 처리방침',
   },
   en: {
     title: 'Sign in',
@@ -57,6 +61,10 @@ const COPY = {
       blocked: 'This account has been suspended.',
       oauth: "Google sign-in didn't finish. Please try again.",
     },
+    storage:
+      "Signing in stores your email address. If you don't finish signing up, it's deleted after 7 days.",
+    policyLink: 'Privacy policy',
+    policyTitle: 'Privacy policy',
   },
 } as const;
 
@@ -139,6 +147,33 @@ for (const locale of ['ko', 'en'] as const) {
       await email.press('Enter');
       await expect(page.locator('main [data-seen]')).toHaveCount(0);
       await expect(notice(page)).toHaveText(t.invalid);
+    });
+
+    test('says under the sign-in options what signing in stores, with the policy a tap away', async ({
+      page,
+      baseURL,
+    }) => {
+      await page.goto(`/${locale}/login`);
+      const main = page.locator('main');
+      const line = main.getByText(t.storage, { exact: true });
+      await expect(line).toBeVisible();
+      // Quiet: small, in the soft white of the account screens.
+      await expect(line).toHaveCSS('font-size', '14px');
+      await expect(line).toHaveCSS('color', /\/ 0\.75\)$|, 0\.75\)$/);
+      // Under the sign-in options: below the button that sends the link.
+      const submit = (await page.getByRole('button', { name: t.submit }).boundingBox())!;
+      expect((await line.boundingBox())!.y).toBeGreaterThan(submit.y + submit.height);
+
+      // The policy is one tap away: an underlined link, as tall as a finger.
+      const link = main.getByRole('link', { name: t.policyLink, exact: true });
+      await expect(link).toHaveAttribute('href', `/${locale}/privacy`);
+      await expect(link).toHaveCSS('text-decoration-line', 'underline');
+      expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      await expectNoHorizontalScroll(page);
+
+      await link.click();
+      await expect(page).toHaveURL(`${baseURL}/${locale}/privacy`);
+      await expect(page.getByRole('heading', { level: 1, name: t.policyTitle })).toBeVisible();
     });
 
     for (const code of ['link', 'blocked', 'oauth'] as const) {

@@ -135,6 +135,7 @@ export default async function PrivacyPage({ params }: Props) {
 
           <Section number={3} id="privacy-retention" title={t('retention.title')}>
             <p>{t('retention.keep')}</p>
+            <p>{t('retention.unfinished')}</p>
             <p>{t('retention.delete')}</p>
           </Section>
 

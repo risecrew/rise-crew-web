@@ -133,6 +133,13 @@ const POLICY = {
     languageCookie: /언어를 기억하는 쿠키/,
     passiveProfile: /기본 프로필/,
     passiveLogs: /접속 기록\(IP 주소, 브라우저 정보, 접속 시각\)/,
+    // An account that signs in and never finishes the sign-up form: deleted after 7 days, and
+    // not shown to the staff.
+    unfinishedRetention:
+      /가입 정보 입력을 마치지 않은 계정은 만든 지 7일이 지나면 자동으로 삭제합니다/,
+    unfinishedRights: /만든 지 7일이 지나면 자동으로 삭제됩니다/,
+    staffRow: '운영진과 관리자',
+    staffFinishedOnly: /가입 정보 입력을 마치지 않은 계정은 보지 못합니다/,
   },
   en: {
     title: 'Privacy policy',
@@ -159,6 +166,11 @@ const POLICY = {
     languageCookie: /remembers that language/,
     passiveProfile: /basic profile Google shares/,
     passiveLogs: /access logs automatically \(IP address, browser, and times\)/,
+    unfinishedRetention:
+      /never finish the sign-up form, the account is deleted automatically 7 days after it was created/,
+    unfinishedRights: /deleted automatically 7 days after it was created/,
+    staffRow: 'Operators and admins',
+    staffFinishedOnly: /do not see accounts that never finished the sign-up form/,
   },
 } as const;
 
@@ -230,6 +242,28 @@ for (const locale of LOCALES) {
     // What arrives without being asked for: the Google profile and the providers' access logs.
     await expect(items).toContainText(copy.passiveProfile);
     await expect(items).toContainText(copy.passiveLogs);
+  });
+
+  test(`/${locale}/privacy says an unfinished sign-up is deleted after 7 days and hidden from the staff`, async ({
+    page,
+  }) => {
+    await page.goto(`/${locale}/privacy`);
+    const main = page.locator('main');
+    await expect(main.locator('section[aria-labelledby="privacy-retention"]')).toContainText(
+      copy.unfinishedRetention,
+    );
+    // Deleting it sooner is still a request by email.
+    const rights = main.locator('section[aria-labelledby="privacy-rights"]');
+    await expect(rights).toContainText(copy.unfinishedRights);
+    await expect(rights.getByRole('link', { name: 'risecrew4@gmail.com' })).toHaveAttribute(
+      'href',
+      'mailto:risecrew4@gmail.com',
+    );
+    const staff = main
+      .locator('section[aria-labelledby="privacy-visibility"] dl > div')
+      .filter({ has: page.locator('dt', { hasText: copy.staffRow }) });
+    await expect(staff).toHaveCount(1);
+    await expect(staff).toContainText(copy.staffFinishedOnly);
   });
 
   test(`/${locale}/privacy is reachable from the footer of every page`, async ({ page }) => {

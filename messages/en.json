@@ -270,6 +270,7 @@
     "retention": {
       "title": "How long we keep it",
       "keep": "We keep your information until you delete your account.",
+      "unfinished": "If you sign in but never finish the sign-up form, the account is deleted automatically 7 days after it was created, along with its sign-in details such as your email address and the basic profile Google shared.",
       "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy."
     },
     "processors": {
@@ -296,7 +297,7 @@
       },
       "staff": {
         "label": "Operators and admins",
-        "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) on the member management screen. They look at it only to manage members and, for people who agreed, to send recruitment notices."
+        "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) of people who finished signing up, on the member management screen. They do not see accounts that never finished the sign-up form. They look at it only to manage members and, for people who agreed, to send recruitment notices."
       },
       "outro": "There is no way to download the member list as a file. The club does not give personal information to anyone outside the companies above and the operators and admins."
     },
@@ -304,7 +305,7 @@
       "title": "Your rights",
       "manage": "On <me>My page</me> you can view your sign-up information at any time, edit it, and delete it by deleting your account. You can change your choice about recruitment emails there too.",
       "decline": "You may decline to consent to the collection and use of your information, but without the required items you cannot sign up.",
-      "unfinished": "If you signed in but did not finish the sign-up form, you cannot reach My page. To delete such an account, email <mail>risecrew4@gmail.com</mail> and ask us."
+      "unfinished": "If you signed in but did not finish the sign-up form, you cannot reach My page, but the account is deleted automatically 7 days after it was created. To have it deleted sooner, or for any other request, email <mail>risecrew4@gmail.com</mail>."
     },
     "under14": {
       "title": "People under 14",
@@ -343,6 +344,8 @@
       "emailInvalid": "Enter a valid email address.",
       "sendFailed": "We couldn't send the link. Please try again in a moment.",
       "tooMany": "Too many requests. Please try again in a moment.",
+      "storage": "Signing in stores your email address. If you don't finish signing up, it's deleted after 7 days.",
+      "policyLink": "Privacy policy",
       "sent": {
         "title": "Check your inbox",
         "body": "We sent a sign-in link to this address.",
