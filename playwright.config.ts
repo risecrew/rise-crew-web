@@ -4,6 +4,8 @@ const PORT = 3100;
 
 export default defineConfig({
   testDir: 'e2e',
+  // The accounts e2e needs the local Supabase stack and its own build: pnpm e2e:auth.
+  testIgnore: 'auth/**',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

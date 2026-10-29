@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { LocaleSwitch } from './locale-switch';
 
@@ -14,10 +14,13 @@ export function MobileNav({
   items,
   action,
   menuLabel,
+  account,
 }: {
   items: Item[];
   action: Action;
   menuLabel: string;
+  // The sign-in link or the signed-in rows, when accounts are switched on.
+  account?: ReactNode;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
   const pathname = usePathname();
@@ -44,6 +47,7 @@ export function MobileNav({
             </li>
           ))}
         </ul>
+        {account}
         <div className="mt-2 flex items-center justify-between border-t border-paper-edge px-3 pt-3">
           <LocaleSwitch tone="ink" />
           {action.external ? (

@@ -22,6 +22,10 @@
     },
     "notFound": {
       "title": "Page not found | RISE CREW"
+    },
+    "privacy": {
+      "title": "Privacy policy | RISE CREW",
+      "description": "What RISE CREW collects when you create an account on this website, why, how long we keep it, and your rights."
     }
   },
   "Nav": {
@@ -40,7 +44,8 @@
     "tagline": "From campus to the world.",
     "supportedBy": "Official startup club of the SKKU ANCHOR Division",
     "address": "Room 50322, Hoam Hall, 25-2 Sungkyunkwan-ro, Jongno-gu, Seoul",
-    "rights": "© {year} RISE CREW"
+    "rights": "© {year} RISE CREW",
+    "privacy": "Privacy policy"
   },
   "Common": {
     "upcoming": "Upcoming",
@@ -204,5 +209,362 @@
     "title": "Page not found",
     "body": "The address may have changed, or the page is not open yet.",
     "home": "Go home"
+  },
+  "Privacy": {
+    "title": "Privacy policy",
+    "lead": "What personal information RISE CREW collects when you create and use an account on this website, why, and how we handle it.",
+    "purpose": {
+      "title": "Why we use your information",
+      "intro": "RISE CREW (“the club”) is responsible for the personal information collected on this website. We use it only for the purposes below, and if a purpose changes we will tell you first and ask for your consent.",
+      "account": {
+        "label": "Account management",
+        "body": "Confirming who has signed up, signing you in, managing roles (guest, member, operator, admin), and limiting the use of accounts that cause problems."
+      },
+      "community": {
+        "label": "Community use",
+        "body": "Showing content that only signed-in people can see, and giving members features such as posting and replying."
+      },
+      "recruit": {
+        "label": "Recruitment notices",
+        "body": "Emailing recruitment dates and application guides, only to people who agreed to receive recruitment emails."
+      }
+    },
+    "items": {
+      "title": "What we collect",
+      "intro": "We ask for the information below when you sign up. We do not collect phone numbers or student IDs.",
+      "email": {
+        "label": "Email",
+        "body": "Required. Taken automatically from the account you sign in with (a Google account or an emailed link). You do not type it in."
+      },
+      "name": {
+        "label": "Last name, first name",
+        "body": "Required. Saved exactly as you type it, and never translated."
+      },
+      "occupation": {
+        "label": "What you do now",
+        "body": "Required. One of undergraduate, graduate student, alumni or employed, founder, or other."
+      },
+      "school": {
+        "label": "School, major",
+        "body": "Asked only if you choose undergraduate or graduate student, and required then."
+      },
+      "affiliation": {
+        "label": "Affiliation",
+        "body": "Optional. If you are not a student, you can give the name of a company or team, for example."
+      },
+      "age14": {
+        "label": "Confirmation that you are 14 or older",
+        "body": "Required. Recorded with the time you confirmed and the version of this policy."
+      },
+      "privacy": {
+        "label": "Consent to collect and use personal information",
+        "body": "Required. Recorded with the time you agreed and the version of this policy."
+      },
+      "recruit": {
+        "label": "Consent to recruitment emails",
+        "body": "Optional. Whether you agreed is recorded with the time and the version of this policy."
+      },
+      "passive": "If you sign in with Google, Supabase also stores the basic profile Google shares (display name, profile picture URL, account identifier and the like) with your sign-in details. Supabase and Vercel keep access logs automatically (IP address, browser, and times), held under each company’s own policy.",
+      "cookies": "This site stores cookies in your browser. While you are signed in, a cookie keeps you signed in. When the language you view the site in differs from your browser’s (for example after you switch language), a cookie remembers that language, whether or not you are signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in and your language choice is not remembered."
+    },
+    "retention": {
+      "title": "How long we keep it",
+      "keep": "We keep your information until you delete your account.",
+      "unfinished": "If you sign in but never finish the sign-up form, the account is deleted automatically 7 days after it was created, along with its sign-in details such as your email address and the basic profile Google shared.",
+      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy."
+    },
+    "processors": {
+      "title": "Who processes it for us",
+      "intro": "We rely on the companies below to run the website. Their servers may be outside South Korea.",
+      "supabase": {
+        "label": "Supabase",
+        "body": "The database (where sign-up information is stored) and sign-in (account verification)"
+      },
+      "vercel": {
+        "label": "Vercel",
+        "body": "Hosting (running the website)"
+      },
+      "google": {
+        "label": "Google",
+        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails (for now, a RISE CREW Gmail account sends the sign-in emails; the recipient address and the one-time sign-in link pass through Google, and the copy is deleted automatically within 30 days)"
+      }
+    },
+    "visibility": {
+      "title": "Who can see it",
+      "self": {
+        "label": "You",
+        "body": "You see your own sign-up information on My page. You cannot see anyone else’s."
+      },
+      "staff": {
+        "label": "Operators and admins",
+        "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) of people who finished signing up, on the member management screen. They do not see accounts that never finished the sign-up form. They look at it only to manage members and, for people who agreed, to send recruitment notices."
+      },
+      "outro": "There is no way to download the member list as a file. The club does not give personal information to anyone outside the companies above and the operators and admins."
+    },
+    "rights": {
+      "title": "Your rights",
+      "manage": "On <me>My page</me> you can view your sign-up information at any time, edit it, and delete it by deleting your account. You can change your choice about recruitment emails there too.",
+      "decline": "You may decline to consent to the collection and use of your information, but without the required items you cannot sign up.",
+      "unfinished": "If you signed in but did not finish the sign-up form, you cannot reach My page, but the account is deleted automatically 7 days after it was created. To have it deleted sooner, or for any other request, email <mail>risecrew4@gmail.com</mail>."
+    },
+    "under14": {
+      "title": "People under 14",
+      "body": "People under 14 cannot sign up. Under the Personal Information Protection Act, handling the information of a child under 14 needs the consent of a legal guardian, so sign-up is limited to people 14 or older, and we ask you to confirm it when you sign up. If we find that an account belongs to someone under 14, we delete it."
+    },
+    "officer": {
+      "title": "Privacy officer",
+      "intro": "For questions about personal information, requests to view, correct or delete it, and complaints, contact:",
+      "responsible": "Privacy officer: RISE CREW President (<mail>risecrew4@gmail.com</mail>)",
+      "handler": "Data handling: Website administrator",
+      "note": "The president changes with each cohort, so we give the position instead of a name."
+    },
+    "version": {
+      "title": "Effective date and version",
+      "body": "This policy applies from the date below. When it changes, we publish the new version on this page, and the version you agreed to is kept in your consent record.",
+      "label": "Effective date · version"
+    }
+  },
+  "Auth": {
+    "menu": {
+      "signIn": "Sign in",
+      "account": "Account menu",
+      "myPage": "My page",
+      "admin": "Admin",
+      "signOut": "Sign out"
+    },
+    "login": {
+      "title": "Sign in",
+      "lead": "New here? Signing in creates your account",
+      "google": "Continue with Google",
+      "or": "or",
+      "emailLabel": "Email",
+      "emailPlaceholder": "name@example.com",
+      "submit": "Email me a sign-in link",
+      "sending": "Sending",
+      "emailInvalid": "Enter a valid email address.",
+      "sendFailed": "We couldn't send the link. Please try again in a moment.",
+      "tooMany": "Too many requests. Please try again in a moment.",
+      "storage": "Signing in stores your email address. If you don't finish signing up, it's deleted after 7 days.",
+      "policyLink": "Privacy policy",
+      "sent": {
+        "title": "Check your inbox",
+        "body": "We sent a sign-in link to this address.",
+        "spam": "If you don't see it, check your spam folder too.",
+        "resend": "Resend the link",
+        "resendIn": "Resend the link ({seconds}s)",
+        "resent": "We sent the link again.",
+        "change": "Use a different email"
+      },
+      "errors": {
+        "link": "That link has expired or was already used. Request a new one.",
+        "blocked": "This account has been suspended.",
+        "oauth": "Google sign-in didn't finish. Please try again."
+      }
+    },
+    "welcome": {
+      "metaTitle": "Finish sign-up",
+      "title": "Welcome!",
+      "lead": "Tell us a few things to finish signing up"
+    },
+    "profile": {
+      "email": "Email",
+      "emailNote": "(your sign-in account)",
+      "lastName": "Last name",
+      "firstName": "First name",
+      "occupation": {
+        "legend": "What you do now",
+        "undergrad": "Undergraduate",
+        "grad": "Graduate student",
+        "alumni": "Alumni or employed",
+        "founder": "Founder",
+        "other": "Other"
+      },
+      "school": "School",
+      "major": "Major",
+      "affiliation": "Affiliation (optional)",
+      "affiliationPlaceholder": "Company or team name",
+      "consents": {
+        "age14": "[Required] I am 14 or older",
+        "privacy": "[Required] I agree to the collection and use of my personal information",
+        "privacyLink": "read",
+        "privacyLinkLabel": "Read how we collect and use personal information (opens in a new tab)",
+        "recruit": "[Optional] Email me about recruitment"
+      },
+      "submit": {
+        "welcome": "Finish sign-up",
+        "edit": "Save"
+      },
+      "submitting": {
+        "welcome": "Signing you up",
+        "edit": "Saving"
+      },
+      "errors": {
+        "summary": "{count, plural, one {# item needs} other {# items need}} a look.",
+        "saveFailed": "We couldn't save that. Please try again in a moment.",
+        "tooLong": "Use {max} characters or fewer.",
+        "required": {
+          "last_name": "Enter your last name.",
+          "first_name": "Enter your first name.",
+          "occupation": "Choose what you do now.",
+          "school": "Enter your school.",
+          "major": "Enter your major."
+        },
+        "consent": {
+          "age14": "You need to be 14 or older to sign up.",
+          "privacy": "You need to agree to sign up."
+        }
+      }
+    },
+    "me": {
+      "metaTitle": "My page",
+      "title": "My page",
+      "editTitle": "Edit your info",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "roles": {
+        "guest": "Guest",
+        "member": "Member",
+        "operator": "Operator",
+        "admin": "Admin"
+      },
+      "rows": {
+        "affiliation": "Affiliation",
+        "recruit": "Recruitment emails",
+        "recruitOn": "Subscribed",
+        "recruitOff": "Not subscribed"
+      },
+      "delete": {
+        "summary": "Delete account",
+        "title": "Delete your account?",
+        "body": "Deleting removes your account and everything you told us when you signed up, right away. This can't be undone, and signing in again with the same email starts a new sign-up.",
+        "word": "delete",
+        "prompt": "To continue, type <strong>{word}</strong> below.",
+        "submit": "Delete my account",
+        "submitting": "Deleting",
+        "errors": {
+          "confirm": "Type {word} exactly as shown.",
+          "failed": "We couldn't delete your account. Please try again in a moment.",
+          "lastAdmin": "You're the only admin, so you can't delete your account yet. Make someone else an admin before deleting your account."
+        }
+      },
+      "deleted": "Your account has been deleted. Thanks for being part of RISE CREW."
+    }
+  },
+  "Admin": {
+    "members": {
+      "metaTitle": "Members",
+      "title": "Members",
+      "search": {
+        "label": "Search by name or email",
+        "placeholder": "Name or email",
+        "submit": "Search"
+      },
+      "filters": {
+        "role": "Role",
+        "allRoles": "All roles",
+        "optIn": "Recruitment opt-in only",
+        "clear": "Clear filters"
+      },
+      "count": "{count, plural, one {# person} other {# people}}",
+      "empty": "No one matches.",
+      "table": {
+        "label": "Member list",
+        "columns": {
+          "name": "Name",
+          "email": "Email",
+          "occupation": "What they do",
+          "detail": "School · major / Affiliation",
+          "optIn": "Recruitment emails",
+          "role": "Role"
+        },
+        "optInYes": "Yes",
+        "optInNo": "No",
+        "none": "No info",
+        "blocked": "Blocked"
+      },
+      "select": {
+        "all": "Select everyone on this page",
+        "row": "Select {name}",
+        "count": "{count} selected",
+        "header": "Select"
+      },
+      "actions": {
+        "label": "For the people selected",
+        "member": "Make member",
+        "guest": "Make guest",
+        "operator": "Make operator",
+        "admin": "Make admin",
+        "block": "Block",
+        "unblock": "Unblock",
+        "pending": "Working",
+        "counted": {
+          "member": "{count, plural, one {Make # member} other {Make # members}}",
+          "guest": "{count, plural, one {Make # guest} other {Make # guests}}",
+          "operator": "{count, plural, one {Make # operator} other {Make # operators}}",
+          "admin": "{count, plural, one {Make # admin} other {Make # admins}}",
+          "block": "{count, plural, one {Block # person} other {Block # people}}",
+          "unblock": "{count, plural, one {Unblock # person} other {Unblock # people}}"
+        }
+      },
+      "confirm": {
+        "block": {
+          "question": "{count, plural, one {Block # person?} other {Block # people?}}",
+          "yes": "Block"
+        },
+        "operator": {
+          "question": "{count, plural, one {Make # person an operator?} other {Make # people operators?}}",
+          "yes": "Make operator"
+        },
+        "admin": {
+          "question": "{count, plural, one {Make # person an admin?} other {Make # people admins?}}",
+          "yes": "Make admin"
+        },
+        "member": {
+          "question": "{count, plural, one {Make # person a member?} other {Make # people members?}}",
+          "yes": "Make member"
+        },
+        "guest": {
+          "question": "{count, plural, one {Make # person a guest?} other {Make # people guests?}}",
+          "yes": "Make guest"
+        },
+        "staffLoss": "{staff, plural, one {# operator or admin will lose that role.} other {# operators or admins will lose those roles.}}",
+        "selfLoss": "Your own account is one of them, so you will lose access to this screen.",
+        "cancel": "Cancel"
+      },
+      "result": {
+        "done": {
+          "member": "{count, plural, one {# person is now a member.} other {# people are now members.}}",
+          "guest": "{count, plural, one {# person is now a guest.} other {# people are now guests.}}",
+          "operator": "{count, plural, one {# person is now an operator.} other {# people are now operators.}}",
+          "admin": "{count, plural, one {# person is now an admin.} other {# people are now admins.}}",
+          "block": "{count, plural, one {# person was blocked.} other {# people were blocked.}}",
+          "unblock": "{count, plural, one {# person was unblocked.} other {# people were unblocked.}}"
+        },
+        "errors": {
+          "none": "Choose who to change first.",
+          "refusedRole": "No one was changed.",
+          "refusedBlock": "No one was blocked.",
+          "refusedUnblock": "No one was unblocked.",
+          "lastAdmin": "That would leave the site without an admin. Make someone else an admin first.",
+          "missing": "Some of these people are no longer on the list. Reload the page and try again.",
+          "stale": "Someone changed in the meantime, so only part of this may have gone through. Check the list.",
+          "failed": "That didn't work. Please try again in a moment."
+        },
+        "who": "{more, plural, =0 {{names}} other {{names} and # more}}",
+        "reasons": {
+          "same": "{count, plural, one {{who} already has the {role} role.} other {{who} already have the {role} role.}} Take them off the selection and try again.",
+          "authorityRole": "{who} can't be changed with your access. Operators can only move people between Guest and Member; ask an admin for anything else.",
+          "authorityBlock": "{who} can't be blocked with your access, because they're an operator or an admin. Ask an admin to do it.",
+          "authorityUnblock": "{who} can't be unblocked with your access, because they're an operator or an admin. Ask an admin to do it.",
+          "self": "{who} is your own account, so you can't block or unblock it. Take yourself off the selection and try again."
+        }
+      },
+      "pages": {
+        "label": "Pages",
+        "previous": "Previous",
+        "next": "Next",
+        "position": "Page {page} of {total}"
+      }
+    }
   }
 }

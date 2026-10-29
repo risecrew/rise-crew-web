@@ -34,3 +34,32 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
+  # The database tests and the accounts e2e, against a local Supabase stack that exists only on this
+  # runner. No repository secrets: the stack makes its own keys, and playwright.auth.config.ts reads
+  # them from `supabase status` when it loads.
+  auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The CLI is the pinned devDependency (supabase in package.json), the one pnpm db:* uses.
+      # -x leaves out the services these tests do not use: the same reduced stack as a local run.
+      # Away from a terminal, `supabase start` prints the stack's keys as one JSON line on stdout,
+      # so stdout is dropped to keep them out of the log. Progress and errors are on stderr.
+      - run: pnpm exec supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /dev/null
+      - run: pnpm db:test
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm e2e:auth
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-auth
+          path: playwright-report
+          retention-days: 7
