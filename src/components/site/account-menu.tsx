@@ -1,9 +1,9 @@
 'use client';
 
-import { useLocale } from 'next-intl';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
-import { defaultLocale, isLocale, type Locale } from '@/i18n/locales';
+import type { Locale } from '@/i18n/locales';
+import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { atLeast } from '@/lib/auth/roles';
 import { cn } from '@/lib/utils';
 import { accountLabel, getServerSnapshot, getSnapshot, subscribe } from './account-store';
@@ -17,11 +17,6 @@ export type AccountLabels = {
 };
 
 type Tone = 'stage' | 'paper';
-
-function useCurrentLocale(): Locale {
-  const locale = useLocale();
-  return isLocale(locale) ? locale : defaultLocale;
-}
 
 // The header's entry to accounts. It is a link to the login page until the browser finds a
 // session, then the first letter of the visitor's name with a menu behind it (a panel's worth of

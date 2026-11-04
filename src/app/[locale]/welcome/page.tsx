@@ -5,6 +5,7 @@ import { asLocale } from '@/i18n/as-locale';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { leaveWelcome } from '@/lib/auth/login';
 import { getViewer } from '@/lib/auth/viewer';
+import { single } from '@/lib/search-params';
 import { AccountLayout, accountMetadata } from '../account-layout';
 import { ProfileForm } from './profile-form';
 
@@ -17,12 +18,6 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   const locale = asLocale((await params).locale);
   const t = await getTranslations({ locale, namespace: 'Auth.welcome' });
   return accountMetadata(t('metaTitle'));
-}
-
-// A query value that is one string. Repeated parameters (`?next=a&next=b`) arrive as a list and
-// count as absent: nobody has a reason to send two.
-function single(value: string | string[] | undefined): string | undefined {
-  return typeof value === 'string' ? value : undefined;
 }
 
 // The sign-up form: the second half of a first sign-in. The emailed link and the Google sign-in

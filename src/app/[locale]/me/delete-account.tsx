@@ -1,9 +1,9 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useActionState, useEffect, useRef } from 'react';
 import { refreshAccount } from '@/components/site/account-store';
-import { defaultLocale, isLocale } from '@/i18n/locales';
+import { useCurrentLocale } from '@/i18n/use-current-locale';
 import type { DeletionState } from '@/lib/auth/deletion';
 import { submitDeletion } from './actions';
 
@@ -16,7 +16,7 @@ import { submitDeletion } from './actions';
 // lime pill that stands for the page's main action.
 export function DeleteAccount() {
   const t = useTranslations('Auth.me.delete');
-  const locale = useLocale();
+  const locale = useCurrentLocale();
   const [state, formAction, pending] = useActionState<DeletionState, FormData>(
     submitDeletion,
     null,
@@ -71,7 +71,7 @@ export function DeleteAccount() {
           }}
           className="mt-6"
         >
-          <input type="hidden" name="locale" value={isLocale(locale) ? locale : defaultLocale} />
+          <input type="hidden" name="locale" value={locale} />
           <label htmlFor="delete-confirm" className="block text-sm font-medium text-white/75">
             {t.rich('prompt', {
               word,

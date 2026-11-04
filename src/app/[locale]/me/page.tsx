@@ -8,6 +8,7 @@ import { displayName, initial } from '@/lib/auth/name';
 import { profileValues } from '@/lib/auth/profile-values';
 import { isStudent } from '@/lib/auth/occupation';
 import { requireViewer } from '@/lib/auth/viewer';
+import { single } from '@/lib/search-params';
 import { AccountLayout, accountMetadata } from '../account-layout';
 import { ProfileForm } from '../welcome/profile-form';
 import { DeleteAccount } from './delete-account';
@@ -22,12 +23,6 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   const locale = asLocale((await params).locale);
   const t = await getTranslations({ locale, namespace: 'Auth.me' });
   return accountMetadata(t('metaTitle'));
-}
-
-// A query value that is one string. Repeated parameters (`?edit=1&edit=2`) arrive as a list and
-// count as absent: nobody has a reason to send two.
-function single(value: string | string[] | undefined): string | undefined {
-  return typeof value === 'string' ? value : undefined;
 }
 
 const TITLE =

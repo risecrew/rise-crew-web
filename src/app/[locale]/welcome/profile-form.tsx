@@ -1,10 +1,10 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useActionState, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { refreshAccount } from '@/components/site/account-store';
 import { Link } from '@/i18n/navigation';
-import { defaultLocale, isLocale, type Locale } from '@/i18n/locales';
+import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { NAME_MAX, OCCUPATIONS, TEXT_MAX, isStudent } from '@/lib/auth/occupation';
 import {
   EMPTY_PROFILE_VALUES,
@@ -33,11 +33,6 @@ const MESSAGE = 'mt-2 px-2 text-base text-pretty break-keep text-white';
 const ROW = 'border-t border-white/15 py-5';
 
 const NO_NAMES: ReadonlySet<string> = new Set();
-
-function useCurrentLocale(): Locale {
-  const locale = useLocale();
-  return isLocale(locale) ? locale : defaultLocale;
-}
 
 export function ProfileForm({ mode, email, next = null, initial }: Props) {
   const t = useTranslations('Auth.profile');

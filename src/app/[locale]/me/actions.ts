@@ -89,7 +89,13 @@ export async function deleteAccount(localeArg: Locale, form: FormData): Promise<
     return refused('failed', typed);
   }
 
-  await endSession();
+  // The account is already gone, so the visitor must reach the page that says so even if the
+  // cookies could not be cleared here (the next request finds no account behind them).
+  try {
+    await endSession();
+  } catch (error) {
+    console.error('Could not end the session:', error instanceof Error ? error.message : error);
+  }
   redirect(`/${locale}?deleted=1`);
 }
 
