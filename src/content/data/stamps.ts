@@ -8,6 +8,11 @@ const orientation = {
   kind: 'document',
   label: { ko: '2기 오리엔테이션 자료 (2026.03)', en: 'Cohort 2 orientation deck (Mar 2026)' },
 } as const;
+// The organizers confirmed these took place; there is no public record to link yet.
+const confirmed = {
+  kind: 'document',
+  label: { ko: '운영진 확인 (2026.11)', en: 'Confirmed by the organizers (Nov 2026)' },
+} as const;
 const seoul = { ko: '서울', en: 'Seoul' };
 
 export const stamps: Stamp[] = [
@@ -151,19 +156,28 @@ export const stamps: Stamp[] = [
     title: { ko: '글로벌 IR과 pre-SEED 투자 유치', en: 'Global IR and pre-seed fundraising' },
     label: { ko: '글로벌 IR', en: 'Global IR' },
     stage: 'global',
-    status: 'planned',
-    evidence: [],
+    status: 'done',
+    evidence: [confirmed],
   },
   {
     id: 'roundtable-2',
-    date: '2026-08',
-    city: seoul,
+    date: '2026-08-28',
+    city: { ko: '수원', en: 'Suwon' },
     country: 'KR',
-    title: { ko: '라운드테이블 멘토링 2차 워크숍', en: 'Roundtable mentoring workshop 2' },
+    title: {
+      ko: '2회 SKKU 창업팀 라운드테이블 워크숍(1박 2일, YBM연수원)',
+      en: '2nd SKKU startup team roundtable workshop (2 days, YBM training center)',
+    },
     label: { ko: '라운드테이블 2차', en: 'Roundtable 2' },
     stage: 'domestic',
-    status: 'planned',
-    evidence: [],
+    photo: 'roundtable-2026-08',
+    status: 'done',
+    evidence: [
+      {
+        kind: 'photo',
+        label: { ko: '행사 사진 (2026.8.28~29)', en: 'Event photos (Aug 28–29, 2026)' },
+      },
+    ],
   },
   {
     id: 'kuala-lumpur-ir',
@@ -173,8 +187,8 @@ export const stamps: Stamp[] = [
     title: { ko: '글로벌 IR과 SEED 투자 유치', en: 'Global IR and seed fundraising' },
     label: { ko: 'SEED IR', en: 'Seed IR' },
     stage: 'global',
-    status: 'planned',
-    evidence: [],
+    status: 'done',
+    evidence: [confirmed],
   },
   {
     id: 'hangzhou',
@@ -184,8 +198,8 @@ export const stamps: Stamp[] = [
     title: { ko: '크리에이터 왕홍 프로그램', en: 'Creator (wanghong) program' },
     label: { ko: '왕홍 프로그램', en: 'Wanghong program' },
     stage: 'global',
-    status: 'planned',
-    evidence: [],
+    status: 'done',
+    evidence: [confirmed],
   },
   {
     id: 'showcase',
