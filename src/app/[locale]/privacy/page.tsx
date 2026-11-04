@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// The nine sections follow the order the spec lists them (§8). Each one is a heading beside its
+// The sections follow the order the spec lists them (§8). Each one is a heading beside its
 // text, the way the site's inner pages set a title beside its facts. The numbers are there to be
 // quoted ("see section 6"), which is what numbering a policy is for.
 function Section({
@@ -136,6 +136,7 @@ export default async function PrivacyPage({ params }: Props) {
             <p>{t('retention.keep')}</p>
             <p>{t('retention.unfinished')}</p>
             <p>{t('retention.delete')}</p>
+            <p>{t('retention.destroy')}</p>
           </Section>
 
           <Section number={4} id="privacy-processors" title={t('processors.title')}>
@@ -149,7 +150,24 @@ export default async function PrivacyPage({ params }: Props) {
             </Rows>
           </Section>
 
-          <Section number={5} id="privacy-visibility" title={t('visibility.title')}>
+          <Section number={5} id="privacy-transfer" title={t('transfer.title')}>
+            <p>{t('transfer.intro')}</p>
+            <Rows>
+              {(['supabase', 'vercel', 'google'] as const).map((key) => (
+                <Row key={key} label={t(`transfer.${key}.label`)}>
+                  {(['country', 'items', 'purpose'] as const).map((field) => (
+                    <p key={field} className="mt-2 first:mt-0">
+                      <span className="text-white">{t(`transfer.fields.${field}`)}: </span>
+                      {t(`transfer.${key}.${field}`)}
+                    </p>
+                  ))}
+                </Row>
+              ))}
+            </Rows>
+            <p>{t('transfer.refuse')}</p>
+          </Section>
+
+          <Section number={6} id="privacy-visibility" title={t('visibility.title')}>
             <Rows>
               {(['self', 'staff', 'admin'] as const).map((key) => (
                 <Row key={key} label={t(`visibility.${key}.label`)}>
@@ -160,17 +178,28 @@ export default async function PrivacyPage({ params }: Props) {
             <p>{t('visibility.outro')}</p>
           </Section>
 
-          <Section number={6} id="privacy-rights" title={t('rights.title')}>
+          <Section number={7} id="privacy-rights" title={t('rights.title')}>
             <p>{t.rich('rights.manage', { me })}</p>
             <p>{t('rights.decline')}</p>
             <p>{t.rich('rights.unfinished', { mail })}</p>
           </Section>
 
-          <Section number={7} id="privacy-under14" title={t('under14.title')}>
+          <Section number={8} id="privacy-under14" title={t('under14.title')}>
             <p>{t('under14.body')}</p>
           </Section>
 
-          <Section number={8} id="privacy-officer" title={t('officer.title')}>
+          <Section number={9} id="privacy-security" title={t('security.title')}>
+            <p>{t('security.intro')}</p>
+            <Rows>
+              {(['managerial', 'technical', 'physical'] as const).map((key) => (
+                <Row key={key} label={t(`security.${key}.label`)}>
+                  {t(`security.${key}.body`)}
+                </Row>
+              ))}
+            </Rows>
+          </Section>
+
+          <Section number={10} id="privacy-officer" title={t('officer.title')}>
             <p>{t('officer.intro')}</p>
             <div className="border-t border-white/15 pt-4 text-lg font-semibold text-white">
               <p>{t.rich('officer.responsible', { mail })}</p>
@@ -179,7 +208,7 @@ export default async function PrivacyPage({ params }: Props) {
             <p className="text-sm text-white/60">{t('officer.note')}</p>
           </Section>
 
-          <Section number={9} id="privacy-version" title={t('version.title')}>
+          <Section number={11} id="privacy-version" title={t('version.title')}>
             <p>{t('version.body')}</p>
             <Rows>
               <Row label={t('version.label')}>
