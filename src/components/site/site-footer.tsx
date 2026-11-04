@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { Link } from '@/i18n/navigation';
+import { isAuthEnabled } from '@/lib/auth/config';
 import { NAV_ITEMS } from './site-header';
 
 export async function SiteFooter() {
@@ -34,9 +35,18 @@ export async function SiteFooter() {
           <p className="mt-2 break-keep">{t('address')}</p>
         </div>
       </div>
-      <p className="border-t border-white/15 px-5 py-5 text-center text-xs tracking-[0.12em] text-white/75">
-        {t('rights', { year: new Date().getFullYear() })}
-      </p>
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-0 border-t border-white/15 px-5 py-2 text-xs tracking-[0.12em] text-white/75">
+        <p>{t('rights', { year: new Date().getFullYear() })}</p>
+        {/* The policy opens together with the accounts. */}
+        {isAuthEnabled() && (
+          <Link
+            href="/privacy"
+            className="py-2 text-sm tracking-normal text-white/85 underline-offset-4 hover:underline"
+          >
+            {t('privacy')}
+          </Link>
+        )}
+      </div>
     </footer>
   );
 }

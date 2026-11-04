@@ -77,3 +77,24 @@ test('fonts load from the site itself, not a third-party CDN', async ({ page }) 
   expect(loaded.some((f) => f.includes('Wanted Sans Variable'))).toBe(true);
   expect(loaded.some((f) => f.includes('Pretendard Variable'))).toBe(true);
 });
+
+// Accounts are off in this suite (no NEXT_PUBLIC_AUTH_ENABLED), so the site looks as it did before
+// they existed: no sign-in entry in the header and no login page. The same checks with the switch
+// on are in e2e/auth/login.spec.ts.
+for (const locale of LOCALES) {
+  test(`/${locale} header has no sign-in entry while accounts are off`, async ({ page }) => {
+    await page.goto(`/${locale}`);
+    await page.waitForLoadState('networkidle');
+    // Counted in the markup, not by what is visible: the phone menu panel is closed.
+    await expect(page.locator('header a[href*="/login"]')).toHaveCount(0);
+    await expect(page.locator('header [data-account-initial]')).toHaveCount(0);
+    await expect(page.locator('header').getByText(/^(로그인|Sign in)$/)).toHaveCount(0);
+  });
+
+  test(`/${locale}/login is a 404 while accounts are off`, async ({ page }) => {
+    const response = await page.goto(`/${locale}/login`);
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByLabel(/이메일|Email/)).toHaveCount(0);
+  });
+}

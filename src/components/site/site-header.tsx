@@ -2,7 +2,9 @@ import { getTranslations } from 'next-intl/server';
 import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { AskButton } from '@/components/stage/ask-button';
 import { Link } from '@/i18n/navigation';
+import { isAuthEnabled } from '@/lib/auth/config';
 import { applyCta, getRecruitment } from '@/lib/content';
+import { AccountMenu } from './account-menu';
 import { LocaleSwitch } from './locale-switch';
 import { MobileNav } from './mobile-nav';
 
@@ -12,6 +14,17 @@ export const NAV_ITEMS = [
   { href: '/network', key: 'network' },
   { href: '/contact', key: 'contact' },
 ] as const;
+
+async function getAccountLabels() {
+  const t = await getTranslations('Auth.menu');
+  return {
+    signIn: t('signIn'),
+    account: t('account'),
+    myPage: t('myPage'),
+    admin: t('admin'),
+    signOut: t('signOut'),
+  };
+}
 
 export async function SiteHeader() {
   const t = await getTranslations('Nav');
@@ -24,6 +37,9 @@ export async function SiteHeader() {
     cta.kind === 'apply'
       ? { href: cta.href, label: ctaT('apply'), external: true }
       : { href: '/join', label: ctaT('notice'), external: false };
+
+  // With accounts switched off the header is exactly what it was before they existed.
+  const accountLabels = isAuthEnabled() ? await getAccountLabels() : null;
 
   return (
     <header className="absolute inset-x-0 top-0 z-30">
@@ -46,8 +62,14 @@ export async function SiteHeader() {
           ))}
           <LocaleSwitch />
           <AskButton cta={cta} className="px-4 py-2" />
+          {accountLabels ? <AccountMenu labels={accountLabels} /> : null}
         </nav>
-        <MobileNav items={items} action={action} menuLabel={t('menu')} />
+        <MobileNav
+          items={items}
+          action={action}
+          menuLabel={t('menu')}
+          account={accountLabels ? <AccountMenu labels={accountLabels} variant="panel" /> : null}
+        />
       </div>
     </header>
   );

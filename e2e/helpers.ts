@@ -14,6 +14,9 @@ export function collectConsoleErrors(page: Page): string[] {
 }
 
 export async function expectAccessible(page: Page) {
+  // After a server action the page's metadata streams back in, so on a slow runner the
+  // <title> can be missing for a moment. Check the page once it has settled.
+  await expect(page).toHaveTitle(/\S/);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
