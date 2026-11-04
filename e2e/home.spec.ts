@@ -14,7 +14,7 @@ test('the home opens on the slogan over a real photo', async ({ page }) => {
   await expect(h1).toContainText('Elevate your future');
   const hero = page.locator('[data-hero]');
   await expect(hero.locator('img')).toHaveAttribute('alt', /워크숍/);
-  await expect(hero).toContainText('임시 사진');
+  await expect(hero).not.toContainText('임시 사진');
   await expect(page.locator('[data-slide-counter], [data-scene]')).toHaveCount(0);
 });
 

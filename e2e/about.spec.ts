@@ -38,9 +38,9 @@ test('timeline: past planned dates read unconfirmed, only future ones upcoming',
   for (const e of unconfirmed) expect(e.text).toContain('Unconfirmed');
 });
 
-test('the page cover shows a real photo marked temporary', async ({ page }) => {
+test('the page cover shows a real photo, no longer marked temporary', async ({ page }) => {
   await page.goto('/ko/about');
   const cover = page.locator('[data-page-cover]');
   await expect(cover.locator('img')).toHaveAttribute('alt', /바이브코딩/);
-  await expect(cover).toContainText('임시 사진');
+  await expect(cover).not.toContainText('임시 사진');
 });
