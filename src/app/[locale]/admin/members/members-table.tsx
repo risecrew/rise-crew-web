@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import {
   startTransition,
   useActionState,
@@ -12,7 +12,7 @@ import {
   type FormEvent,
   type KeyboardEvent,
 } from 'react';
-import { defaultLocale, isLocale, type Locale } from '@/i18n/locales';
+import { useCurrentLocale } from '@/i18n/use-current-locale';
 import type { MemberChange, MemberFailure, MemberState } from '@/lib/auth/members';
 import type { AppRole } from '@/lib/auth/roles';
 import { cn } from '@/lib/utils';
@@ -36,11 +36,6 @@ export type MemberRowView = {
 };
 
 const NONE: ReadonlySet<string> = new Set();
-
-function useCurrentLocale(): Locale {
-  const locale = useLocale();
-  return isLocale(locale) ? locale : defaultLocale;
-}
 
 // The page's scripts are what make "select everyone" work, so the box is only there once they are.
 const subscribeToNothing = () => () => {};

@@ -29,7 +29,15 @@ let known: { id: string; names: NameParts } | null = null;
 let client: Client | null = null;
 const listeners = new Set<() => void>();
 
+function sameAccount(a: Account, b: Account): boolean {
+  if (a.status === 'out' || b.status === 'out') return a.status === b.status;
+  return a.role === b.role && a.email === b.email && a.names === b.names;
+}
+
 function publish(next: Account) {
+  // A token refresh reports the same account again; keeping the old snapshot spares every
+  // subscriber a re-render.
+  if (sameAccount(current, next)) return;
   current = next;
   for (const listener of listeners) listener();
 }
