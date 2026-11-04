@@ -1,5 +1,6 @@
 // Draft from a standard template; must be approved by operators and the ANCHOR Division before the switch is turned on.
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageCover } from '@/components/site/page-cover';
@@ -72,6 +73,9 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 const underlined = 'underline underline-offset-4';
 
 export default async function PrivacyPage({ params }: Props) {
+  // An unapproved draft: the policy opens together with the accounts.
+  if (!isAuthEnabled()) notFound();
+
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('Privacy');
@@ -82,16 +86,11 @@ export default async function PrivacyPage({ params }: Props) {
       {chunks}
     </a>
   );
-  // My page exists only once accounts are switched on; until then the policy (which can be read
-  // with the switch off) names it in plain text instead of linking to a 404.
-  const me = (chunks: ReactNode) =>
-    isAuthEnabled() ? (
-      <Link href="/me" className={underlined}>
-        {chunks}
-      </Link>
-    ) : (
-      chunks
-    );
+  const me = (chunks: ReactNode) => (
+    <Link href="/me" className={underlined}>
+      {chunks}
+    </Link>
+  );
 
   return (
     <main id="main" className="bg-stage">

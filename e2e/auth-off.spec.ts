@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { LOCALES, PAGES } from './helpers';
 
 // The sign-in routes exist only when accounts are switched on. This suite runs with the switch
 // off, so they must look like any other address that is not a page (the accounts e2e, in e2e/auth,
@@ -56,3 +57,17 @@ test('posting to the members screen is a 404 while accounts are off', async ({ r
   });
   expect(response.status()).toBe(404);
 });
+
+// The privacy policy is an unapproved draft until the accounts are launched: no page, no link.
+for (const locale of LOCALES) {
+  test(`/${locale}/privacy is a 404 while accounts are off`, async ({ request }) => {
+    expect((await request.get(`/${locale}/privacy`, { maxRedirects: 0 })).status()).toBe(404);
+  });
+
+  test(`the ${locale} footer has no privacy link while accounts are off`, async ({ page }) => {
+    for (const path of PAGES) {
+      await page.goto(`/${locale}${path}`);
+      await expect(page.locator(`footer a[href="/${locale}/privacy"]`)).toHaveCount(0);
+    }
+  });
+}

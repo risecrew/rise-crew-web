@@ -3,8 +3,8 @@ import type { Locale } from '@/i18n/locales';
 export type PagePath = '' | '/about' | '/network' | '/contact' | '/join';
 export const PAGE_PATHS: readonly PagePath[] = ['', '/about', '/network', '/contact', '/join'];
 
-// Reachable pages that are not in the sitemap (yet). The privacy policy is there to be read and
-// reviewed, but is listed with the other pages only once accounts are launched.
+// Pages that are not in the sitemap (yet). The privacy policy opens only once accounts are
+// switched on, and is listed with the other pages after that.
 export type UnlistedPath = '/privacy';
 
 export function localizedAlternates(locale: Locale, path: PagePath | UnlistedPath) {

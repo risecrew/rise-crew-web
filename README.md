@@ -84,7 +84,7 @@ pnpm e2e:auth       # 로그인과 계정 화면 e2e (위 "검사" 참고)
 
 ### Production에서 켜기
 
-운영진과 ANCHOR 사업단 담당자가 개인정보 처리방침(`/ko/privacy`)을 확인해 **승인한 뒤에만** 켭니다. 처리방침 초안은 표준 양식에 맞춘 것이고 법률 검토가 아닙니다.
+운영진과 ANCHOR 사업단 담당자가 개인정보 처리방침을 미리보기 주소의 `/ko/privacy`에서 확인해 **승인한 뒤에만** 켭니다. 스위치를 켜면 처리방침 페이지와 푸터 링크도 함께 열립니다. 처리방침 초안은 표준 양식에 맞춘 것이고 법률 검토가 아닙니다.
 
 1. 승인한 날짜(`YYYY-MM-DD`)를 `src/lib/auth/profile.ts`의 `PRIVACY_POLICY_VERSION`에 넣고, `tests/lib/auth-profile.test.ts`가 가진 같은 값도 고쳐 PR로 merge한다. 이 값이 처리방침 맨 아래의 시행일이고 동의 기록에 남는 버전이다. 승인 전에 글이 바뀌는 동안은 값을 그대로 두고, 승인한 날에만 바꾼다. 켠 뒤 글을 고치면 새 날짜로 바꾼다.
 2. Vercel의 **Production** 환경변수에 `NEXT_PUBLIC_AUTH_ENABLED=true` **하나만** 더한다. `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`는 이 PR을 merge하기 **전에** 이미 운영용 Supabase 프로젝트의 값으로 Production에 넣어 두었어야 한다(아래 "7. Vercel 환경변수"). 스위치가 없으면 이 세 값이 있어도 계정 기능은 꺼진 채라서, merge해도 공개 사이트는 그대로다. 출시 때 새로 더하는 것은 스위치 하나뿐이다.
