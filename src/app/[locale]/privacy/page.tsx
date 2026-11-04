@@ -151,7 +151,7 @@ export default async function PrivacyPage({ params }: Props) {
 
           <Section number={5} id="privacy-visibility" title={t('visibility.title')}>
             <Rows>
-              {(['self', 'staff'] as const).map((key) => (
+              {(['self', 'staff', 'admin'] as const).map((key) => (
                 <Row key={key} label={t(`visibility.${key}.label`)}>
                   {t(`visibility.${key}.body`)}
                 </Row>

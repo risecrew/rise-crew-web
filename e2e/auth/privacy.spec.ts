@@ -47,6 +47,12 @@ const POLICY = {
     unfinishedRights: /만든 지 7일이 지나면 자동으로 삭제됩니다/,
     staffRow: '운영진과 관리자',
     staffFinishedOnly: /가입 정보 입력을 마치지 않은 계정은 보지 못합니다/,
+    // Supabase's own sign-in logs name the account, and whoever runs the site can read every
+    // account in the Supabase dashboard, which can also export tables.
+    signInLogs: /로그인 기록에는 계정 이메일과 계정 식별자도 포함됩니다/,
+    adminRow: '웹사이트 관리자',
+    adminDashboard: /Supabase 관리 화면에서 모든 계정/,
+    noExport: /회원 관리 화면에는 명단을 파일로 내려받는 기능이 없습니다/,
   },
   en: {
     title: 'Privacy policy',
@@ -78,6 +84,10 @@ const POLICY = {
     unfinishedRights: /deleted automatically 7 days after it was created/,
     staffRow: 'Operators and admins',
     staffFinishedOnly: /do not see accounts that never finished the sign-up form/,
+    signInLogs: /sign-in logs also include your account email and account identifier/,
+    adminRow: 'Website administrator',
+    adminDashboard: /every account in the Supabase dashboard/,
+    noExport: /member management screen has no way to download the member list/,
   },
 } as const;
 
@@ -171,6 +181,23 @@ for (const locale of LOCALES) {
       .filter({ has: page.locator('dt', { hasText: copy.staffRow }) });
     await expect(staff).toHaveCount(1);
     await expect(staff).toContainText(copy.staffFinishedOnly);
+  });
+
+  test(`/${locale}/privacy says who else can read accounts, outside the member screen`, async ({
+    page,
+  }) => {
+    await page.goto(`/${locale}/privacy`);
+    const main = page.locator('main');
+    await expect(main.locator('section[aria-labelledby="privacy-items"]')).toContainText(
+      copy.signInLogs,
+    );
+    const visibility = main.locator('section[aria-labelledby="privacy-visibility"]');
+    const admin = visibility
+      .locator('dl > div')
+      .filter({ has: page.locator('dt', { hasText: copy.adminRow }) });
+    await expect(admin).toHaveCount(1);
+    await expect(admin).toContainText(copy.adminDashboard);
+    await expect(visibility).toContainText(copy.noExport);
   });
 
   test(`/${locale}/privacy is reachable from the footer of every page`, async ({ page }) => {

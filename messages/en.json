@@ -264,7 +264,7 @@
         "label": "Consent to recruitment emails",
         "body": "Optional. Whether you agreed is recorded with the time and the version of this policy."
       },
-      "passive": "If you sign in with Google, Supabase also stores the basic profile Google shares (display name, profile picture URL, account identifier and the like) with your sign-in details. Supabase and Vercel keep access logs automatically (IP address, browser, and times), held under each company’s own policy.",
+      "passive": "If you sign in with Google, Supabase also stores the basic profile Google shares (display name, profile picture URL, account identifier and the like) with your sign-in details. Supabase and Vercel keep access logs automatically (IP address, browser, and times), and Supabase’s sign-in logs also include your account email and account identifier. These logs are held under each company’s own policy.",
       "cookies": "This site stores cookies in your browser. While you are signed in, a cookie keeps you signed in. When the language you view the site in differs from your browser’s (for example after you switch language), a cookie remembers that language, whether or not you are signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in and your language choice is not remembered."
     },
     "retention": {
@@ -286,7 +286,7 @@
       },
       "google": {
         "label": "Google",
-        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails (for now, a RISE CREW Gmail account sends the sign-in emails; the recipient address and the one-time sign-in link pass through Google, and the copy is deleted automatically within 30 days)"
+        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails. For now, a RISE CREW Gmail account sends the sign-in emails. The recipient address and the one-time sign-in link pass through Google, and the sent copy is deleted automatically within 30 days."
       }
     },
     "visibility": {
@@ -299,7 +299,11 @@
         "label": "Operators and admins",
         "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) of people who finished signing up, on the member management screen. They do not see accounts that never finished the sign-up form. They look at it only to manage members and, for people who agreed, to send recruitment notices."
       },
-      "outro": "There is no way to download the member list as a file. The club does not give personal information to anyone outside the companies above and the operators and admins."
+      "admin": {
+        "label": "Website administrator",
+        "body": "As the person handling the data, the website administrator can see the sign-in details and sign-up information of every account in the Supabase dashboard, including accounts that never finished the sign-up form. They look at it only when running the site or handling a deletion request requires it."
+      },
+      "outro": "The member management screen has no way to download the member list as a file. The club does not give personal information to anyone outside the companies and people named above."
     },
     "rights": {
       "title": "Your rights",
