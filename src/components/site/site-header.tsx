@@ -26,7 +26,8 @@ async function getAccountLabels() {
     signIn: t('signIn'),
     account: t('account'),
     myPage: t('myPage'),
-    admin: t('admin'),
+    members: t('members'),
+    teams: t('teams'),
     signOut: t('signOut'),
   };
 }

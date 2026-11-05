@@ -12,7 +12,8 @@ export type AccountLabels = {
   signIn: string;
   account: string;
   myPage: string;
-  admin: string;
+  members: string;
+  teams: string;
   signOut: string;
 };
 
@@ -141,11 +142,18 @@ function AccountLinks({
         </Link>
       </li>
       {staff ? (
-        <li>
-          <Link href="/admin/members" prefetch={false} className={row}>
-            {labels.admin}
-          </Link>
-        </li>
+        <>
+          <li>
+            <Link href="/admin/members" prefetch={false} className={row}>
+              {labels.members}
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/teams" prefetch={false} className={row}>
+              {labels.teams}
+            </Link>
+          </li>
+        </>
       ) : null}
       <li>
         {/* A plain form, so signing out works before the page has finished loading. Only a POST

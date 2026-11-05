@@ -406,7 +406,8 @@ test.describe('a visitor who is already signed in', () => {
     const header = page.locator('header');
     await expect(header.getByRole('link', { name: '마이페이지' })).toBeVisible();
     // A member is not on the operator team.
-    await expect(header.getByRole('link', { name: '관리', exact: true })).toHaveCount(0);
+    await expect(header.getByRole('link', { name: '회원 관리', exact: true })).toHaveCount(0);
+    await expect(header.getByRole('link', { name: '팀 관리', exact: true })).toHaveCount(0);
 
     await header.getByRole('button', { name: '로그아웃' }).click();
     await expect(page).toHaveURL(`${baseURL}/ko`);
@@ -425,8 +426,13 @@ test.describe('a visitor who is already signed in', () => {
     const toggle = page.getByRole('button', { name: /계정 메뉴/ });
     if (await toggle.isVisible()) await toggle.click();
     await expect(
-      page.locator('header').getByRole('link', { name: '관리', exact: true }),
+      page.locator('header').getByRole('link', { name: '회원 관리', exact: true }),
     ).toBeVisible();
+    const teams = page.locator('header').getByRole('link', { name: '팀 관리', exact: true });
+    await expect(teams).toHaveAttribute('href', '/ko/admin/teams');
+    await teams.click();
+    await expect(page).toHaveURL(`${baseURL}/ko/admin/teams`);
+    await expect(page.getByRole('heading', { level: 1, name: '팀 관리' })).toBeVisible();
   });
 
   test('can close the desktop menu with Escape', async ({ page, baseURL }, testInfo) => {

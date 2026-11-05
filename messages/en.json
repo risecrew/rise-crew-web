@@ -379,7 +379,8 @@
       "signIn": "Sign in",
       "account": "Account menu",
       "myPage": "My page",
-      "admin": "Admin",
+      "members": "Members",
+      "teams": "Teams",
       "signOut": "Sign out"
     },
     "login": {
