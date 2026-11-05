@@ -13,6 +13,7 @@ import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { Link } from '@/i18n/navigation';
 import { TEAM_LIMITS, TEAM_POST_VISIBILITIES, checkPhoto } from '@/lib/teams/forms';
 import { removePhotos, uploadPhotos } from '@/lib/teams/upload';
+import { FieldNotice } from './field-notice';
 import { AREA, FIELD, LABEL, MESSAGE, PRIMARY, ROW, TEXT_BUTTON } from './form-parts';
 
 type Existing = {
@@ -39,6 +40,7 @@ export function PostForm({ team, post }: Props) {
   const [pending, start] = useTransition();
   const [state, setState] = useState<TeamActionState>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pickNotice, setPickNotice] = useState<string | null>(null);
   const [title, setTitle] = useState(post?.title ?? '');
   const [body, setBody] = useState(post?.body ?? '');
   const [visibility, setVisibility] = useState(post?.visibility ?? 'public');
@@ -62,15 +64,15 @@ export function PostForm({ team, post }: Props) {
   }
 
   function pickPhotos(files: File[]) {
-    setNotice(null);
+    setPickNotice(null);
     if (files.length > room) {
-      setNotice(t('errors.tooMany'));
+      setPickNotice(t('errors.tooMany'));
       return;
     }
     for (const file of files) {
       const check = checkPhoto(file, TEAM_LIMITS.inputBytes);
       if (check !== 'ok') {
-        setNotice(check === 'tooLarge' ? t('errors.tooLarge') : t('errors.badType'));
+        setPickNotice(check === 'tooLarge' ? t('errors.tooLarge') : t('errors.badType'));
         return;
       }
     }
@@ -83,6 +85,7 @@ export function PostForm({ team, post }: Props) {
     const form = new FormData(event.currentTarget);
     start(async () => {
       setNotice(null);
+      setPickNotice(null);
       setState(null);
       if (!postId.current) postId.current = crypto.randomUUID();
       const id = postId.current;
@@ -192,6 +195,7 @@ export function PostForm({ team, post }: Props) {
           }}
           className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white disabled:opacity-60"
         />
+        <FieldNotice text={pickNotice} />
         <p className="mt-2 px-2 text-sm break-keep text-white/75">{t('photoHint')}</p>
         <p className="mt-1 px-2 text-sm break-keep text-white/75">{t('photoNotice')}</p>
 

@@ -8,6 +8,7 @@ import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { Link } from '@/i18n/navigation';
 import { TEAM_LIMITS, TEAM_LINK_KINDS, checkPhoto, type TeamLink } from '@/lib/teams/forms';
 import { removeTeamImage, uploadTeamImage, type UploadError } from '@/lib/teams/upload';
+import { FieldNotice } from './field-notice';
 import { AREA, FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from './form-parts';
 
 type Props = {
@@ -31,6 +32,8 @@ export function IntroForm({ team }: Props) {
   const [pending, start] = useTransition();
   const [state, setState] = useState<TeamActionState>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [logoNotice, setLogoNotice] = useState<string | null>(null);
+  const [coverNotice, setCoverNotice] = useState<string | null>(null);
   const [tagline, setTagline] = useState(team.tagline);
   const [intro, setIntro] = useState(team.intro);
   const [links, setLinks] = useState<{ key: number; kind: string; url: string }[]>(
@@ -53,13 +56,17 @@ export function IntroForm({ team }: Props) {
   }
 
   // A refused file does not stay named in the field, where it would look chosen.
-  function pickImage(input: HTMLInputElement, keep: (file: File | null) => void) {
+  function pickImage(
+    input: HTMLInputElement,
+    keep: (file: File | null) => void,
+    say: (text: string | null) => void,
+  ) {
     const file = input.files?.[0] ?? null;
-    setNotice(null);
+    say(null);
     if (file) {
       const check = checkPhoto(file, TEAM_LIMITS.inputBytes);
       if (check !== 'ok') {
-        setNotice(check === 'tooLarge' ? t('errors.tooLarge') : t('errors.badType'));
+        say(check === 'tooLarge' ? t('errors.tooLarge') : t('errors.badType'));
         keep(null);
         input.value = '';
         return;
@@ -81,6 +88,8 @@ export function IntroForm({ team }: Props) {
     const form = new FormData(event.currentTarget);
     start(async () => {
       setNotice(null);
+      setLogoNotice(null);
+      setCoverNotice(null);
       setState(null);
       let newLogo: string | null = null;
       if (logo) {
@@ -145,9 +154,10 @@ export function IntroForm({ team }: Props) {
           id="team-logo"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => pickImage(event.target, setLogo)}
+          onChange={(event) => pickImage(event.target, setLogo, setLogoNotice)}
           className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white"
         />
+        <FieldNotice text={logoNotice} />
         <p className="mt-2 px-2 text-sm text-white/75">{t('logoHint')}</p>
         {team.logo_path && !logo ? (
           <label className="mt-2 flex min-h-11 items-center gap-3 px-2 text-base text-white/85">
@@ -170,9 +180,10 @@ export function IntroForm({ team }: Props) {
           id="team-cover"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => pickImage(event.target, setCover)}
+          onChange={(event) => pickImage(event.target, setCover, setCoverNotice)}
           className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white"
         />
+        <FieldNotice text={coverNotice} />
         <p className="mt-2 px-2 text-sm break-keep text-white/75">{t('coverHint')}</p>
         {team.cover_path && !cover ? (
           <label className="mt-2 flex min-h-11 items-center gap-3 px-2 text-base text-white/85">

@@ -108,6 +108,47 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
     if (sentTo !== null) headingRef.current?.focus();
   }, [sentTo]);
 
+  // The emailed link usually opens in a new tab of this same browser, which signs in there and leaves
+  // this tab saying "check your inbox". The session cookies are shared, so this tab sees them appear
+  // and moves on too. Only a new session counts: one this browser already had must not end the wait.
+  // Reading the cookies decides nothing but where to go; the page there checks the session itself.
+  // The welcome page sends a finished account straight on to `next`.
+  const waiting = sentTo !== null;
+  useEffect(() => {
+    if (!waiting) return;
+    const { auth } = createSupabaseBrowserClient();
+    const currentToken = () =>
+      auth.getSession().then(
+        ({ data }) => data.session?.access_token ?? null,
+        () => null,
+      );
+    const before = currentToken();
+    let done = false;
+
+    const check = async () => {
+      const [had, now] = await Promise.all([before, currentToken()]);
+      if (done || !now || now === had) return;
+      done = true;
+      window.location.replace(`/${locale}/welcome?next=${encodeURIComponent(next)}`);
+    };
+
+    // A phone stops the timer of a tab in the background, so coming back to the tab checks as well.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void check();
+    };
+    const timer = window.setInterval(check, 2000);
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', check);
+    window.addEventListener('pageshow', check);
+    return () => {
+      done = true;
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', check);
+      window.removeEventListener('pageshow', check);
+    };
+  }, [waiting, locale, next]);
+
   async function sendLink(address: string): Promise<boolean> {
     let error: { status?: number; code?: string } | null;
     try {

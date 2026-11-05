@@ -607,7 +607,7 @@ test('a refused logo does not stay in the form', async ({ page, baseURL }, testI
     mimeType: 'image/svg+xml',
     buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'),
   });
-  await expect(page.getByText('JPEG, PNG, WebP 사진만 올릴 수 있어요.')).toBeVisible();
+  await expect(page.getByText('JPEG, PNG, WebP 사진만 올릴 수 있어요.')).toBeInViewport();
   await expect(page.getByLabel('로고')).toHaveValue('');
 });
 
@@ -897,10 +897,13 @@ test('at most four photos can be picked', async ({ page, baseURL }, testInfo) =>
   const { email, slug } = await teamWithMember(testInfo);
   await signIn(page, email, baseURL!);
   await openNewPost(page, slug);
+  // Where a person is after using the photo button: the message has to be on screen there, not
+  // somewhere further down a phone's long form.
+  await page.getByLabel('사진 추가').scrollIntoViewIfNeeded();
   await page
     .getByLabel('사진 추가')
     .setInputFiles(['a', 'b', 'c', 'd', 'e'].map((n) => png(`${n}.png`)));
-  await expect(page.getByText('사진은 글마다 4장까지 올릴 수 있어요.')).toBeVisible();
+  await expect(page.getByText('사진은 글마다 4장까지 올릴 수 있어요.')).toBeInViewport();
 });
 
 test('the forms are clean on a phone and pass the accessibility check', async ({
