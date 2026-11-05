@@ -15,7 +15,7 @@ export function TeamMark({
   return (
     <span
       className={cn(
-        'relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/15 bg-white/5 font-display font-[800] text-white',
+        'relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/15 bg-stage font-display font-[800] text-white',
         className,
       )}
     >

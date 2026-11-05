@@ -171,6 +171,49 @@ test('a post with a photo reaches a signed-out visitor, until it is changed to s
   await stranger.close();
 });
 
+test('the latest public photo opens the team page, and leaves when the post closes', async ({
+  page,
+  baseURL,
+  browser,
+}, testInfo) => {
+  const { id, email, slug } = await teamWithMember(testInfo);
+  const stranger = await browser.newContext();
+  const visitor = await stranger.newPage();
+  const cover = visitor.locator('[data-team-cover] img[src*="team-post-photos"]');
+
+  // Without a photo there is nothing behind the name.
+  await visitor.goto(`/ko/startups/${slug}`);
+  await expect(visitor.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(cover).toHaveCount(0);
+
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`표지 글 ${id}`);
+  await page.getByLabel('사진 추가').setInputFiles(png('a.png'));
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByRole('heading', { level: 1, name: `표지 글 ${id}` })).toBeVisible();
+
+  await visitor.goto(`/ko/startups/${slug}`);
+  await expect(cover).toHaveCount(1);
+  expect((await visitor.request.get((await cover.getAttribute('src'))!)).status()).toBe(200);
+
+  await page.getByRole('link', { name: '수정', exact: true }).click();
+  await page.getByRole('radio', { name: '가입자만' }).check();
+  await page.getByRole('button', { name: '저장' }).click();
+  // The form says 가입자만 too, so wait for the save to leave the form.
+  await afterSave(page).toHaveURL(/\/posts\/[0-9a-f-]+$/);
+
+  await visitor.goto(`/ko/startups/${slug}`);
+  await expect(visitor.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(cover).toHaveCount(0);
+
+  // A signed-in post is not a cover for anyone, members included.
+  await page.goto(`/ko/startups/${slug}`);
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.locator('[data-team-cover] img[src*="team-post-photos"]')).toHaveCount(0);
+  await stranger.close();
+});
+
 test('editing shows the edited time, and deleting removes the post and its files', async ({
   page,
   baseURL,

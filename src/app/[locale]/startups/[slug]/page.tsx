@@ -1,19 +1,26 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { PageCover } from '@/components/site/page-cover';
 import { SectionHeading } from '@/components/site/section-heading';
 import { Fact, FactList } from '@/components/stage/facts';
 import { OUTLINE, PRIMARY } from '@/components/teams/form-parts';
 import { Pager } from '@/components/teams/pager';
 import { CHIP, PostList } from '@/components/teams/post-list';
+import { TeamCover } from '@/components/teams/team-cover';
 import { TeamMark } from '@/components/teams/team-mark';
 import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { getViewer } from '@/lib/auth/viewer';
 import { localizedAlternates } from '@/lib/metadata';
-import { getTeamAccess, getTeamBySlug, listPosts, logoUrl, pageCount } from '@/lib/teams/queries';
+import {
+  getTeamAccess,
+  getTeamBySlug,
+  getTeamCover,
+  listPosts,
+  logoUrl,
+  pageCount,
+} from '@/lib/teams/queries';
 import { parseTeamsQuery } from '@/lib/teams/query';
 
 type Props = {
@@ -50,8 +57,9 @@ export default async function TeamPage({ params, searchParams }: Props) {
   const { page } = parseTeamsQuery(await searchParams);
   const viewer = await getViewer();
   const canReadSignedIn = viewer !== null && viewer.onboarded && !viewer.blocked;
-  const [access, { posts, total, lockedCount }] = await Promise.all([
+  const [access, cover, { posts, total, lockedCount }] = await Promise.all([
     getTeamAccess(team, viewer),
+    getTeamCover(team.id),
     listPosts(team.id, page, !canReadSignedIn && !viewer?.blocked),
   ]);
   const signedIn = viewer !== null;
@@ -59,34 +67,44 @@ export default async function TeamPage({ params, searchParams }: Props) {
 
   return (
     <main id="main" className="bg-stage">
-      <PageCover title={team.name} lead={team.tagline || undefined}>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <TeamMark name={team.name} url={logoUrl(team.logo_path)} className="size-16 text-3xl" />
-          {!team.is_published ? <span className={CHIP}>{t('unpublished')}</span> : null}
-        </div>
-        {access.isMember || access.isStaff ? (
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            {access.isMember ? (
-              <Link href={`/startups/${team.slug}/posts/new`} className={PRIMARY}>
-                {t('form.newPost')}
+      <TeamCover
+        name={team.name}
+        tagline={team.tagline}
+        facts={`${t(`fields.${team.field}`)} · ${t('cohort', { cohort: team.cohort })}`}
+        photo={cover}
+        logo={
+          team.logo_path ? (
+            <TeamMark
+              name={team.name}
+              url={logoUrl(team.logo_path)}
+              className="size-20 bg-stage md:size-32"
+            />
+          ) : null
+        }
+        badge={!team.is_published ? <span className={CHIP}>{t('unpublished')}</span> : null}
+        actions={
+          access.isMember || access.isStaff ? (
+            <>
+              {access.isMember ? (
+                <Link href={`/startups/${team.slug}/posts/new`} className={PRIMARY}>
+                  {t('form.newPost')}
+                </Link>
+              ) : null}
+              <Link href={`/startups/${team.slug}/edit`} className={OUTLINE}>
+                {t('form.editIntro')}
               </Link>
-            ) : null}
-            <Link href={`/startups/${team.slug}/edit`} className={OUTLINE}>
-              {t('form.editIntro')}
-            </Link>
-          </div>
-        ) : null}
-      </PageCover>
+            </>
+          ) : null
+        }
+      />
 
       <section className="border-t border-white/10 bg-stage text-white">
-        <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 py-14 md:px-10 md:py-20 lg:grid-cols-2">
-          <p className="max-w-2xl text-lg leading-relaxed wrap-anywhere break-keep whitespace-pre-wrap text-white/85">
+        <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 py-14 md:px-10 md:py-20 lg:grid-cols-[2fr_1fr]">
+          <p className="max-w-3xl text-lg leading-relaxed wrap-anywhere break-keep whitespace-pre-wrap text-white/85">
             {team.intro || t('introEmpty')}
           </p>
-          <FactList>
-            <Fact label={t('facts.field')}>{t(`fields.${team.field}`)}</Fact>
-            <Fact label={t('facts.cohort')}>{t('cohort', { cohort: team.cohort })}</Fact>
-            {team.links.length > 0 ? (
+          {team.links.length > 0 ? (
+            <FactList>
               <Fact label={t('facts.links')}>
                 <ul className="flex flex-col">
                   {team.links.map((link) => (
@@ -103,8 +121,8 @@ export default async function TeamPage({ params, searchParams }: Props) {
                   ))}
                 </ul>
               </Fact>
-            ) : null}
-          </FactList>
+            </FactList>
+          ) : null}
         </div>
       </section>
 

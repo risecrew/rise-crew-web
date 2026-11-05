@@ -195,6 +195,27 @@ export async function signPhotoPairs(
   }));
 }
 
+// The photo that opens a team's page: the first one of its latest public post, as a 10-minute
+// address. Only a public post counts, so everyone sees the same cover, and a photo leaves the cover
+// when its post is hidden or closed.
+export async function getTeamCover(teamId: string): Promise<string | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('team_posts')
+    .select('photo_paths')
+    .eq('team_id', teamId)
+    .eq('visibility', 'public')
+    .is('hidden_at', null)
+    .not('photo_paths', 'eq', '{}')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+  const [url] = await signPhotos(data.photo_paths.slice(0, 1));
+  return url ?? null;
+}
+
 // Logos are in a public bucket, so the address is known without asking anyone.
 export function logoUrl(path: string | null): string | null {
   if (!path) return null;
