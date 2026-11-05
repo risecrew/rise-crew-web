@@ -51,7 +51,7 @@ pnpm e2e:auth       # 로그인과 계정 화면 e2e (위 "검사" 참고)
 - 메모리가 작은 컴퓨터는 필요한 것만 켜도 됩니다. `db:test`와 `e2e:auth`는 이것으로 충분하고 CI도 같은 구성을 씁니다.
 
   ```bash
-  pnpm exec supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+  pnpm exec supabase start -x realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
   ```
 
 - 시드 계정은 `guest@example.test`, `member@example.test`, `operator@example.test`, `admin@example.test`입니다. 역할은 앞의 이름과 같고, 모두 가짜 값이며 비밀번호가 없습니다.

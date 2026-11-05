@@ -155,8 +155,6 @@ select results_eq(
   'anon reads public posts of published teams: no signed_in, hidden or unpublished-team post');
 select throws_ok('select author_id from public.team_posts', '42501', null,
   'anon cannot read who wrote a post');
-select throws_ok('select hidden_at from public.team_posts', '42501', null,
-  'anon cannot read the hidden column');
 select throws_ok(
   $$update public.teams set tagline = 'x' where id = '7e590000-0000-4000-8000-000000000a01'$$,
   '42501', null, 'anon cannot update a team');
@@ -274,7 +272,7 @@ select results_eq(
 
 select is(
   public._t_rows($$update public.teams
-     set tagline = '새 한 줄', intro = '새 소개', logo_path = 'x/y.png',
+     set tagline = '새 한 줄', intro = '새 소개', logo_path = '7e590000-0000-4000-8000-000000000a01/7e590000-0000-4000-8000-000000000020.png',
          links = '[{"kind":"homepage","url":"https://a.example.test"}]'
    where id = '7e590000-0000-4000-8000-000000000a01'$$),
   1, 'a team member can change tagline, intro, logo and links');
@@ -388,6 +386,10 @@ select throws_ok(
                                        from generate_series(1, 6) as i)
      where id = '7e590000-0000-4000-8000-000000000a01'$$,
   '23514', null, 'a sixth link is refused');
+select throws_ok(
+  $$update public.teams set logo_path = '7e590000-0000-4000-8000-000000000b01/7e590000-0000-4000-8000-000000000020.png'
+     where id = '7e590000-0000-4000-8000-000000000a01'$$,
+  '23514', null, 'a logo path outside the team''s own folder is refused');
 select throws_ok(
   $$update public.teams set tagline = repeat('가', 81) where id = '7e590000-0000-4000-8000-000000000a01'$$,
   '23514', null, 'an 81-character tagline is refused');

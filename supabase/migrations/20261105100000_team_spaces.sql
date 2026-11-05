@@ -100,7 +100,9 @@ create table public.teams (
   constraint teams_cohort_positive check (cohort >= 1),
   constraint teams_tagline_length check (char_length(tagline) <= 80),
   constraint teams_intro_length check (char_length(intro) <= 2000),
-  constraint teams_logo_path_length check (char_length(logo_path) <= 200),
+  -- The logo lives in this team's own folder (team-logos, see the storage migration).
+  constraint teams_logo_path_format
+    check (logo_path ~ ('^' || id::text || '/[0-9a-f-]{36}\.(jpg|png|webp)$')),
   constraint teams_links_valid check (private.valid_team_links(links))
 );
 comment on table public.teams is
@@ -339,13 +341,10 @@ grant update (slug, name, field, cohort, tagline, intro, logo_path, links, is_pu
 grant select on table public.team_members to authenticated;
 grant insert (team_id, user_id), delete on table public.team_members to authenticated;
 
--- author_id is not in either select grant: who wrote a post is a record, not
--- something the site or the Data API shows. hidden_at is only for signed-in
--- accounts, because anon never sees a hidden post anyway.
-grant select (id, team_id, title, body, visibility, photo_paths, created_at, updated_at, edited_at)
-  on table public.team_posts to anon;
+-- author_id is not in the select grant: who wrote a post is a record, not
+-- something the site or the Data API shows.
 grant select (id, team_id, title, body, visibility, photo_paths, hidden_at, created_at, updated_at, edited_at)
-  on table public.team_posts to authenticated;
+  on table public.team_posts to anon, authenticated;
 grant insert (id, team_id, author_id, title, body, visibility, photo_paths)
   on table public.team_posts to authenticated;
 grant update (title, body, visibility, photo_paths, hidden_at)

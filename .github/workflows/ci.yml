@@ -53,7 +53,7 @@ jobs:
       # -x leaves out the services these tests do not use: the same reduced stack as a local run.
       # Away from a terminal, `supabase start` prints the stack's keys as one JSON line on stdout,
       # so stdout is dropped to keep them out of the log. Progress and errors are on stderr.
-      - run: pnpm exec supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /dev/null
+      - run: pnpm exec supabase start -x realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /dev/null
       - run: pnpm db:test
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm e2e:auth
