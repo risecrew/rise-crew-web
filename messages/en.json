@@ -482,7 +482,8 @@
         "affiliation": "Affiliation",
         "recruit": "Recruitment emails",
         "recruitOn": "Subscribed",
-        "recruitOff": "Not subscribed"
+        "recruitOff": "Not subscribed",
+        "teams": "My teams"
       },
       "delete": {
         "summary": "Delete account",

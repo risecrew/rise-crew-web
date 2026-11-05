@@ -127,6 +127,21 @@ export async function getTeamAccess(
   return { isMember: data !== null, isStaff };
 }
 
+// The teams the visitor belongs to, for My page. The database answers only with the visitor's own
+// rows, and only with teams they can currently see: someone demoted out of a team that is not
+// published no longer gets it back.
+export async function listMyTeams(viewer: Viewer): Promise<{ slug: string; name: string }[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('teams(slug, name)')
+    .eq('user_id', viewer.id);
+  if (error) throw new Error(error.message);
+  return data
+    .flatMap((row) => (row.teams ? [row.teams] : []))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 // One page of the posts this visitor may read, newest first, and how many signed-in posts they
 // cannot read yet (asked only when `countLocked`, for a visitor who is not a finished account).
 export async function listPosts(

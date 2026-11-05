@@ -283,6 +283,37 @@ test('a cover that is too big is refused before any upload and leaves the field 
   await expect(page.getByLabel('표지 사진', { exact: true })).toHaveValue('');
 });
 
+test('my page lists my teams with links, and a team I leave goes away', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug, teamId } = await teamWithMember(testInfo);
+  const hidden = await createTeam({
+    slug: `my-hidden-${id}`,
+    name: `비공개 내 팀 ${id}`,
+    cohort: 3,
+    is_published: false,
+  });
+  await addTeamMember(hidden, email);
+
+  await signIn(page, email, baseURL!);
+  await page.goto('/ko/me');
+  const teams = page.locator('main').getByRole('link', { name: new RegExp(`${id}$`) });
+  await expect(teams).toHaveCount(2);
+  await expect(page.getByRole('link', { name: `글쓰는 팀 ${id}` })).toHaveAttribute(
+    'href',
+    `/ko/startups/${slug}`,
+  );
+  await expect(page.getByText('소속 팀')).toBeVisible();
+
+  await removeTeamMember(teamId, email);
+  await removeTeamMember(hidden, email);
+  await page.goto('/ko/me');
+  await expect(page.getByText(`글쓰는 팀 ${id}`)).toHaveCount(0);
+  // Someone in no team sees no empty row.
+  await expect(page.getByText('소속 팀')).toHaveCount(0);
+});
+
 test('editing shows the edited time, and deleting removes the post and its files', async ({
   page,
   baseURL,

@@ -482,7 +482,8 @@
         "affiliation": "소속",
         "recruit": "모집 소식 이메일",
         "recruitOn": "받아요",
-        "recruitOff": "받지 않아요"
+        "recruitOff": "받지 않아요",
+        "teams": "소속 팀"
       },
       "delete": {
         "summary": "회원 탈퇴",
