@@ -64,7 +64,6 @@ export default async function HomePage({ params }: Props) {
         partners={partners}
         press={press}
         cta={applyCta(recruitment)}
-        today={new Date()}
       />
     </main>
   );

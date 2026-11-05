@@ -39,6 +39,8 @@ export async function SiteFooter() {
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-0 border-t border-white/15 px-5 py-2 text-xs tracking-[0.12em] text-white/75">
         <p>{t('rights', { year: new Date().getFullYear() })}</p>
+        {/* The people who built the site, by their handles; the same in both languages. */}
+        <p lang="en">made by sjhbread, jwc</p>
         {/* The policy opens together with the accounts. */}
         {isAuthEnabled() && (
           <Link

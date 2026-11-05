@@ -79,4 +79,16 @@ export const photos: Photo[] = [
     source: archive('2026.8.29', 'Aug 29, 2026'),
     temporary: false,
   },
+  {
+    id: 'beyond-expo-crew-jersey-2026',
+    src: '/images/activities/beyond-expo-crew-jersey-2026.jpg',
+    width: 3200,
+    height: 2400,
+    alt: L(
+      'BEYOND Expo 2026 전시장에서 RISE CREW 25 저지를 펼쳐 든 RISE CREW 멤버들',
+      'RISE CREW members holding up a RISE CREW 25 jersey on the BEYOND Expo 2026 floor',
+    ),
+    source: archive('2026.5 마카오', 'Macau, May 2026'),
+    temporary: false,
+  },
 ];

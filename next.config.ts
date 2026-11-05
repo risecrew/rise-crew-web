@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   // The e2e run with accounts switched on builds into its own folder (.next-auth), so it can sit
   // beside the default build without overwriting it.
   distDir: process.env.NEXT_DIST_DIR ?? '.next',
+  // 75 for every photo; 90 for the opening one, which fills the window and is looked at first.
+  images: { qualities: [75, 90] },
   // Vendored fonts live in versioned folders (public/fonts/<package>-<version>), so a file at a
   // given URL never changes and can be cached for a year.
   async headers() {

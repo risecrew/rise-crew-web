@@ -36,6 +36,7 @@ export async function Hero({
             locale={locale}
             temporaryLabel={common('temporaryPhoto')}
             priority
+            hero
             badge="none"
           />
         ) : null
@@ -57,8 +58,13 @@ export async function Hero({
             ))}
             {/* The initials stand in a column of their own, each centred in it, so they stack
                 into the word RISE (the narrow I no longer drifts left). They carry the full size
-                at the heaviest weight; the rest of each line steps down to 0.8 of it. */}
-            <span aria-hidden className="grid grid-cols-[auto_1fr] items-baseline gap-x-[0.14em]">
+                at the heaviest weight; the rest of each line steps down to 0.8 of it. The R's ink
+                starts 0.05em inside its box, so the column moves left by that much: the R then
+                stands on the same line as the logo above and the sentence below. */}
+            <span
+              aria-hidden
+              className="-ml-[0.05em] grid grid-cols-[auto_1fr] items-baseline gap-x-[0.14em]"
+            >
               {SLOGAN.map(([initial, rest]) => (
                 <span key={initial} className="contents">
                   <span className="justify-self-center font-[1000] text-lime">{initial}</span>

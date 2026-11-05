@@ -13,7 +13,7 @@ test('the home opens on the slogan over a real photo', async ({ page }) => {
   await expect(h1).toContainText('Reach your vision');
   await expect(h1).toContainText('Elevate your future');
   const hero = page.locator('[data-hero]');
-  await expect(hero.locator('img')).toHaveAttribute('alt', /워크숍/);
+  await expect(hero.locator('img')).toHaveAttribute('alt', /RISE CREW 25 저지/);
   await expect(hero).not.toContainText('임시 사진');
   await expect(page.locator('[data-slide-counter], [data-scene]')).toHaveCount(0);
 });
@@ -103,18 +103,35 @@ test('the three chapter names share one size and fit the content width', async (
   expect([...sizes]).toHaveLength(1);
 });
 
-test('the header action says what happens while recruitment is closed', async ({
+test('the header carries no recruitment button; the hero and the ask do', async ({
   page,
   isMobile,
 }) => {
   await page.goto('/ko');
   if (isMobile) await page.locator('header summary').click();
   const header = page.locator('header');
-  await expect(header.getByRole('link', { name: '모집 안내 보기' })).toHaveAttribute(
-    'href',
-    '/ko/join',
-  );
+  await expect(header.getByRole('link', { name: '모집 안내 보기' })).toHaveCount(0);
   await expect(header.getByRole('link', { name: '지원하기' })).toHaveCount(0);
+  await expect(
+    page.locator('[data-hero]').getByRole('link', { name: '모집 안내 보기' }),
+  ).toHaveAttribute('href', '/ko/join');
+});
+
+test('the header lines up with the hero: logo over the slogan, last item over the button', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the desktop row only');
+  await page.goto('/ko');
+  const logo = await page.locator('header a[href="/ko"]').first().boundingBox();
+  const slogan = await page.locator('[data-hero] h1').boundingBox();
+  const nav = await page.getByRole('navigation', { name: '주 메뉴' }).boundingBox();
+  const button = await page
+    .locator('[data-hero]')
+    .getByRole('link', { name: '모집 안내 보기' })
+    .boundingBox();
+  expect(Math.abs(logo!.x - slogan!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(nav!.x + nav!.width - (button!.x + button!.width))).toBeLessThanOrEqual(1);
 });
 
 test('the ask leads to the join page while recruitment is closed', async ({ page }) => {
