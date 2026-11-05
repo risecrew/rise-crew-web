@@ -770,5 +770,11 @@
         "uploadFailed": "The photos did not upload. What you wrote is still here, so please try again."
       }
     }
+  },
+  "Error": {
+    "title": "Something went wrong",
+    "body": "This page could not be loaded. Please try again in a moment.",
+    "retry": "Try again",
+    "home": "Go home"
   }
 }

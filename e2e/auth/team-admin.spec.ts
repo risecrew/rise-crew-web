@@ -155,6 +155,25 @@ test('hiding a post takes it from visitors, keeps it for the team and staff, and
   await strangers.close();
 });
 
+test('someone who is not staff has no hide button on a post', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const id = unique(testInfo);
+  const slug = `no-hide-${id}`;
+  const teamId = await createTeam({ slug, name: `단추 팀 ${id}`, cohort: 5 });
+  const memberEmail = `team-nohide-${id}@example.test`;
+  created.push(memberEmail);
+  await createOnboardedAccount(memberEmail, { role: 'member' });
+  await addTeamMember(teamId, memberEmail);
+  const postId = await createPost(memberEmail, teamId, { title: `단추 글 ${id}` });
+
+  await signIn(page, memberEmail, baseURL!);
+  await page.goto(`/ko/startups/${slug}/posts/${postId}`);
+  await expect(page.getByRole('link', { name: '수정', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '숨기기' })).toHaveCount(0);
+});
+
 test('an operator deletes a post from its page', async ({ page, baseURL }, testInfo) => {
   const id = unique(testInfo);
   const slug = `delete-${id}`;
@@ -178,8 +197,6 @@ for (const email of [MEMBER, GUEST]) {
     await signIn(page, email, baseURL!);
     expect((await page.goto('/ko/admin/teams'))?.status()).toBe(404);
     expect((await page.goto('/ko/admin/teams/new'))?.status()).toBe(404);
-    await page.goto(`/ko/startups`);
-    await expect(page.getByRole('button', { name: '숨기기' })).toHaveCount(0);
   });
 }
 

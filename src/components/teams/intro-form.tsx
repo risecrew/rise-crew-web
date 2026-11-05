@@ -1,5 +1,6 @@
 'use client';
 
+import { unstable_rethrow } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition, type FormEvent } from 'react';
 import { saveIntro, type TeamActionState } from '@/app/[locale]/startups/[slug]/actions';
@@ -48,13 +49,16 @@ export function IntroForm({ team }: Props) {
     return t('errors.invalid');
   }
 
-  function pickLogo(file: File | null) {
+  function pickLogo(input: HTMLInputElement) {
+    const file = input.files?.[0] ?? null;
     setNotice(null);
     if (file) {
       const check = checkPhoto(file, TEAM_LIMITS.logoBytes);
       if (check !== 'ok') {
         setNotice(check === 'tooLarge' ? t('errors.logoTooLarge') : t('errors.badType'));
         setLogo(null);
+        // A refused file does not stay named in the field, where it would look chosen.
+        input.value = '';
         return;
       }
     }
@@ -66,6 +70,7 @@ export function IntroForm({ team }: Props) {
     const form = new FormData(event.currentTarget);
     start(async () => {
       setNotice(null);
+      setState(null);
       let uploaded: string | null = null;
       if (logo) {
         const result = await uploadLogo(team.id, logo);
@@ -75,8 +80,18 @@ export function IntroForm({ team }: Props) {
         }
         uploaded = result.path;
       }
-      form.set('logo_path', uploaded ?? (dropLogo ? '' : (team.logo_path ?? '')));
-      const result = await saveIntro(null, form);
+      form.set('logo_change', uploaded ? 'new' : dropLogo ? 'remove' : 'keep');
+      if (uploaded) form.set('logo_path', uploaded);
+      let result: TeamActionState;
+      try {
+        result = await saveIntro(null, form);
+      } catch (error) {
+        // A redirect after a save arrives as a throw, and must go on. Anything else means the answer
+        // never came, and the logo may be in use, so it stays.
+        unstable_rethrow(error);
+        setState({ ok: false, error: 'failed' });
+        return;
+      }
       if (result) {
         setState(result);
         if (uploaded) await removeLogo(uploaded);
@@ -106,7 +121,7 @@ export function IntroForm({ team }: Props) {
           id="team-logo"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => pickLogo(event.target.files?.[0] ?? null)}
+          onChange={(event) => pickLogo(event.target)}
           className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white"
         />
         <p className="mt-2 px-2 text-sm text-white/75">{t('logoHint')}</p>

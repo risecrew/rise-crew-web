@@ -6,12 +6,15 @@ import {
   expectNoHorizontalScroll,
 } from '../helpers';
 import {
+  accountId,
   addTeamMember,
+  adminClient,
   createOnboardedAccount,
   createPost,
   createTeam,
   deleteAccount,
   hidePost,
+  requestSignInLink,
   signIn,
 } from './helpers';
 
@@ -71,9 +74,8 @@ test('the list shows published teams only, and the menu links to it', async ({ p
   await expect(page.getByRole('link', { name: new RegExp(`열린 팀 ${stamp}`) })).toBeVisible();
   await expect(page.getByRole('link', { name: new RegExp(`다른 팀 ${stamp}`) })).toBeVisible();
   await expect(page.getByText(`닫힌 팀 ${stamp}`)).toHaveCount(0);
-  await expect(
-    page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '창업팀' }),
-  ).toHaveAttribute('href', '/ko/startups');
+  // The phone menu is closed, so look in the footer, which has the same items on every screen.
+  await expect(page.locator('footer a[href="/ko/startups"]')).toHaveText('창업팀');
 });
 
 test('a field filter narrows the list and stays in the address', async ({ page }) => {
@@ -158,6 +160,52 @@ test('a finished guest reads the signed-in post and has no team buttons', async 
   await expect(page.getByRole('link', { name: '글쓰기' })).toHaveCount(0);
   await page.goto(`/ko/startups/${SLUG}/posts/${signedInPost}`);
   await expect(page.getByText('가입자 본문')).toBeVisible();
+});
+
+test('an account that has not finished signing up is told how to read the rest', async ({
+  page,
+  baseURL,
+}) => {
+  const email = `team-page-unfinished-${stamp}@example.test`;
+  try {
+    await page.goto(await requestSignInLink(email, baseURL!));
+    await page.goto(`/ko/startups/${SLUG}`);
+    await expect(page.getByText('가입을 마치면 볼 수 있어요')).toBeVisible();
+    await expect(page.getByRole('link', { name: '가입 마치기' })).toHaveAttribute(
+      'href',
+      new RegExp(`/ko/welcome\\?next=.*${SLUG}`),
+    );
+    await expect(page.getByText(SIGNED_IN_TITLE)).toHaveCount(0);
+  } finally {
+    await deleteAccount(email);
+  }
+});
+
+test('a blocked account reads public posts only and gets no prompt', async ({
+  browser,
+  baseURL,
+}) => {
+  const email = `team-page-blocked-${stamp}@example.test`;
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  try {
+    await createOnboardedAccount(email);
+    await signIn(page, email, baseURL!);
+    const { error } = await adminClient()
+      .from('user_roles')
+      .update({ blocked_at: new Date().toISOString() })
+      .eq('user_id', await accountId(email));
+    expect(error).toBeNull();
+
+    await page.goto(`/ko/startups/${SLUG}`);
+    await expect(page.getByRole('link', { name: new RegExp(PUBLIC_TITLE) })).toBeVisible();
+    await expect(page.getByText(SIGNED_IN_TITLE)).toHaveCount(0);
+    await expect(page.getByText('가입자 전용 글이')).toHaveCount(0);
+    expect((await page.goto(`/ko/startups/${SLUG}/posts/${signedInPost}`))?.status()).toBe(404);
+  } finally {
+    await context.close();
+    await deleteAccount(email);
+  }
 });
 
 for (const locale of LOCALES) {

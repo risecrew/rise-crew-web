@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
+import { unstable_rethrow } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition, type FormEvent } from 'react';
+import { useRef, useState, useTransition, type FormEvent } from 'react';
 import {
   createPost,
   updatePost,
@@ -42,7 +43,12 @@ export function PostForm({ team, post }: Props) {
   const [body, setBody] = useState(post?.body ?? '');
   const [visibility, setVisibility] = useState(post?.visibility ?? 'public');
   const [kept, setKept] = useState(post?.photos ?? []);
+  const [removed, setRemoved] = useState<string[]>([]);
   const [added, setAdded] = useState<File[]>([]);
+  // Kept between tries, so sending again after a lost answer cannot post twice.
+  const postId = useRef(post?.id ?? '');
+  // Photos already up from a try whose answer got lost: sending again does not upload them again.
+  const uploaded = useRef<string[]>([]);
 
   const fields = state?.fields ?? {};
   const room = TEAM_LIMITS.photos - kept.length - added.length;
@@ -69,6 +75,7 @@ export function PostForm({ team, post }: Props) {
       }
     }
     setAdded((all) => [...all, ...files]);
+    uploaded.current = [];
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -77,26 +84,41 @@ export function PostForm({ team, post }: Props) {
     start(async () => {
       setNotice(null);
       setState(null);
-      const id = post?.id ?? crypto.randomUUID();
-      const upload = await uploadPhotos(team.id, id, added);
-      if ('error' in upload) {
-        setNotice(
-          upload.error === 'tooLarge'
-            ? t('errors.tooLarge')
-            : upload.error === 'badType'
-              ? t('errors.badType')
-              : t('errors.uploadFailed'),
-        );
-        return;
+      if (!postId.current) postId.current = crypto.randomUUID();
+      const id = postId.current;
+      if (uploaded.current.length === 0) {
+        const upload = await uploadPhotos(team.id, id, added);
+        if ('error' in upload) {
+          setNotice(
+            upload.error === 'tooLarge'
+              ? t('errors.tooLarge')
+              : upload.error === 'badType'
+                ? t('errors.badType')
+                : t('errors.uploadFailed'),
+          );
+          return;
+        }
+        uploaded.current = upload.paths;
       }
       form.set('id', id);
-      for (const photo of kept) form.append('photo_path', photo.path);
-      for (const path of upload.paths) form.append('photo_path', path);
+      for (const path of uploaded.current) form.append('photo_path', path);
+      for (const path of removed) form.append('removed_path', path);
 
-      const result = await (post ? updatePost : createPost)(null, form);
+      let result: TeamActionState;
+      try {
+        result = await (post ? updatePost : createPost)(null, form);
+      } catch (error) {
+        // A redirect after a save arrives as a throw, and must go on. Anything else means the answer
+        // never came: the save may or may not have happened, so the photos stay and a second try
+        // uses them.
+        unstable_rethrow(error);
+        setState({ ok: false, error: 'failed' });
+        return;
+      }
       if (result) {
         setState(result);
-        await removePhotos(upload.paths);
+        await removePhotos(uploaded.current);
+        uploaded.current = [];
       }
     });
   }
@@ -187,7 +209,10 @@ export function PostForm({ team, post }: Props) {
                 <button
                   type="button"
                   className={TEXT_BUTTON}
-                  onClick={() => setKept((all) => all.filter((p) => p.path !== photo.path))}
+                  onClick={() => {
+                    setKept((all) => all.filter((p) => p.path !== photo.path));
+                    setRemoved((all) => [...all, photo.path]);
+                  }}
                 >
                   {t('removePhoto', { number: index + 1 })}
                 </button>
@@ -202,7 +227,10 @@ export function PostForm({ team, post }: Props) {
                 <button
                   type="button"
                   className={TEXT_BUTTON}
-                  onClick={() => setAdded((all) => all.filter((_, i) => i !== index))}
+                  onClick={() => {
+                    setAdded((all) => all.filter((_, i) => i !== index));
+                    uploaded.current = [];
+                  }}
                 >
                   {t('removePhoto', { number: kept.length + index + 1 })}
                 </button>

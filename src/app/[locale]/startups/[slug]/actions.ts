@@ -1,9 +1,10 @@
 'use server';
 
 import type { PostgrestError } from '@supabase/supabase-js';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { z } from 'zod';
 import { asLocale } from '@/i18n/as-locale';
+import { isAuthEnabled } from '@/lib/auth/config';
 import { getViewer } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { TEAM_LIMITS, isPhotoPathFor, postSchema, teamIntroSchema } from '@/lib/teams/forms';
@@ -47,21 +48,31 @@ function refusal(
 
 // Who is asking, and the team they mean. The team comes through the visitor's own session too. Every
 // action starts here and then lets the database decide, so losing access while a form is open
-// comes back as a sentence and writes nothing.
+// comes back as a sentence and writes nothing. With accounts switched off there is no such action.
 async function begin(form: FormData) {
+  if (!isAuthEnabled()) notFound();
   const locale = asLocale(text(form, 'locale'));
-  const viewer = await getViewer();
-  if (!viewer || viewer.blocked) return null;
-  const team = await getTeamBySlug(text(form, 'slug'));
-  if (!team) return null;
-  return { locale, viewer, team, supabase: await createSupabaseServerClient() };
+  try {
+    const viewer = await getViewer();
+    if (!viewer || viewer.blocked) return DENIED;
+    const team = await getTeamBySlug(text(form, 'slug'));
+    if (!team) return DENIED;
+    return { locale, viewer, team, supabase: await createSupabaseServerClient() };
+  } catch {
+    // The database cannot be read. The form keeps what was typed and says to try again.
+    return FAILED;
+  }
+}
+
+function refused(context: Awaited<ReturnType<typeof begin>>): context is TeamActionState {
+  return context === null || 'ok' in context;
 }
 
 const LOGO_PATH = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
 
 export async function saveIntro(_prev: TeamActionState, form: FormData): Promise<TeamActionState> {
   const context = await begin(form);
-  if (!context) return DENIED;
+  if (refused(context)) return context;
   const { locale, team, supabase } = context;
 
   const kinds = form.getAll('link_kind');
@@ -76,21 +87,25 @@ export async function saveIntro(_prev: TeamActionState, form: FormData): Promise
   });
   if (!parsed.success) return invalid(parsed.error);
 
-  const logoPath = text(form, 'logo_path');
-  if (logoPath && (!LOGO_PATH.test(logoPath) || !logoPath.startsWith(`${team.id}/`))) {
+  // Only a logo this form changed is written, so saving an open form cannot undo a logo another
+  // member put up in the meantime.
+  const logoChange = text(form, 'logo_change');
+  const logoPath = logoChange === 'new' ? text(form, 'logo_path') : null;
+  if (logoPath !== null && (!LOGO_PATH.test(logoPath) || !logoPath.startsWith(`${team.id}/`))) {
     return { ok: false, error: 'invalid' };
   }
+  const changesLogo = logoChange === 'new' || logoChange === 'remove';
 
   const { data, error } = await supabase
     .from('teams')
-    .update({ ...parsed.data, logo_path: logoPath || null })
+    .update({ ...parsed.data, ...(changesLogo ? { logo_path: logoPath } : {}) })
     .eq('id', team.id)
     .select('id');
-  const refused = refusal(error, data);
-  if (refused) return refused;
+  const stopped = refusal(error, data);
+  if (stopped) return stopped;
 
   // Only now is the old logo unused.
-  if (team.logo_path && team.logo_path !== logoPath) {
+  if (changesLogo && team.logo_path && team.logo_path !== logoPath) {
     await supabase.storage.from('team-logos').remove([team.logo_path]);
   }
   redirect(`/${locale}/startups/${team.slug}`);
@@ -104,7 +119,7 @@ function photoPaths(form: FormData, teamId: string, postId: string): string[] | 
 
 export async function createPost(_prev: TeamActionState, form: FormData): Promise<TeamActionState> {
   const context = await begin(form);
-  if (!context) return DENIED;
+  if (refused(context)) return context;
   const { locale, viewer, team, supabase } = context;
 
   const id = text(form, 'id');
@@ -127,14 +142,18 @@ export async function createPost(_prev: TeamActionState, form: FormData): Promis
       photo_paths: paths,
     })
     .select('id');
-  const refused = refusal(error, data);
-  if (refused) return refused;
+  // The form sends the same id when it tries again, so a save whose answer got lost does not post
+  // twice: the post is already there.
+  if (error?.code !== '23505') {
+    const stopped = refusal(error, data);
+    if (stopped) return stopped;
+  }
   redirect(`/${locale}/startups/${team.slug}/posts/${id}`);
 }
 
 export async function updatePost(_prev: TeamActionState, form: FormData): Promise<TeamActionState> {
   const context = await begin(form);
-  if (!context) return DENIED;
+  if (refused(context)) return context;
   const { locale, team, supabase } = context;
 
   const id = text(form, 'id');
@@ -145,11 +164,18 @@ export async function updatePost(_prev: TeamActionState, form: FormData): Promis
     visibility: text(form, 'visibility'),
   });
   if (!parsed.success) return invalid(parsed.error);
-  const paths = photoPaths(form, team.id, id);
-  if (!paths) return { ok: false, error: 'invalid' };
+  const added = photoPaths(form, team.id, id);
+  if (!added) return { ok: false, error: 'invalid' };
 
   const before = await getPost(team.id, id);
   if (!before) return DENIED;
+
+  // The form says what it took off and what it added, not the whole list, so saving an open form
+  // cannot undo a photo another member added in the meantime.
+  const asked = form.getAll('removed_path');
+  const removed = before.photo_paths.filter((path) => asked.includes(path));
+  const paths = [...before.photo_paths.filter((path) => !removed.includes(path)), ...added];
+  if (paths.length > TEAM_LIMITS.photos) return { ok: false, error: 'invalid' };
 
   const { data, error } = await supabase
     .from('team_posts')
@@ -157,18 +183,17 @@ export async function updatePost(_prev: TeamActionState, form: FormData): Promis
     .eq('id', id)
     .eq('team_id', team.id)
     .select('id');
-  const refused = refusal(error, data);
-  if (refused) return refused;
+  const stopped = refusal(error, data);
+  if (stopped) return stopped;
 
   // Only now are the photos taken off the post unused.
-  const removed = before.photo_paths.filter((path) => !paths.includes(path));
   if (removed.length > 0) await supabase.storage.from('team-post-photos').remove(removed);
   redirect(`/${locale}/startups/${team.slug}/posts/${id}`);
 }
 
 export async function deletePost(_prev: TeamActionState, form: FormData): Promise<TeamActionState> {
   const context = await begin(form);
-  if (!context) return DENIED;
+  if (refused(context)) return context;
   const { locale, team, supabase } = context;
 
   const id = text(form, 'id');
@@ -182,8 +207,8 @@ export async function deletePost(_prev: TeamActionState, form: FormData): Promis
     .eq('id', id)
     .eq('team_id', team.id)
     .select('id');
-  const refused = refusal(error, data);
-  if (refused) return refused;
+  const stopped = refusal(error, data);
+  if (stopped) return stopped;
 
   if (before.photo_paths.length > 0) {
     await supabase.storage.from('team-post-photos').remove(before.photo_paths);

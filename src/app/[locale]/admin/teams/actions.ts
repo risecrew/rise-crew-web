@@ -2,9 +2,10 @@
 
 import type { PostgrestError } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { z } from 'zod';
 import { asLocale } from '@/i18n/as-locale';
+import { isAuthEnabled } from '@/lib/auth/config';
 import { atLeast } from '@/lib/auth/roles';
 import { getViewer } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -46,6 +47,7 @@ function writeRefusal(error: PostgrestError): TeamAdminState {
 }
 
 async function begin(form: FormData) {
+  if (!isAuthEnabled()) notFound();
   const locale = asLocale(text(form, 'locale'));
   const viewer = await getViewer();
   if (!viewer || viewer.blocked || !atLeast(viewer.role, 'operator')) return null;

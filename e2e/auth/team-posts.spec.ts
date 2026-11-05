@@ -6,6 +6,7 @@ import {
   anonymousClient,
   clientSignedInAs,
   createOnboardedAccount,
+  createPost,
   createTeam,
   deleteAccount,
   removeTeamMember,
@@ -218,7 +219,7 @@ test('removing a photo while editing removes the file', async ({ page, baseURL }
   await expect.poll(() => filesOf(teamId, postId)).toHaveLength(1);
 });
 
-test('a member of another team and a guest get a 404 on the writing pages', async ({
+test('a member of another team gets a 404 on the writing pages', async ({
   page,
   baseURL,
 }, testInfo) => {
@@ -230,6 +231,13 @@ test('a member of another team and a guest get a 404 on the writing pages', asyn
   await page.goto(`/ko/startups/${theirs.slug}`);
   await expect(page.getByRole('link', { name: '글쓰기' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: '소개 수정' })).toHaveCount(0);
+});
+
+test('a guest gets a 404 on the writing pages', async ({ page, baseURL }, testInfo) => {
+  const { slug } = await teamWithMember(testInfo);
+  await signIn(page, 'guest@example.test', baseURL!);
+  expect((await page.goto(`/ko/startups/${slug}/edit`))?.status()).toBe(404);
+  expect((await page.goto(`/ko/startups/${slug}/posts/new`))?.status()).toBe(404);
 });
 
 test('signed out, the writing pages go to sign-in', async ({ page }, testInfo) => {
@@ -317,15 +325,150 @@ test('a member who lost access is refused when posting too', async ({
   await page.getByLabel('제목').fill(title);
   await removeTeamMember(teamId, email);
   await page.getByRole('button', { name: '올리기' }).click();
-  await expect(page.getByText('이 팀의 내용을 고칠 권한이 없어요.')).toBeVisible();
+  await afterSave(page.getByText('이 팀의 내용을 고칠 권한이 없어요.')).toBeVisible();
   await expect(page.getByLabel('제목')).toHaveValue(title);
+  const { data } = await anonymousClient().from('team_posts').select('id').eq('title', title);
+  expect(data).toEqual([]);
+});
+
+test('a member who lost access is refused when editing a post, and it stays as it was', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug, teamId } = await teamWithMember(testInfo);
+  const title = `그대로 둘 글 ${id}`;
+  const postId = await createPost(email, teamId, { title });
+  await signIn(page, email, baseURL!);
+  await page.goto(`/ko/startups/${slug}/posts/${postId}/edit`);
+  await page.getByLabel('제목').fill(`${title} 고침`);
+  await removeTeamMember(teamId, email);
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page.getByText('이 팀의 내용을 고칠 권한이 없어요.')).toBeVisible();
+  await expect(page.getByLabel('제목')).toHaveValue(`${title} 고침`);
+  const { data } = await anonymousClient().from('team_posts').select('title').eq('id', postId);
+  expect(data).toEqual([{ title }]);
+});
+
+test('when the connection drops on save, the form keeps everything and says so', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`끊긴 글 ${id}`);
+  await page.getByLabel('본문').fill('남아야 할 본문');
+  await page.route('**/posts/new', async (route) =>
+    route.request().method() === 'POST' ? route.abort() : route.continue(),
+  );
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByText('저장하지 못했어요.')).toBeVisible();
+  await expect(page.getByLabel('제목')).toHaveValue(`끊긴 글 ${id}`);
+  await expect(page.getByLabel('본문')).toHaveValue('남아야 할 본문');
+
+  // Sent again, the same post goes up once.
+  await page.unroute('**/posts/new');
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByRole('heading', { level: 1, name: `끊긴 글 ${id}` })).toBeVisible();
+});
+
+test('saving an open form does not undo a photo or logo another member just added', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug, teamId } = await teamWithMember(testInfo);
+  const title = `둘이 고치는 글 ${id}`;
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(title);
+  await page.getByLabel('사진 추가').setInputFiles(png('a.png'));
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByRole('heading', { level: 1, name: title })).toBeVisible();
+  const postId = page.url().split('/').pop()!;
+
+  // The form opens, and then a teammate adds a photo.
+  await page.goto(`/ko/startups/${slug}/posts/${postId}/edit`);
+  const teammate = await clientSignedInAs(email);
+  const photo = `${teamId}/${postId}/${crypto.randomUUID()}.png`;
+  expect(
+    (
+      await teammate.storage
+        .from('team-post-photos')
+        .upload(photo, PIXEL, { contentType: 'image/png' })
+    ).error,
+  ).toBeNull();
+  const { data: post } = await teammate
+    .from('team_posts')
+    .select('photo_paths')
+    .eq('id', postId)
+    .single();
+  expect(
+    (
+      await teammate
+        .from('team_posts')
+        .update({ photo_paths: [...post!.photo_paths, photo] })
+        .eq('id', postId)
+    ).error,
+  ).toBeNull();
+
+  await page.getByLabel('제목').fill(`${title} 고침`);
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page.getByRole('heading', { level: 1, name: `${title} 고침` })).toBeVisible();
+  await expect(page.locator('main article img')).toHaveCount(2);
+  await expect.poll(() => filesOf(teamId, postId)).toHaveLength(2);
+
+  // The same with the logo.
+  await page.goto(`/ko/startups/${slug}/edit`);
+  const logo = `${teamId}/${crypto.randomUUID()}.png`;
+  expect(
+    (await teammate.storage.from('team-logos').upload(logo, PIXEL, { contentType: 'image/png' }))
+      .error,
+  ).toBeNull();
+  expect(
+    (await teammate.from('teams').update({ logo_path: logo }).eq('id', teamId)).error,
+  ).toBeNull();
+  await page.getByLabel('한 줄 소개').fill('로고는 그대로');
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page.getByText('로고는 그대로')).toBeVisible();
+  const { data: team } = await teammate.from('teams').select('logo_path').eq('id', teamId).single();
+  expect(team?.logo_path).toBe(logo);
+});
+
+test('a refused logo does not stay in the form', async ({ page, baseURL }, testInfo) => {
+  const { email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByLabel('로고').setInputFiles({
+    name: 'x.svg',
+    mimeType: 'image/svg+xml',
+    buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'),
+  });
+  await expect(page.getByText('JPEG, PNG, WebP 사진만 올릴 수 있어요.')).toBeVisible();
+  await expect(page.getByLabel('로고')).toHaveValue('');
+});
+
+test('the site asks for photo addresses that last 10 minutes', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`시간 글 ${id}`);
+  await page.getByLabel('사진 추가').setInputFiles(png('a.png'));
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByRole('heading', { level: 1, name: `시간 글 ${id}` })).toBeVisible();
+  const src = (await page.locator('main article img').getAttribute('src'))!;
+  const token = new URL(src).searchParams.get('token')!;
+  const claims = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString('utf8'));
+  expect(claims.exp - claims.iat).toBe(600);
 });
 
 test('a file that is too big or an SVG is refused before any upload', async ({
   page,
   baseURL,
 }, testInfo) => {
-  const { email, slug } = await teamWithMember(testInfo);
+  const { id, email, slug } = await teamWithMember(testInfo);
   await signIn(page, email, baseURL!);
   await openNewPost(page, slug);
 
@@ -348,6 +491,13 @@ test('a file that is too big or an SVG is refused before any upload', async ({
     buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'),
   });
   await expect(page.getByText('JPEG, PNG, WebP 사진만 올릴 수 있어요.')).toBeVisible();
+
+  // Neither was kept, so posting now sends no file.
+  await page.getByLabel('제목').fill(`파일 없는 글 ${id}`);
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(
+    page.getByRole('heading', { level: 1, name: `파일 없는 글 ${id}` }),
+  ).toBeVisible();
   expect(uploads).toBe(0);
 });
 
@@ -357,28 +507,30 @@ test('a logo cannot be copied into an SVG', async ({ request }, testInfo) => {
   const { email, teamId } = await teamWithMember(testInfo);
   const member = await clientSignedInAs(email);
   const from = `${teamId}/${crypto.randomUUID()}.png`;
-  const to = `${teamId}/${crypto.randomUUID()}.png`;
   const upload = await member.storage
     .from('team-logos')
     .upload(from, PIXEL, { contentType: 'image/png' });
   expect(upload.error).toBeNull();
 
   const { data } = await member.auth.getSession();
-  const response = await request.post(`${process.env.E2E_SUPABASE_URL}/storage/v1/object/copy`, {
-    headers: {
-      Authorization: `Bearer ${data.session!.access_token}`,
-      apikey: process.env.E2E_SUPABASE_PUBLISHABLE_KEY!,
-    },
-    data: {
-      bucketId: 'team-logos',
-      sourceKey: from,
-      destinationBucket: 'team-logos',
-      destinationKey: to,
-      copyMetadata: false,
-      metadata: { mimetype: 'image/svg+xml' },
-    },
-  });
-  expect(response.ok()).toBe(false);
+  const copyAs = (mimetype: string) =>
+    request.post(`${process.env.E2E_SUPABASE_URL}/storage/v1/object/copy`, {
+      headers: {
+        Authorization: `Bearer ${data.session!.access_token}`,
+        apikey: process.env.E2E_SUPABASE_PUBLISHABLE_KEY!,
+      },
+      data: {
+        bucketId: 'team-logos',
+        sourceKey: from,
+        destinationBucket: 'team-logos',
+        destinationKey: `${teamId}/${crypto.randomUUID()}.png`,
+        copyMetadata: false,
+        metadata: { mimetype },
+      },
+    });
+  // The same request as an image goes through, so the refusal below is about the type.
+  expect((await copyAs('image/png')).ok()).toBe(true);
+  expect((await copyAs('image/svg+xml')).ok()).toBe(false);
 });
 
 test('at most four photos can be picked', async ({ page, baseURL }, testInfo) => {
