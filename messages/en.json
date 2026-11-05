@@ -627,8 +627,6 @@
       "toPage": "View team page",
       "empty": "No teams yet.",
       "name": "Team name",
-      "slug": "Address",
-      "slugHint": "Lowercase letters, numbers and hyphens. Used in /startups/this-value.",
       "field": "Field",
       "cohort": "Cohort",
       "published": "Published",
@@ -650,9 +648,7 @@
       "fieldErrors": {
         "required": "Please fill this in.",
         "invalid": "This value cannot be used.",
-        "tooLong": "This is too long.",
-        "invalidSlug": "Use lowercase letters, numbers and hyphens only.",
-        "slugTaken": "This address is already in use."
+        "tooLong": "This is too long."
       },
       "errors": {
         "denied": "You do not have permission to do this.",

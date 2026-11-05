@@ -627,8 +627,6 @@
       "toPage": "팀 페이지 보기",
       "empty": "아직 만든 팀이 없어요.",
       "name": "팀 이름",
-      "slug": "주소",
-      "slugHint": "영어 소문자, 숫자, 하이픈. 주소에 /startups/이-값 으로 쓰여요.",
       "field": "분야",
       "cohort": "기수",
       "published": "공개",
@@ -650,9 +648,7 @@
       "fieldErrors": {
         "required": "이 칸을 채워 주세요.",
         "invalid": "이 값은 쓸 수 없어요.",
-        "tooLong": "글자 수가 너무 많아요.",
-        "invalidSlug": "영어 소문자, 숫자, 하이픈만 쓸 수 있어요.",
-        "slugTaken": "이미 쓰고 있는 주소예요."
+        "tooLong": "글자 수가 너무 많아요."
       },
       "errors": {
         "denied": "이 일을 할 권한이 없어요.",

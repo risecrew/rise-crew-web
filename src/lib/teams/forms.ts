@@ -67,12 +67,6 @@ export const postSchema = z.object({
 });
 
 export const teamCreateSchema = z.object({
-  slug: z
-    .string()
-    .trim()
-    .min(1, 'required')
-    .max(60, 'tooLong')
-    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'invalidSlug'),
   name: requiredText(TEAM_LIMITS.name),
   field: z.enum(TEAM_FIELDS, { error: 'invalid' }),
   cohort: z
@@ -87,6 +81,18 @@ export const teamSettingsSchema = teamCreateSchema.extend({
     .optional()
     .transform((value) => value === 'on'),
 });
+
+// A team's address is made once, when the team is created, and never changes, so a shared link keeps
+// working. What it says matters little: the letters of an English name, or just "team", then a
+// random ending that also keeps two teams with the same name apart.
+export function makeTeamSlug(name: string, ending = crypto.randomUUID().slice(0, 6)): string {
+  const words = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .slice(0, 40)
+    .replace(/^-+|-+$/g, '');
+  return `${words || 'team'}-${ending}`;
+}
 
 export function checkPhoto(
   file: { size: number; type: string },

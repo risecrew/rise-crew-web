@@ -32,7 +32,7 @@ function useErrorSentence() {
   };
 }
 
-// The name, address, field and cohort of a team: to create one, or, with the publish switch, to
+// The name, field and cohort of a team: to create one, or, with the publish switch, to
 // change one. React empties a form once its action has run, so the values are kept here and a
 // refusal leaves what was typed in place.
 export function TeamSettingsForm({ team }: { team?: Team }) {
@@ -47,7 +47,6 @@ export function TeamSettingsForm({ team }: { team?: Team }) {
   const fields = state && !state.ok ? (state.fields ?? {}) : {};
   const formRef = useRef<HTMLFormElement>(null);
   const [name, setName] = useState(team?.name ?? '');
-  const [slug, setSlug] = useState(team?.slug ?? '');
   const [field, setField] = useState(team?.field ?? 'other');
   const [cohort, setCohort] = useState(team ? String(team.cohort) : '');
   const [published, setPublished] = useState(team?.is_published ?? false);
@@ -59,8 +58,6 @@ export function TeamSettingsForm({ team }: { team?: Team }) {
   function message(name: string): string | null {
     const code = fields[name];
     if (!code) return null;
-    if (code === 'taken') return t('fieldErrors.slugTaken');
-    if (code === 'invalidSlug') return t('fieldErrors.invalidSlug');
     if (code === 'required') return t('fieldErrors.required');
     if (code === 'tooLong') return t('fieldErrors.tooLong');
     return t('fieldErrors.invalid');
@@ -85,28 +82,6 @@ export function TeamSettingsForm({ team }: { team?: Team }) {
           className={FIELD}
         />
         {message('name') ? <p className={MESSAGE}>{message('name')}</p> : null}
-      </div>
-
-      <div className={ROW}>
-        <label htmlFor="team-slug" className={LABEL}>
-          {t('slug')}
-        </label>
-        <input
-          id="team-slug"
-          name="slug"
-          value={slug}
-          onChange={(event) => setSlug(event.target.value)}
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          aria-describedby="team-slug-hint"
-          aria-invalid={message('slug') ? true : undefined}
-          className={FIELD}
-        />
-        <p id="team-slug-hint" className="mt-2 px-2 text-sm break-keep text-white/75">
-          {t('slugHint')}
-        </p>
-        {message('slug') ? <p className={MESSAGE}>{message('slug')}</p> : null}
       </div>
 
       <div className={`${ROW} grid gap-5 sm:grid-cols-2`}>

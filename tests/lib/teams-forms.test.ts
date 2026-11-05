@@ -4,6 +4,7 @@ import {
   TEAM_LIMITS,
   checkPhoto,
   isPhotoPathFor,
+  makeTeamSlug,
   postSchema,
   teamCreateSchema,
   teamIntroSchema,
@@ -116,15 +117,10 @@ describe('postSchema', () => {
 });
 
 describe('teamCreateSchema and teamSettingsSchema', () => {
-  const ok = { slug: 'rise-team', name: '라이즈', field: 'other', cohort: '3' };
+  const ok = { name: '라이즈', field: 'other', cohort: '3' };
 
   it('accepts a good team and reads the cohort as a number', () => {
     expect(teamCreateSchema.parse(ok)).toEqual({ ...ok, cohort: 3 });
-  });
-  it('refuses a slug with capitals, a double hyphen or an edge hyphen', () => {
-    for (const slug of ['Rise', 'a--b', '-a', 'a-', 'a b', '']) {
-      expect(teamCreateSchema.safeParse({ ...ok, slug }).success).toBe(false);
-    }
   });
   it('refuses an unknown field, cohort 0 and a 51-character name', () => {
     expect(teamCreateSchema.safeParse({ ...ok, field: 'zzz' }).success).toBe(false);
@@ -135,6 +131,34 @@ describe('teamCreateSchema and teamSettingsSchema', () => {
   it('settings adds the publish switch', () => {
     expect(teamSettingsSchema.parse({ ...ok, is_published: 'on' }).is_published).toBe(true);
     expect(teamSettingsSchema.parse(ok).is_published).toBe(false);
+  });
+  it('settings cannot carry an address', () => {
+    expect(teamSettingsSchema.parse({ ...ok, slug: 'other-address' })).not.toHaveProperty('slug');
+  });
+});
+
+describe('makeTeamSlug', () => {
+  const DATABASE_RULE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+  it('uses the letters of an English name', () => {
+    expect(makeTeamSlug('Popvia', 'abc123')).toBe('popvia-abc123');
+    expect(makeTeamSlug('Yureka Publishing!', 'abc123')).toBe('yureka-publishing-abc123');
+  });
+  it('falls back to team for a Korean name', () => {
+    expect(makeTeamSlug('느린단맛연구소', 'abc123')).toBe('team-abc123');
+  });
+  it('keeps the English part of a mixed name', () => {
+    expect(makeTeamSlug('AI 곁은', 'abc123')).toBe('ai-abc123');
+  });
+  it('always passes the database rule and stays short', () => {
+    for (const name of ['--', ' a  b ', 'É!', 'x'.repeat(50), `${'a-'.repeat(25)}`]) {
+      const slug = makeTeamSlug(name, 'abc123');
+      expect(slug).toMatch(DATABASE_RULE);
+      expect(slug.length).toBeLessThanOrEqual(60);
+    }
+  });
+  it('makes a different address each time without being told the ending', () => {
+    expect(makeTeamSlug('같은 이름')).not.toBe(makeTeamSlug('같은 이름'));
   });
 });
 

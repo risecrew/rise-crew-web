@@ -35,7 +35,7 @@ export default async function AdminTeamsPage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from('teams')
-    .select('id, slug, name, field, cohort, is_published')
+    .select('id, name, field, cohort, is_published')
     .order('cohort', { ascending: false })
     .order('name');
   if (error) throw new Error(error.message);
@@ -66,7 +66,7 @@ export default async function AdminTeamsPage({ params }: Props) {
                     </span>
                     <span className="mt-1 block text-sm font-medium text-white/60">
                       {teamT(`fields.${team.field as TeamField}`)} ·{' '}
-                      {teamT('cohort', { cohort: team.cohort })} · /{team.slug}
+                      {teamT('cohort', { cohort: team.cohort })}
                     </span>
                   </span>
                   {!team.is_published ? (

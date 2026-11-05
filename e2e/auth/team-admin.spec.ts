@@ -37,7 +37,6 @@ test('an operator creates a team, which stays off the list until it is published
   await page.getByRole('link', { name: '팀 만들기' }).click();
 
   await page.getByLabel('팀 이름').fill(`새 팀 ${id}`);
-  await page.getByLabel('주소').fill(`new-team-${id}`);
   await page.getByLabel('분야').selectOption('edutech');
   await page.getByLabel('기수').fill(String(cohort));
   await page.getByRole('button', { name: '만들기' }).click();
@@ -45,7 +44,11 @@ test('an operator creates a team, which stays off the list until it is published
 
   await page.goto(`/ko/startups?cohort=${cohort}`);
   await expect(page.getByText(`새 팀 ${id}`)).toHaveCount(0);
-  await page.goto(`/ko/startups/new-team-${id}`);
+  // The address made itself, and the team's own page opens from the admin screen.
+  await page.goto('/ko/admin/teams');
+  await page.getByRole('link', { name: new RegExp(`새 팀 ${id}`) }).click();
+  await page.getByRole('link', { name: '팀 페이지 보기' }).click();
+  await expect(page).toHaveURL(new RegExp(`/ko/startups/${id.toLowerCase()}-[0-9a-f]{6}$`));
   await expect(page.getByText('비공개', { exact: true })).toBeVisible();
 
   await page.goBack();
@@ -81,17 +84,29 @@ test('the startups list offers staff the way to create a team, and nobody else',
   await others.close();
 });
 
-test('a duplicate address shows a message at the field', async ({ page, baseURL }, testInfo) => {
+test('a refused team keeps what was typed, and two teams can share a name', async ({
+  page,
+  baseURL,
+}, testInfo) => {
   const id = unique(testInfo);
-  await createTeam({ slug: `taken-${id}`, name: `있는 팀 ${id}`, cohort: 5 });
   await signIn(page, OPERATOR, baseURL!);
   await page.goto('/ko/admin/teams/new');
-  await page.getByLabel('팀 이름').fill(`같은 주소 ${id}`);
-  await page.getByLabel('주소').fill(`taken-${id}`);
-  await page.getByLabel('기수').fill('5');
+  await expect(page.getByLabel('주소')).toHaveCount(0);
+  await page.getByLabel('팀 이름').fill(`같은 이름 ${id}`);
+  await page.getByLabel('기수').fill('abc');
   await page.getByRole('button', { name: '만들기' }).click();
-  await expect(page.getByText('이미 쓰고 있는 주소예요.')).toBeVisible();
-  await expect(page.getByLabel('팀 이름')).toHaveValue(`같은 주소 ${id}`);
+  await expect(page.getByText('이 값은 쓸 수 없어요.')).toBeVisible();
+  await expect(page.getByLabel('팀 이름')).toHaveValue(`같은 이름 ${id}`);
+
+  for (let i = 0; i < 2; i += 1) {
+    await page.goto('/ko/admin/teams/new');
+    await page.getByLabel('팀 이름').fill(`같은 이름 ${id}`);
+    await page.getByLabel('기수').fill('5');
+    await page.getByRole('button', { name: '만들기' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: `같은 이름 ${id}` })).toBeVisible();
+  }
+  await page.goto('/ko/admin/teams');
+  await expect(page.getByRole('link', { name: new RegExp(`같은 이름 ${id}`) })).toHaveCount(2);
 });
 
 test('adding a guest is refused, adding a member lets them post, removing them closes it', async ({

@@ -9,7 +9,7 @@ import { isAuthEnabled } from '@/lib/auth/config';
 import { atLeast } from '@/lib/auth/roles';
 import { getViewer } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { teamCreateSchema, teamSettingsSchema } from '@/lib/teams/forms';
+import { makeTeamSlug, teamCreateSchema, teamSettingsSchema } from '@/lib/teams/forms';
 import { isUuid } from '@/lib/teams/query';
 
 // What an operator's form hears back. Everything is written with the operator's own session, so the
@@ -25,7 +25,6 @@ export type TeamAdminState =
 
 const DENIED: TeamAdminState = { ok: false, error: 'denied' };
 const FAILED: TeamAdminState = { ok: false, error: 'failed' };
-const SLUG_TAKEN: TeamAdminState = { ok: false, error: 'invalid', fields: { slug: 'taken' } };
 
 function text(form: FormData, name: string): string {
   const value = form.get(name);
@@ -42,7 +41,6 @@ function invalid(error: z.ZodError): TeamAdminState {
 }
 
 function writeRefusal(error: PostgrestError): TeamAdminState {
-  if (error.code === '23505') return SLUG_TAKEN;
   return error.code === '42501' ? DENIED : FAILED;
 }
 
@@ -56,7 +54,6 @@ async function begin(form: FormData) {
 
 function teamFields(form: FormData) {
   return {
-    slug: text(form, 'slug'),
     name: text(form, 'name'),
     field: text(form, 'field'),
     cohort: text(form, 'cohort').trim(),
@@ -69,13 +66,17 @@ export async function createTeam(_prev: TeamAdminState, form: FormData): Promise
   const parsed = teamCreateSchema.safeParse(teamFields(form));
   if (!parsed.success) return invalid(parsed.error);
 
-  const { data, error } = await context.supabase
-    .from('teams')
-    .insert(parsed.data)
-    .select('id')
-    .single();
-  if (error) return writeRefusal(error);
-  redirect(`/${context.locale}/admin/teams/${data.id}`);
+  // The ending is random, so a clash is very unlikely; another ending settles it.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { data, error } = await context.supabase
+      .from('teams')
+      .insert({ ...parsed.data, slug: makeTeamSlug(parsed.data.name) })
+      .select('id')
+      .single();
+    if (!error) redirect(`/${context.locale}/admin/teams/${data.id}`);
+    if (error.code !== '23505') return writeRefusal(error);
+  }
+  return FAILED;
 }
 
 export async function updateTeamSettings(
