@@ -52,17 +52,26 @@ export async function removePhotos(paths: string[]): Promise<void> {
   }
 }
 
-export async function uploadLogo(
+type TeamImageBucket = 'team-logos' | 'team-covers';
+
+const IMAGE_LIMITS: Record<TeamImageBucket, number> = {
+  'team-logos': TEAM_LIMITS.logoBytes,
+  'team-covers': TEAM_LIMITS.coverBytes,
+};
+
+// A team's logo or cover: one public file in the team's folder.
+export async function uploadTeamImage(
+  bucket: TeamImageBucket,
   teamId: string,
   file: File,
 ): Promise<{ path: string } | { error: UploadError }> {
-  const check = checkPhoto(file, TEAM_LIMITS.logoBytes);
+  const check = checkPhoto(file, IMAGE_LIMITS[bucket]);
   if (check !== 'ok') return { error: check };
 
   const path = `${teamId}/${crypto.randomUUID()}.${extensionOf(file)}`;
   try {
     const { error } = await createSupabaseBrowserClient()
-      .storage.from('team-logos')
+      .storage.from(bucket)
       .upload(path, file, { contentType: file.type, upsert: false });
     return error ? { error: 'failed' } : { path };
   } catch {
@@ -70,10 +79,10 @@ export async function uploadLogo(
   }
 }
 
-export async function removeLogo(path: string): Promise<void> {
+export async function removeTeamImage(bucket: TeamImageBucket, path: string): Promise<void> {
   try {
-    await createSupabaseBrowserClient().storage.from('team-logos').remove([path]);
+    await createSupabaseBrowserClient().storage.from(bucket).remove([path]);
   } catch {
-    // As above: a leftover logo is harmless.
+    // As above: a leftover image is harmless.
   }
 }

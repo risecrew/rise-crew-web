@@ -765,8 +765,12 @@
         "logoTooLarge": "A logo can be up to 2MB.",
         "badType": "Only JPEG, PNG and WebP photos can be uploaded.",
         "tooMany": "A post can have up to 4 photos.",
-        "uploadFailed": "The photos did not upload. What you wrote is still here, so please try again."
-      }
+        "uploadFailed": "The photos did not upload. What you wrote is still here, so please try again.",
+        "coverTooLarge": "A cover photo can be up to 5MB."
+      },
+      "cover": "Cover photo",
+      "coverHint": "Shown large at the top of the team page, to everyone. JPEG, PNG or WebP, up to 5MB. Without one, the photo from the latest public post appears.",
+      "removeCover": "Remove the current cover photo"
     }
   },
   "Error": {

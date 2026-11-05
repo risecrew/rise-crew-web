@@ -214,6 +214,75 @@ test('the latest public photo opens the team page, and leaves when the post clos
   await stranger.close();
 });
 
+test('a chosen cover opens the team page ahead of any post photo, until it is removed', async ({
+  page,
+  baseURL,
+  browser,
+}, testInfo) => {
+  const { id, email, slug, teamId } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`표지 경쟁 글 ${id}`);
+  await page.getByLabel('사진 추가').setInputFiles(png('a.png'));
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(
+    page.getByRole('heading', { level: 1, name: `표지 경쟁 글 ${id}` }),
+  ).toBeVisible();
+
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByLabel('표지 사진', { exact: true }).setInputFiles(png('cover.png'));
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page).toHaveURL(new RegExp(`/ko/startups/${slug}$`));
+
+  const stranger = await browser.newContext();
+  const visitor = await stranger.newPage();
+  await visitor.goto(`/ko/startups/${slug}`);
+  const chosen = visitor.locator('[data-team-cover] img[src*="team-covers"]');
+  await expect(chosen).toHaveCount(1);
+  await expect(visitor.locator('[data-team-cover] img[src*="team-post-photos"]')).toHaveCount(0);
+  expect((await visitor.request.get((await chosen.getAttribute('src'))!)).status()).toBe(200);
+
+  async function coverFiles() {
+    const { data, error } = await adminClient().storage.from('team-covers').list(teamId);
+    if (error) throw error;
+    return data.length;
+  }
+  await expect.poll(coverFiles).toBe(1);
+
+  // A new cover takes the old file's place.
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByLabel('표지 사진', { exact: true }).setInputFiles(png('second.png'));
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page).toHaveURL(new RegExp(`/ko/startups/${slug}$`));
+  await expect.poll(coverFiles).toBe(1);
+
+  // Taken off, the latest public photo comes back.
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByLabel('지금 표지 사진 빼기').check();
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page).toHaveURL(new RegExp(`/ko/startups/${slug}$`));
+  await expect.poll(coverFiles).toBe(0);
+  await visitor.goto(`/ko/startups/${slug}`);
+  await expect(visitor.locator('[data-team-cover] img[src*="team-post-photos"]')).toHaveCount(1);
+  await stranger.close();
+});
+
+test('a cover that is too big is refused before any upload and leaves the field empty', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByLabel('표지 사진', { exact: true }).setInputFiles({
+    name: 'big.png',
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(6 * 1024 * 1024),
+  });
+  await expect(page.getByText('표지 사진은 5MB까지 올릴 수 있어요.')).toBeVisible();
+  await expect(page.getByLabel('표지 사진', { exact: true })).toHaveValue('');
+});
+
 test('editing shows the edited time, and deleting removes the post and its files', async ({
   page,
   baseURL,

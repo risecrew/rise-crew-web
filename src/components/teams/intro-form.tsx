@@ -7,7 +7,7 @@ import { saveIntro, type TeamActionState } from '@/app/[locale]/startups/[slug]/
 import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { Link } from '@/i18n/navigation';
 import { TEAM_LIMITS, TEAM_LINK_KINDS, checkPhoto, type TeamLink } from '@/lib/teams/forms';
-import { removeLogo, uploadLogo } from '@/lib/teams/upload';
+import { removeTeamImage, uploadTeamImage } from '@/lib/teams/upload';
 import { AREA, FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from './form-parts';
 
 type Props = {
@@ -17,12 +17,13 @@ type Props = {
     tagline: string;
     intro: string;
     logo_path: string | null;
+    cover_path: string | null;
     links: TeamLink[];
   };
 };
 
-// The intro of a team, in the team's own words. The logo goes up from the browser first, and is
-// taken down again if the save is refused.
+// The intro of a team, in the team's own words. The logo and cover go up from the browser first, and
+// are taken down again if the save is refused.
 export function IntroForm({ team }: Props) {
   const t = useTranslations('Teams.form');
   const kinds = useTranslations('Teams.linkKinds');
@@ -38,6 +39,8 @@ export function IntroForm({ team }: Props) {
   const [nextKey, setNextKey] = useState(team.links.length);
   const [logo, setLogo] = useState<File | null>(null);
   const [dropLogo, setDropLogo] = useState(false);
+  const [cover, setCover] = useState<File | null>(null);
+  const [dropCover, setDropCover] = useState(false);
 
   const fields = state?.fields ?? {};
 
@@ -49,20 +52,25 @@ export function IntroForm({ team }: Props) {
     return t('errors.invalid');
   }
 
-  function pickLogo(input: HTMLInputElement) {
+  // A refused file does not stay named in the field, where it would look chosen.
+  function pickImage(
+    input: HTMLInputElement,
+    maxBytes: number,
+    tooLarge: string,
+    keep: (file: File | null) => void,
+  ) {
     const file = input.files?.[0] ?? null;
     setNotice(null);
     if (file) {
-      const check = checkPhoto(file, TEAM_LIMITS.logoBytes);
+      const check = checkPhoto(file, maxBytes);
       if (check !== 'ok') {
-        setNotice(check === 'tooLarge' ? t('errors.logoTooLarge') : t('errors.badType'));
-        setLogo(null);
-        // A refused file does not stay named in the field, where it would look chosen.
+        setNotice(check === 'tooLarge' ? tooLarge : t('errors.badType'));
+        keep(null);
         input.value = '';
         return;
       }
     }
-    setLogo(file);
+    keep(file);
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -71,30 +79,43 @@ export function IntroForm({ team }: Props) {
     start(async () => {
       setNotice(null);
       setState(null);
-      let uploaded: string | null = null;
+      let newLogo: string | null = null;
       if (logo) {
-        const result = await uploadLogo(team.id, logo);
+        const result = await uploadTeamImage('team-logos', team.id, logo);
         if ('error' in result) {
           setNotice(t('errors.uploadFailed'));
           return;
         }
-        uploaded = result.path;
+        newLogo = result.path;
       }
-      form.set('logo_change', uploaded ? 'new' : dropLogo ? 'remove' : 'keep');
-      if (uploaded) form.set('logo_path', uploaded);
+      let newCover: string | null = null;
+      if (cover) {
+        const result = await uploadTeamImage('team-covers', team.id, cover);
+        if ('error' in result) {
+          setNotice(t('errors.uploadFailed'));
+          if (newLogo) await removeTeamImage('team-logos', newLogo);
+          return;
+        }
+        newCover = result.path;
+      }
+      form.set('logo_change', newLogo ? 'new' : dropLogo ? 'remove' : 'keep');
+      if (newLogo) form.set('logo_path', newLogo);
+      form.set('cover_change', newCover ? 'new' : dropCover ? 'remove' : 'keep');
+      if (newCover) form.set('cover_path', newCover);
       let result: TeamActionState;
       try {
         result = await saveIntro(null, form);
       } catch (error) {
         // A redirect after a save arrives as a throw, and must go on. Anything else means the answer
-        // never came, and the logo may be in use, so it stays.
+        // never came, and the images may be in use, so they stay.
         unstable_rethrow(error);
         setState({ ok: false, error: 'failed' });
         return;
       }
       if (result) {
         setState(result);
-        if (uploaded) await removeLogo(uploaded);
+        if (newLogo) await removeTeamImage('team-logos', newLogo);
+        if (newCover) await removeTeamImage('team-covers', newCover);
       }
     });
   }
@@ -121,7 +142,9 @@ export function IntroForm({ team }: Props) {
           id="team-logo"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => pickLogo(event.target)}
+          onChange={(event) =>
+            pickImage(event.target, TEAM_LIMITS.logoBytes, t('errors.logoTooLarge'), setLogo)
+          }
           className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white"
         />
         <p className="mt-2 px-2 text-sm text-white/75">{t('logoHint')}</p>
@@ -134,6 +157,33 @@ export function IntroForm({ team }: Props) {
               className="size-6 cursor-pointer appearance-none rounded-sm border border-white/50 bg-white/5 checked:border-lime checked:bg-lime"
             />
             {t('removeLogo')}
+          </label>
+        ) : null}
+      </div>
+
+      <div className={ROW}>
+        <label htmlFor="team-cover" className={LABEL}>
+          {t('cover')}
+        </label>
+        <input
+          id="team-cover"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(event) =>
+            pickImage(event.target, TEAM_LIMITS.coverBytes, t('errors.coverTooLarge'), setCover)
+          }
+          className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white"
+        />
+        <p className="mt-2 px-2 text-sm break-keep text-white/75">{t('coverHint')}</p>
+        {team.cover_path && !cover ? (
+          <label className="mt-2 flex min-h-11 items-center gap-3 px-2 text-base text-white/85">
+            <input
+              type="checkbox"
+              checked={dropCover}
+              onChange={(event) => setDropCover(event.target.checked)}
+              className="size-6 cursor-pointer appearance-none rounded-sm border border-white/50 bg-white/5 checked:border-lime checked:bg-lime"
+            />
+            {t('removeCover')}
           </label>
         ) : null}
       </div>

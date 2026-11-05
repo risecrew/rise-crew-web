@@ -59,7 +59,7 @@ export default async function TeamPage({ params, searchParams }: Props) {
   const canReadSignedIn = viewer !== null && viewer.onboarded && !viewer.blocked;
   const [access, cover, { posts, total, lockedCount }] = await Promise.all([
     getTeamAccess(team, viewer),
-    getTeamCover(team.id),
+    getTeamCover(team),
     listPosts(team.id, page, !canReadSignedIn && !viewer?.blocked),
   ]);
   const signedIn = viewer !== null;

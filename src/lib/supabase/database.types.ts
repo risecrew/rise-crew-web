@@ -178,6 +178,7 @@ export type Database = {
       teams: {
         Row: {
           cohort: number;
+          cover_path: string | null;
           created_at: string;
           field: string;
           id: string;
@@ -193,6 +194,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           cohort: number;
+          cover_path?: string | null;
           created_at?: string;
           field: string;
           id?: string;
@@ -207,6 +209,7 @@ export type Database = {
         };
         Update: {
           cohort?: number;
+          cover_path?: string | null;
           created_at?: string;
           field?: string;
           id?: string;

@@ -40,6 +40,7 @@ describe('TEAM_LIMITS', () => {
       photos: 4,
       photoBytes: 5 * MB,
       logoBytes: 2 * MB,
+      coverBytes: 5 * MB,
       pageSize: 10,
     });
   });

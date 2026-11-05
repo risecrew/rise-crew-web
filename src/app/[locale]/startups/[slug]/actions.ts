@@ -68,7 +68,22 @@ function refused(context: Awaited<ReturnType<typeof begin>>): context is TeamAct
   return context === null || 'ok' in context;
 }
 
-const LOGO_PATH = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
+const IMAGE_PATH = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
+
+// What the form did with the team's logo or cover: kept it, removed it, or put up a new file.
+function imageChange(
+  form: FormData,
+  name: 'logo' | 'cover',
+  teamId: string,
+): { changes: boolean; path: string | null } | 'invalid' {
+  const change = text(form, `${name}_change`);
+  if (change === 'remove') return { changes: true, path: null };
+  if (change !== 'new') return { changes: false, path: null };
+  const path = text(form, `${name}_path`);
+  return IMAGE_PATH.test(path) && path.startsWith(`${teamId}/`)
+    ? { changes: true, path }
+    : 'invalid';
+}
 
 export async function saveIntro(_prev: TeamActionState, form: FormData): Promise<TeamActionState> {
   const context = await begin(form);
@@ -87,26 +102,30 @@ export async function saveIntro(_prev: TeamActionState, form: FormData): Promise
   });
   if (!parsed.success) return invalid(parsed.error);
 
-  // Only a logo this form changed is written, so saving an open form cannot undo a logo another
-  // member put up in the meantime.
-  const logoChange = text(form, 'logo_change');
-  const logoPath = logoChange === 'new' ? text(form, 'logo_path') : null;
-  if (logoPath !== null && (!LOGO_PATH.test(logoPath) || !logoPath.startsWith(`${team.id}/`))) {
-    return { ok: false, error: 'invalid' };
-  }
-  const changesLogo = logoChange === 'new' || logoChange === 'remove';
+  // Only an image this form changed is written, so saving an open form cannot undo a logo or cover
+  // another member put up in the meantime.
+  const logo = imageChange(form, 'logo', team.id);
+  const cover = imageChange(form, 'cover', team.id);
+  if (logo === 'invalid' || cover === 'invalid') return { ok: false, error: 'invalid' };
 
   const { data, error } = await supabase
     .from('teams')
-    .update({ ...parsed.data, ...(changesLogo ? { logo_path: logoPath } : {}) })
+    .update({
+      ...parsed.data,
+      ...(logo.changes ? { logo_path: logo.path } : {}),
+      ...(cover.changes ? { cover_path: cover.path } : {}),
+    })
     .eq('id', team.id)
     .select('id');
   const stopped = refusal(error, data);
   if (stopped) return stopped;
 
-  // Only now is the old logo unused.
-  if (changesLogo && team.logo_path && team.logo_path !== logoPath) {
+  // Only now are the old files unused.
+  if (logo.changes && team.logo_path && team.logo_path !== logo.path) {
     await supabase.storage.from('team-logos').remove([team.logo_path]);
+  }
+  if (cover.changes && team.cover_path && team.cover_path !== cover.path) {
+    await supabase.storage.from('team-covers').remove([team.cover_path]);
   }
   redirect(`/${locale}/startups/${team.slug}`);
 }

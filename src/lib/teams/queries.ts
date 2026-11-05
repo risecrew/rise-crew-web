@@ -13,7 +13,7 @@ import type { TeamsQuery } from './query';
 // what comes back. Nothing here checks who may see what, and nothing here uses the secret key.
 
 const TEAM_COLUMNS =
-  'id, slug, name, field, cohort, tagline, intro, logo_path, links, is_published';
+  'id, slug, name, field, cohort, tagline, intro, logo_path, cover_path, links, is_published';
 // author_id is left out on purpose: the database refuses to show it to anyone.
 const POST_COLUMNS =
   'id, team_id, title, body, visibility, photo_paths, hidden_at, created_at, edited_at';
@@ -27,6 +27,7 @@ export type Team = {
   tagline: string;
   intro: string;
   logo_path: string | null;
+  cover_path: string | null;
   links: TeamLink[];
   is_published: boolean;
 };
@@ -195,15 +196,18 @@ export async function signPhotoPairs(
   }));
 }
 
-// The photo that opens a team's page: the first one of its latest public post, as a 10-minute
-// address. Only a public post counts, so everyone sees the same cover, and a photo leaves the cover
-// when its post is hidden or closed.
-export async function getTeamCover(teamId: string): Promise<string | null> {
+// The photo that opens a team's page: the cover the team chose, or else the first photo of its
+// latest public post, as a 10-minute address. Only a public post counts, so everyone sees the same
+// cover, and a post's photo leaves the cover when the post is hidden or closed.
+export async function getTeamCover(team: Pick<Team, 'id' | 'cover_path'>): Promise<string | null> {
+  if (team.cover_path) {
+    return `${getSupabasePublicConfig().url}/storage/v1/object/public/team-covers/${team.cover_path}`;
+  }
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from('team_posts')
     .select('photo_paths')
-    .eq('team_id', teamId)
+    .eq('team_id', team.id)
     .eq('visibility', 'public')
     .is('hidden_at', null)
     .not('photo_paths', 'eq', '{}')

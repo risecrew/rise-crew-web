@@ -765,8 +765,12 @@
         "logoTooLarge": "로고는 2MB까지 올릴 수 있어요.",
         "badType": "JPEG, PNG, WebP 사진만 올릴 수 있어요.",
         "tooMany": "사진은 글마다 4장까지 올릴 수 있어요.",
-        "uploadFailed": "사진을 올리지 못했어요. 쓴 내용은 그대로 있으니 다시 눌러 주세요."
-      }
+        "uploadFailed": "사진을 올리지 못했어요. 쓴 내용은 그대로 있으니 다시 눌러 주세요.",
+        "coverTooLarge": "표지 사진은 5MB까지 올릴 수 있어요."
+      },
+      "cover": "표지 사진",
+      "coverHint": "팀 페이지 맨 위에 크게 나오고, 모두에게 공개돼요. JPEG, PNG, WebP. 5MB까지. 올리지 않으면 최신 공개 글의 사진이 나와요.",
+      "removeCover": "지금 표지 사진 빼기"
     }
   },
   "Error": {
