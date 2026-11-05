@@ -9,8 +9,10 @@ export async function SiteFooter() {
   const nav = await getTranslations('Nav');
 
   return (
-    <footer className="bg-cobalt text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.4fr_1fr_1fr] md:px-10">
+    // Every page ends on the stage colour, so the footer rises out of it into cobalt instead of
+    // starting on a hard edge (the same fade the traction section uses).
+    <footer className="bg-[linear-gradient(180deg,var(--color-stage),var(--color-cobalt)_65%)] text-white">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 pt-24 pb-14 md:grid-cols-[1.4fr_1fr_1fr] md:px-10 md:pt-32">
         <div>
           <RiseSymbol className="h-10 w-auto" />
           <p className="mt-4 font-display text-2xl font-[800]">RISE CREW</p>
