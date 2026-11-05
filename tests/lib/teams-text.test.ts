@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { linkify } from '@/lib/teams/text';
+import { linkify, postDate } from '@/lib/teams/text';
 
 describe('linkify', () => {
   it('leaves a trailing period outside the link', () => {
@@ -44,5 +44,12 @@ describe('linkify', () => {
         .map((part) => part.value)
         .join(''),
     ).toBe(text);
+  });
+});
+
+describe('postDate', () => {
+  it('shows the date in Korea, whichever server renders it', () => {
+    expect(postDate('2026-11-05T15:30:00Z', 'ko')).toBe('2026.11.06');
+    expect(postDate('2026-11-05T15:30:00Z', 'en')).toBe('6 NOV 2026');
   });
 });

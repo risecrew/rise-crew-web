@@ -1,3 +1,6 @@
+import type { Locale } from '@/i18n/locales';
+import { formatStampDate } from '@/lib/format';
+
 export type TextPart = { kind: 'text' | 'link'; value: string };
 
 // An address starts with http(s):// and a letter or digit, and ends at a space, a quote, an angle
@@ -42,4 +45,16 @@ export function linkify(text: string): TextPart[] {
   }
   pushText(text.slice(position));
   return parts;
+}
+
+const KOREA_DATE = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+// The day a post was written, as the club sees the calendar.
+export function postDate(iso: string, locale: Locale): string {
+  return formatStampDate(KOREA_DATE.format(new Date(iso)), locale);
 }
