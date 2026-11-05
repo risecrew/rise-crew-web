@@ -83,8 +83,9 @@ test('the Global gallery holds each city in date order', async ({ page }) => {
   await expectNoHorizontalScroll(page);
 });
 
-test('chapter titles run across the content width', async ({ page }) => {
+test('the three chapter names share one size and fit the content width', async ({ page }) => {
   await page.goto('/ko');
+  const sizes = new Set<string>();
   for (const id of ['campus', 'domestic', 'global']) {
     const fit = await page.locator(`#${id}-title`).evaluate((el) => {
       // The word itself, not the block it sits in.
@@ -93,11 +94,13 @@ test('chapter titles run across the content width', async ({ page }) => {
       const style = getComputedStyle(parent);
       const inner =
         parent.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-      return { ratio: box.width / inner, right: box.right, viewport: innerWidth };
+      return { ratio: box.width / inner, size: getComputedStyle(el).fontSize };
     });
-    expect(fit.ratio).toBeGreaterThan(0.9);
-    expect(fit.right).toBeLessThanOrEqual(fit.viewport);
+    sizes.add(fit.size);
+    expect(fit.ratio, `${id} overflows its column`).toBeLessThanOrEqual(1);
   }
+  // The display step, the same as the inner page titles; never one size per word.
+  expect([...sizes]).toHaveLength(1);
 });
 
 test('the header action says what happens while recruitment is closed', async ({
