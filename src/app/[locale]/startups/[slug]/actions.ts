@@ -97,17 +97,26 @@ export async function saveIntro(_prev: TeamActionState, form: FormData): Promise
   if (refused(context)) return context;
   const { locale, team, supabase } = context;
 
+  // A row left blank is not a link, but the rows after it keep their place on the form, so a message
+  // goes back to the row it is about.
   const kinds = form.getAll('link_kind');
-  const links = form
+  const rows = form
     .getAll('link_url')
-    .map((url, index) => ({ kind: kinds[index], url }))
+    .map((url, row) => ({ row, kind: kinds[row], url }))
     .filter((link) => typeof link.url === 'string' && link.url.trim() !== '');
   const parsed = teamIntroSchema.safeParse({
     tagline: text(form, 'tagline'),
     intro: text(form, 'intro'),
-    links,
+    links: rows.map(({ kind, url }) => ({ kind, url })),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      if (issue.path[0] === 'links' && typeof issue.path[1] === 'number') {
+        issue.path[1] = rows[issue.path[1]]?.row ?? issue.path[1];
+      }
+    }
+    return invalid(parsed.error);
+  }
 
   // Only an image this form changed is written, so saving an open form cannot undo a logo or cover
   // another member put up in the meantime.

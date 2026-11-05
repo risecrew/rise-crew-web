@@ -89,6 +89,10 @@ export function PostForm({ team, post }: Props) {
       if (uploaded.current.length === 0) {
         const upload = await uploadPhotos(team.id, id, added);
         if ('error' in upload) {
+          if (upload.error === 'denied') {
+            setState({ ok: false, error: 'denied' });
+            return;
+          }
           setNotice(
             upload.error === 'tooLarge'
               ? t('errors.tooLarge')

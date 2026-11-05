@@ -2,7 +2,14 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { PHOTO_TYPES, TEAM_LIMITS, checkPhoto } from './forms';
 import { shrinkImage, type ImageKind } from './shrink';
 
-export type UploadError = 'tooLarge' | 'badType' | 'unreadable' | 'failed';
+export type UploadError = 'tooLarge' | 'badType' | 'unreadable' | 'denied' | 'failed';
+
+// Storage says no with a 403 when the policies refuse: the person is no longer allowed, which is
+// not the same as a failed upload that trying again would fix.
+function uploadFailure(error: unknown): 'denied' | 'failed' {
+  const { status, statusCode } = error as { status?: unknown; statusCode?: unknown };
+  return status === 403 || statusCode === '403' ? 'denied' : 'failed';
+}
 
 function extensionOf(blob: Blob): string {
   return PHOTO_TYPES[blob.type as keyof typeof PHOTO_TYPES];
@@ -39,16 +46,16 @@ export async function uploadPhotos(
   const paths: string[] = [];
   for (const blob of blobs) {
     const path = `${teamId}/${postId}/${crypto.randomUUID()}.${extensionOf(blob)}`;
-    let failed = false;
+    let failure: 'denied' | 'failed' | null = null;
     try {
       const { error } = await bucket.upload(path, blob, { contentType: blob.type, upsert: false });
-      failed = error !== null;
+      if (error) failure = uploadFailure(error);
     } catch {
-      failed = true;
+      failure = 'failed';
     }
-    if (failed) {
+    if (failure) {
       await removePhotos(paths);
-      return { error: 'failed' };
+      return { error: failure };
     }
     paths.push(path);
   }
@@ -81,7 +88,7 @@ export async function uploadTeamImage(
     const { error } = await createSupabaseBrowserClient()
       .storage.from(bucket)
       .upload(path, prepared.blob, { contentType: prepared.blob.type, upsert: false });
-    return error ? { error: 'failed' } : { path };
+    return error ? { error: uploadFailure(error) } : { path };
   } catch {
     return { error: 'failed' };
   }

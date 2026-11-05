@@ -146,8 +146,17 @@ export default async function StartupsPage({ params, searchParams }: Props) {
             </>
           ) : (
             <div className="mt-10 border-t border-white/15 pt-6">
-              <p className="text-lg text-white/85">{t(filtered ? 'emptyFiltered' : 'empty')}</p>
-              {filtered ? (
+              <p className="text-lg text-white/85">
+                {t(q.page > 1 ? 'emptyPage' : filtered ? 'emptyFiltered' : 'empty')}
+              </p>
+              {q.page > 1 ? (
+                <Link
+                  href={{ pathname: '/startups', query: filterQuery(q, {}) }}
+                  className="mt-2 inline-flex min-h-11 items-center text-white underline underline-offset-4"
+                >
+                  {t('pager.first')}
+                </Link>
+              ) : filtered ? (
                 <Link
                   href="/startups"
                   className="mt-2 inline-flex min-h-11 items-center text-white underline underline-offset-4"
@@ -158,12 +167,14 @@ export default async function StartupsPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          <Pager
-            pathname="/startups"
-            query={filterQuery(q, {})}
-            page={q.page}
-            pages={pageCount(total)}
-          />
+          {teams.length > 0 ? (
+            <Pager
+              pathname="/startups"
+              query={filterQuery(q, {})}
+              page={q.page}
+              pages={pageCount(total)}
+            />
+          ) : null}
         </div>
       </section>
     </main>

@@ -118,8 +118,8 @@ export default async function TeamPage({ params, searchParams }: Props) {
             <FactList>
               <Fact label={t('facts.links')}>
                 <ul className="flex flex-col">
-                  {team.links.map((link) => (
-                    <li key={link.url}>
+                  {team.links.map((link, index) => (
+                    <li key={`${link.url}-${index}`}>
                       <a
                         href={link.url}
                         target="_blank"
@@ -165,12 +165,24 @@ export default async function TeamPage({ params, searchParams }: Props) {
           {posts.length > 0 ? (
             <PostList posts={posts} slug={team.slug} />
           ) : (
-            <p className="mt-8 border-t border-white/15 pt-6 text-lg text-white/85">
-              {t('posts.empty')}
-            </p>
+            <div className="mt-8 border-t border-white/15 pt-6">
+              <p className="text-lg text-white/85">
+                {t(page > 1 ? 'posts.emptyPage' : 'posts.empty')}
+              </p>
+              {page > 1 ? (
+                <Link
+                  href={`/startups/${team.slug}`}
+                  className="mt-2 inline-flex min-h-11 items-center underline underline-offset-4"
+                >
+                  {t('pager.first')}
+                </Link>
+              ) : null}
+            </div>
           )}
 
-          <Pager pathname={`/startups/${team.slug}`} page={page} pages={pageCount(total)} />
+          {posts.length > 0 ? (
+            <Pager pathname={`/startups/${team.slug}`} page={page} pages={pageCount(total)} />
+          ) : null}
         </div>
       </section>
     </main>

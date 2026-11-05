@@ -742,6 +742,71 @@ test('photos show in the lists, and a closed post leaves them', async ({
   await stranger.close();
 });
 
+test('a member who lost access is told so when a photo is refused', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug, teamId } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`사진 거절 글 ${id}`);
+  await page.getByLabel('사진 추가').setInputFiles(png('a.png'));
+  await removeTeamMember(teamId, email);
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByText('이 팀의 내용을 고칠 권한이 없어요.')).toBeVisible();
+  await expect(page.getByText('사진을 올리지 못했어요.')).toHaveCount(0);
+  await expect(page.getByLabel('제목')).toHaveValue(`사진 거절 글 ${id}`);
+});
+
+test('a bad link is marked on its own row when a row above is blank', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByRole('button', { name: '링크 추가' }).click();
+  await page.getByRole('button', { name: '링크 추가' }).click();
+  const addresses = page.getByLabel('주소');
+  await addresses.nth(1).fill('javascript:alert(1)');
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(
+    page.getByText('http:// 또는 https://로 시작하는 주소를 적어 주세요.'),
+  ).toBeVisible();
+  await expect(addresses.nth(1)).toHaveAttribute('aria-invalid', 'true');
+  await expect(addresses.nth(0)).not.toHaveAttribute('aria-invalid', 'true');
+});
+
+test('a page past the end says so and offers the way back', async ({ page }, testInfo) => {
+  const { email, slug, teamId } = await teamWithMember(testInfo);
+  await createPost(email, teamId, { title: '있는 글' });
+  await page.goto(`/ko/startups/${slug}?page=99`);
+  await expect(page.getByText('이 쪽에는 글이 없어요.')).toBeVisible();
+  await expect(page.getByText('아직 올라온 글이 없어요.')).toHaveCount(0);
+  await page.getByRole('link', { name: '첫 쪽으로' }).click();
+  await expect(page.getByRole('link', { name: /있는 글/ })).toBeVisible();
+
+  await page.goto('/ko/startups?page=99999');
+  await expect(page.getByText('이 쪽에는 팀이 없어요.')).toBeVisible();
+  await expect(page.getByRole('link', { name: '첫 쪽으로' })).toHaveAttribute(
+    'href',
+    '/ko/startups',
+  );
+});
+
+test('two links to the same address both show', async ({ page, baseURL }, testInfo) => {
+  const { email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByRole('button', { name: '링크 추가' }).click();
+  await page.getByRole('button', { name: '링크 추가' }).click();
+  await page.getByLabel('주소').nth(0).fill('https://same.example.test/');
+  await page.getByLabel('주소').nth(1).fill('https://same.example.test/');
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page).toHaveURL(new RegExp(`/ko/startups/${slug}$`));
+  await expect(page.getByRole('link', { name: '홈페이지' })).toHaveCount(2);
+});
+
 test('going back after a save shows what was saved, not the old text', async ({
   page,
   baseURL,

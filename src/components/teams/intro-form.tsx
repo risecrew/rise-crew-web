@@ -69,6 +69,7 @@ export function IntroForm({ team }: Props) {
   }
 
   function uploadSentence(error: UploadError): string {
+    if (error === 'denied') return t('errors.denied');
     if (error === 'tooLarge') return t('errors.tooLarge');
     if (error === 'badType') return t('errors.badType');
     if (error === 'unreadable') return t('errors.unreadable');
