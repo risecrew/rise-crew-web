@@ -20,11 +20,13 @@ const POLICY = {
     headings: [
       '개인정보 수집·이용 목적',
       '수집하는 항목',
-      '보유 기간',
+      '보유 기간과 파기',
       '처리를 맡기는 곳',
+      '개인정보의 국외 이전',
       '열람할 수 있는 사람',
       '이용자의 권리',
       '만 14세 미만',
+      '개인정보의 안전성 확보 조치',
       '개인정보 보호책임자',
       '시행일과 버전',
     ],
@@ -47,6 +49,18 @@ const POLICY = {
     unfinishedRights: /만든 지 7일이 지나면 자동으로 삭제됩니다/,
     staffRow: '운영진과 관리자',
     staffFinishedOnly: /가입 정보 입력을 마치지 않은 계정은 보지 못합니다/,
+    // Supabase's own sign-in logs name the account, and whoever runs the site can read every
+    // account in the Supabase dashboard, which can also export tables.
+    signInLogs: /로그인 기록에는 계정 이메일과 계정 식별자도 포함됩니다/,
+    adminRow: '웹사이트 관리자',
+    adminDashboard: /Supabase 관리 화면에서 모든 계정/,
+    noExport: /회원 관리 화면에는 명단을 파일로 내려받는 기능이 없습니다/,
+    destroy: /데이터베이스에서 삭제하는 방법으로 파기합니다/,
+    // The database is in Seoul, but the site's server functions run in the US (Vercel iad1).
+    transferDatabase: /데이터베이스는 대한민국\(서울\)에 있지만/,
+    transferServer: /미국 \(웹사이트 서버가 실행되는 지역\)/,
+    transferRefuse: /국외 이전을 원하지 않으면/,
+    noPasswords: /이 사이트는 비밀번호를 받지 않습니다/,
   },
   en: {
     title: 'Privacy policy',
@@ -57,11 +71,13 @@ const POLICY = {
     headings: [
       'Why we use your information',
       'What we collect',
-      'How long we keep it',
+      'How long we keep it, and how we destroy it',
       'Who processes it for us',
+      'Transfers outside South Korea',
       'Who can see it',
       'Your rights',
       'People under 14',
+      'How we keep it safe',
       'Privacy officer',
       'Effective date and version',
     ],
@@ -78,6 +94,15 @@ const POLICY = {
     unfinishedRights: /deleted automatically 7 days after it was created/,
     staffRow: 'Operators and admins',
     staffFinishedOnly: /do not see accounts that never finished the sign-up form/,
+    signInLogs: /sign-in logs also include your account email and account identifier/,
+    adminRow: 'Website administrator',
+    adminDashboard: /every account in the Supabase dashboard/,
+    noExport: /member management screen has no way to download the member list/,
+    destroy: /destroy it by deleting it from the database/,
+    transferDatabase: /The database that stores sign-up information is in South Korea \(Seoul\)/,
+    transferServer: /United States \(where the website’s server runs\)/,
+    transferRefuse: /If you do not want this transfer/,
+    noPasswords: /This site does not ask for passwords/,
   },
 } as const;
 
@@ -171,6 +196,43 @@ for (const locale of LOCALES) {
       .filter({ has: page.locator('dt', { hasText: copy.staffRow }) });
     await expect(staff).toHaveCount(1);
     await expect(staff).toContainText(copy.staffFinishedOnly);
+  });
+
+  test(`/${locale}/privacy says who else can read accounts, outside the member screen`, async ({
+    page,
+  }) => {
+    await page.goto(`/${locale}/privacy`);
+    const main = page.locator('main');
+    await expect(main.locator('section[aria-labelledby="privacy-items"]')).toContainText(
+      copy.signInLogs,
+    );
+    const visibility = main.locator('section[aria-labelledby="privacy-visibility"]');
+    const admin = visibility
+      .locator('dl > div')
+      .filter({ has: page.locator('dt', { hasText: copy.adminRow }) });
+    await expect(admin).toHaveCount(1);
+    await expect(admin).toContainText(copy.adminDashboard);
+    await expect(visibility).toContainText(copy.noExport);
+  });
+
+  test(`/${locale}/privacy covers destruction, transfers abroad and safety measures`, async ({
+    page,
+  }) => {
+    await page.goto(`/${locale}/privacy`);
+    const main = page.locator('main');
+    await expect(main.locator('section[aria-labelledby="privacy-retention"]')).toContainText(
+      copy.destroy,
+    );
+    const transfer = main.locator('section[aria-labelledby="privacy-transfer"]');
+    await expect(transfer).toContainText(copy.transferDatabase);
+    await expect(transfer).toContainText(copy.transferServer);
+    await expect(transfer).toContainText(copy.transferRefuse);
+    for (const name of ['Supabase Pte. Ltd.', 'Vercel Inc.', 'Google LLC']) {
+      await expect(transfer.locator('dt', { hasText: name })).toHaveCount(1);
+    }
+    await expect(main.locator('section[aria-labelledby="privacy-security"]')).toContainText(
+      copy.noPasswords,
+    );
   });
 
   test(`/${locale}/privacy is reachable from the footer of every page`, async ({ page }) => {

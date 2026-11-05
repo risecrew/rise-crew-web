@@ -264,18 +264,19 @@
         "label": "Consent to recruitment emails",
         "body": "Optional. Whether you agreed is recorded with the time and the version of this policy."
       },
-      "passive": "If you sign in with Google, Supabase also stores the basic profile Google shares (display name, profile picture URL, account identifier and the like) with your sign-in details. Supabase and Vercel keep access logs automatically (IP address, browser, and times), held under each company’s own policy.",
+      "passive": "If you sign in with Google, Supabase also stores the basic profile Google shares (display name, profile picture URL, account identifier and the like) with your sign-in details. Supabase and Vercel keep access logs automatically (IP address, browser, and times), and Supabase’s sign-in logs also include your account email and account identifier. These logs are held under each company’s own policy.",
       "cookies": "This site stores cookies in your browser. While you are signed in, a cookie keeps you signed in. When the language you view the site in differs from your browser’s (for example after you switch language), a cookie remembers that language, whether or not you are signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in and your language choice is not remembered."
     },
     "retention": {
-      "title": "How long we keep it",
+      "title": "How long we keep it, and how we destroy it",
       "keep": "We keep your information until you delete your account.",
       "unfinished": "If you sign in but never finish the sign-up form, the account is deleted automatically 7 days after it was created, along with its sign-in details such as your email address and the basic profile Google shared.",
-      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy."
+      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy.",
+      "destroy": "When the retention period ends or there is a reason to delete information, we destroy it without delay. We handle personal information only in electronic form and destroy it by deleting it from the database. We do not keep it on paper or in separate files. Anything left in a company’s backups is gone when that backup’s retention period ends."
     },
     "processors": {
       "title": "Who processes it for us",
-      "intro": "We rely on the companies below to run the website. Their servers may be outside South Korea.",
+      "intro": "We rely on the companies below to run the website. What goes outside South Korea is set out in the next section.",
       "supabase": {
         "label": "Supabase",
         "body": "The database (where sign-up information is stored) and sign-in (account verification)"
@@ -286,8 +287,36 @@
       },
       "google": {
         "label": "Google",
-        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails (for now, a RISE CREW Gmail account sends the sign-in emails; the recipient address and the one-time sign-in link pass through Google, and the copy is deleted automatically within 30 days)"
+        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails. For now, a RISE CREW Gmail account sends the sign-in emails. The recipient address and the one-time sign-in link pass through Google, and the sent copy is deleted automatically within 30 days."
       }
+    },
+    "transfer": {
+      "title": "Transfers outside South Korea",
+      "intro": "The database that stores sign-up information is in South Korea (Seoul), but some personal information goes outside the country as set out below, as far as running the service requires. We disclose this in this policy under Article 28-8(1)(3) of the Personal Information Protection Act. It is sent over encrypted connections whenever you sign up, sign in or use the site.",
+      "fields": {
+        "country": "Country",
+        "items": "Information",
+        "purpose": "Purpose and retention"
+      },
+      "supabase": {
+        "label": "Supabase Pte. Ltd. (privacy@supabase.com)",
+        "country": "The database is in South Korea (Seoul). Running and supporting the service may involve processing in Singapore and other countries.",
+        "items": "Sign-up information, sign-in details, consent records, access logs",
+        "purpose": "Running the database and sign-in. Kept until you delete your account; access logs follow the company’s own policy."
+      },
+      "vercel": {
+        "label": "Vercel Inc. (privacy@vercel.com)",
+        "country": "United States (where the website’s server runs)",
+        "items": "What passes through while you use the site (sign-in cookies, sign-up information you enter or edit) and access logs",
+        "purpose": "Running the website. What passes through is used for processing and not stored; access logs follow the company’s own policy."
+      },
+      "google": {
+        "label": "Google LLC (policies.google.com/privacy)",
+        "country": "The United States and other countries where Google runs servers",
+        "items": "Account details used for Google sign-in; the recipient address and one-time link in sign-in emails",
+        "purpose": "Google sign-in and sending sign-in emails. Sent copies are deleted within 30 days; anything else follows the company’s own policy."
+      },
+      "refuse": "If you do not want this transfer, do not create an account, or delete yours on My page. You then cannot use features that need signing in, but public pages stay open without an account."
     },
     "visibility": {
       "title": "Who can see it",
@@ -299,7 +328,11 @@
         "label": "Operators and admins",
         "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) of people who finished signing up, on the member management screen. They do not see accounts that never finished the sign-up form. They look at it only to manage members and, for people who agreed, to send recruitment notices."
       },
-      "outro": "There is no way to download the member list as a file. The club does not give personal information to anyone outside the companies above and the operators and admins."
+      "admin": {
+        "label": "Website administrator",
+        "body": "As the person handling the data, the website administrator can see the sign-in details and sign-up information of every account in the Supabase dashboard, including accounts that never finished the sign-up form. They look at it only when running the site or handling a deletion request requires it."
+      },
+      "outro": "The member management screen has no way to download the member list as a file. The club does not give personal information to anyone outside the companies and people named above."
     },
     "rights": {
       "title": "Your rights",
@@ -310,6 +343,22 @@
     "under14": {
       "title": "People under 14",
       "body": "People under 14 cannot sign up. Under the Personal Information Protection Act, handling the information of a child under 14 needs the consent of a legal guardian, so sign-up is limited to people 14 or older, and we ask you to confirm it when you sign up. If we find that an account belongs to someone under 14, we delete it."
+    },
+    "security": {
+      "title": "How we keep it safe",
+      "intro": "We take the measures below to protect personal information.",
+      "managerial": {
+        "label": "Administrative",
+        "body": "Only operators, admins and the website administrator can see personal information. The Google account that sends sign-in emails uses two-step verification."
+      },
+      "technical": {
+        "label": "Technical",
+        "body": "Database access rules limit what each role can see. Information travelling to and from the site uses encrypted connections (HTTPS), and Supabase stores the database encrypted. This site does not ask for passwords."
+      },
+      "physical": {
+        "label": "Physical",
+        "body": "The club runs no servers of its own and keeps no paper lists. Personal information is held in the facilities of the companies above."
+      }
     },
     "officer": {
       "title": "Privacy officer",
