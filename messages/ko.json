@@ -681,11 +681,12 @@
     "emptyFiltered": "조건에 맞는 팀이 없어요.",
     "fields": {
       "ai-software": "AI·소프트웨어",
-      "mobility": "모빌리티",
+      "edutech": "에듀테크",
       "healthcare": "헬스케어",
-      "commerce": "커머스",
-      "content": "콘텐츠",
-      "sustainability": "지속가능성",
+      "foodtech": "푸드테크",
+      "lifestyle": "라이프스타일",
+      "commerce-marketing": "커머스·마케팅",
+      "mobility": "모빌리티",
       "other": "기타"
     },
     "facts": {

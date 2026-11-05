@@ -681,11 +681,12 @@
     "emptyFiltered": "No teams match these filters.",
     "fields": {
       "ai-software": "AI & software",
-      "mobility": "Mobility",
+      "edutech": "Edtech",
       "healthcare": "Healthcare",
-      "commerce": "Commerce",
-      "content": "Content",
-      "sustainability": "Sustainability",
+      "foodtech": "Food tech",
+      "lifestyle": "Lifestyle",
+      "commerce-marketing": "Commerce & marketing",
+      "mobility": "Mobility",
       "other": "Other"
     },
     "facts": {

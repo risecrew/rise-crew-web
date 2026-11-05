@@ -2,11 +2,12 @@
 // for the club, and the database only checks the shape of the value.
 export const TEAM_FIELDS = [
   'ai-software',
-  'mobility',
+  'edutech',
   'healthcare',
-  'commerce',
-  'content',
-  'sustainability',
+  'foodtech',
+  'lifestyle',
+  'commerce-marketing',
+  'mobility',
   'other',
 ] as const;
 
