@@ -97,6 +97,130 @@ export type Database = {
         };
         Relationships: [];
       };
+      team_members: {
+        Row: {
+          created_at: string;
+          team_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          team_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          team_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'team_members_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      team_posts: {
+        Row: {
+          author_id: string | null;
+          body: string;
+          created_at: string;
+          edited_at: string | null;
+          hidden_at: string | null;
+          id: string;
+          photo_paths: string[];
+          team_id: string;
+          title: string;
+          updated_at: string;
+          visibility: Database['public']['Enums']['team_post_visibility'];
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id?: string | null;
+          body?: string;
+          created_at?: string;
+          edited_at?: string | null;
+          hidden_at?: string | null;
+          id?: string;
+          photo_paths?: string[];
+          team_id: string;
+          title: string;
+          updated_at?: string;
+          visibility?: Database['public']['Enums']['team_post_visibility'];
+        };
+        Update: {
+          author_id?: string | null;
+          body?: string;
+          created_at?: string;
+          edited_at?: string | null;
+          hidden_at?: string | null;
+          id?: string;
+          photo_paths?: string[];
+          team_id?: string;
+          title?: string;
+          updated_at?: string;
+          visibility?: Database['public']['Enums']['team_post_visibility'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'team_posts_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      teams: {
+        Row: {
+          cohort: number;
+          created_at: string;
+          field: string;
+          id: string;
+          intro: string;
+          is_published: boolean;
+          links: NonNullable<Json>;
+          logo_path: string | null;
+          name: string;
+          slug: string;
+          tagline: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          cohort: number;
+          created_at?: string;
+          field: string;
+          id?: string;
+          intro?: string;
+          is_published?: boolean;
+          links?: NonNullable<Json>;
+          logo_path?: string | null;
+          name: string;
+          slug: string;
+          tagline?: string;
+          updated_at?: string;
+        };
+        Update: {
+          cohort?: number;
+          created_at?: string;
+          field?: string;
+          id?: string;
+          intro?: string;
+          is_published?: boolean;
+          links?: NonNullable<Json>;
+          logo_path?: string | null;
+          name?: string;
+          slug?: string;
+          tagline?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       user_roles: {
         Row: {
           blocked_at: string | null;
@@ -147,10 +271,12 @@ export type Database = {
     };
     Functions: {
       custom_access_token_hook: { Args: { event: Json }; Returns: Json };
+      team_signed_in_post_count: { Args: { team: string }; Returns: number };
     };
     Enums: {
       app_role: 'guest' | 'member' | 'operator' | 'admin';
       occupation: 'undergrad' | 'grad' | 'alumni' | 'founder' | 'other';
+      team_post_visibility: 'public' | 'signed_in';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -267,6 +393,7 @@ export const Constants = {
     Enums: {
       app_role: ['guest', 'member', 'operator', 'admin'],
       occupation: ['undergrad', 'grad', 'alumni', 'founder', 'other'],
+      team_post_visibility: ['public', 'signed_in'],
     },
   },
 } as const;
