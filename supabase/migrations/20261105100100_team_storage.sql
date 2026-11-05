@@ -9,7 +9,12 @@
 --   same people see both, and changing a post's visibility closes its photos on
 --   the next request.
 -- - The size and type limits are bucket settings because photos go straight
---   from the browser to Storage: no server code of ours runs on the way.
+--   from the browser to Storage: no server code of ours runs on the way. A copy
+--   inside Storage does not pass through those settings, so the write policies
+--   hold the same limits (private.storage_file_allowed).
+-- - A signed URL opens its file until it expires, whatever happens to the post
+--   meanwhile. The site asks for 10 minutes. Someone who could read a photo may
+--   have kept it anyway, so closing a post stops new readers, not past ones.
 -- - The secret key is not used for any of this.
 --
 -- Paths: team-logos   {team_id}/{uuid}.{ext}
@@ -36,6 +41,29 @@ $$;
 revoke execute on function private.path_uuid(text, integer)
   from public, anon, authenticated, service_role;
 grant execute on function private.path_uuid(text, integer) to anon, authenticated;
+
+-- Whether a file row is one the buckets would have taken. Storage fills in
+-- metadata after an upload (null until then, when the bucket has already checked
+-- the file), and a copy brings what its caller says.
+create function private.storage_file_allowed(metadata jsonb, max_bytes bigint)
+returns boolean
+language sql
+immutable
+set search_path = ''
+as $$
+  select metadata is null
+    or (
+      coalesce(metadata ->> 'mimetype' in ('image/jpeg', 'image/png', 'image/webp'), false)
+      and case
+        when metadata ->> 'size' ~ '^[0-9]{1,18}$' then (metadata ->> 'size')::bigint <= max_bytes
+        else not (metadata ? 'size')
+      end
+    );
+$$;
+
+revoke execute on function private.storage_file_allowed(jsonb, bigint)
+  from public, anon, authenticated, service_role;
+grant execute on function private.storage_file_allowed(jsonb, bigint) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Post photos
@@ -78,6 +106,7 @@ create policy team_post_photos_insert_member on storage.objects
     bucket_id = 'team-post-photos'
     and name ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}/[0-9a-f-]{36}\.(jpg|png|webp)$'
     and private.path_uuid(name, 2) is not null
+    and private.storage_file_allowed(metadata, 5242880)
     and private.is_team_member(private.path_uuid(name, 1))
   );
 
@@ -115,6 +144,7 @@ create policy team_logos_insert_member_or_operator on storage.objects
   with check (
     bucket_id = 'team-logos'
     and name ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}\.(jpg|png|webp)$'
+    and private.storage_file_allowed(metadata, 2097152)
     and (
       private.is_team_member(private.path_uuid(name, 1))
       or (select private.is_at_least('operator'))
@@ -134,6 +164,7 @@ create policy team_logos_update_member_or_operator on storage.objects
   with check (
     bucket_id = 'team-logos'
     and name ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}\.(jpg|png|webp)$'
+    and private.storage_file_allowed(metadata, 2097152)
     and (
       private.is_team_member(private.path_uuid(name, 1))
       or (select private.is_at_least('operator'))

@@ -261,7 +261,9 @@ end;
 $$;
 
 -- Writing starts at member (spec section 4), and a blocked account is no
--- member. The message is what the admin screen recognizes.
+-- member. The message is what the admin screen recognizes. A trigger runs
+-- before row level security, so anyone but an operator is turned away first:
+-- otherwise the two different refusals would tell them someone's role.
 create function private.guard_team_member_insert()
 returns trigger
 language plpgsql
@@ -269,6 +271,10 @@ security definer
 set search_path = ''
 as $$
 begin
+  if (select auth.uid()) is not null and not private.is_at_least('operator') then
+    raise exception 'only operators can add team members'
+      using errcode = '42501';
+  end if;
   if coalesce(private.app_role_of(new.user_id) < 'member', true) then
     raise exception 'team members must be at least member'
       using errcode = 'P0001';

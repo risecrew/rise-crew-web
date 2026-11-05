@@ -7,6 +7,8 @@
 --   member A  7e5a0000-0000-4000-8000-000000000003  in team A
 --   member B  7e5a0000-0000-4000-8000-000000000004  in team B
 --   operator  7e5a0000-0000-4000-8000-000000000005  in no team
+--   unfinished 7e5a0000-0000-4000-8000-000000000006 has not finished signing up
+--   blocked   7e5a0000-0000-4000-8000-000000000007  finished sign-up, blocked
 --
 -- Team A ...a01 and team B ...b01 are published, team U ...c01 is not. Posts:
 -- ...d01 public, ...d02 signed_in, ...d03 public and hidden (team A), ...d04
@@ -16,7 +18,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(29);
+select plan(40);
 
 create function public._t_rows(statement text)
 returns integer
@@ -52,7 +54,12 @@ insert into auth.users (id, email) values
   ('7e5a0000-0000-4000-8000-000000000001', 'pgtap-store-guest@example.test'),
   ('7e5a0000-0000-4000-8000-000000000003', 'pgtap-store-a@example.test'),
   ('7e5a0000-0000-4000-8000-000000000004', 'pgtap-store-b@example.test'),
-  ('7e5a0000-0000-4000-8000-000000000005', 'pgtap-store-operator@example.test');
+  ('7e5a0000-0000-4000-8000-000000000005', 'pgtap-store-operator@example.test'),
+  ('7e5a0000-0000-4000-8000-000000000006', 'unfinished-store@example.test'),
+  ('7e5a0000-0000-4000-8000-000000000007', 'pgtap-store-blocked@example.test');
+
+update public.user_roles set blocked_at = now()
+ where user_id = '7e5a0000-0000-4000-8000-000000000007';
 
 update public.user_roles set role = 'member'
  where user_id in ('7e5a0000-0000-4000-8000-000000000003',
@@ -126,6 +133,16 @@ set local request.jwt.claims = '{"sub":"7e5a0000-0000-4000-8000-000000000001","r
 select results_eq('select public._t_photos()', $$values ('public.png'), ('signed.png')$$,
   'a finished guest sees photos of public and signed_in posts');
 
+set local request.jwt.claims = '{"sub":"7e5a0000-0000-4000-8000-000000000006","role":"authenticated"}';
+
+select results_eq('select public._t_photos()', $$values ('public.png')$$,
+  'an unfinished account sees only the photo of a public post');
+
+set local request.jwt.claims = '{"sub":"7e5a0000-0000-4000-8000-000000000007","role":"authenticated"}';
+
+select results_eq('select public._t_photos()', $$values ('public.png')$$,
+  'a blocked account sees only the photo of a public post');
+
 set local request.jwt.claims = '{"sub":"7e5a0000-0000-4000-8000-000000000003","role":"authenticated"}';
 
 select results_eq('select public._t_photos()',
@@ -184,6 +201,28 @@ select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('team-post-photos',
     '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000dee/7e5a0000-0000-4000-8000-000000000013.svg')$$,
   '42501', null, 'a file name with another extension is refused');
+
+-- A copy inside Storage skips the bucket's own checks, so the policies hold the same limits. The
+-- row a copy writes carries what the caller says the file is.
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name, metadata) values ('team-post-photos',
+    '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000dee/7e5a0000-0000-4000-8000-000000000031.png',
+    '{"mimetype":"image/svg+xml","size":10}')$$,
+  '42501', null, 'a photo row that says it is SVG is refused');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name, metadata) values ('team-post-photos',
+    '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000dee/7e5a0000-0000-4000-8000-000000000032.png',
+    '{"mimetype":"image/png","size":5242881}')$$,
+  '42501', null, 'a photo row over 5MB is refused');
+select lives_ok(
+  $$insert into storage.objects (bucket_id, name, metadata) values ('team-post-photos',
+    '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000dee/7e5a0000-0000-4000-8000-000000000033.png',
+    '{"mimetype":"image/png","size":5242880}')$$,
+  'a photo row of exactly 5MB is accepted');
+select is(
+  public._t_rows($$update storage.objects set name = name || 'x'
+     where bucket_id = 'team-post-photos' and name like '7e5a0000-%/public.png'$$),
+  0, 'a photo cannot be overwritten or moved, even by its team');
 
 set local request.jwt.claims = '{"sub":"7e5a0000-0000-4000-8000-000000000001","role":"authenticated"}';
 
@@ -245,6 +284,26 @@ select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('team-logos',
     '7e5a0000-0000-4000-8000-000000000a01/x/7e5a0000-0000-4000-8000-000000000024.png')$$,
   '42501', null, 'a logo path with an extra folder is refused');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name, metadata) values ('team-logos',
+    '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000034.png',
+    '{"mimetype":"image/svg+xml","size":10}')$$,
+  '42501', null, 'a logo row that says it is SVG is refused');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name, metadata) values ('team-logos',
+    '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000035.png',
+    '{"mimetype":"image/png","size":2097153}')$$,
+  '42501', null, 'a logo row over 2MB is refused');
+select throws_ok(
+  $$update storage.objects set metadata = '{"mimetype":"image/svg+xml","size":10}'
+     where bucket_id = 'team-logos'
+       and name = '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000022.webp'$$,
+  '42501', null, 'a logo cannot be changed into SVG');
+select is(
+  public._t_rows($$update storage.objects set metadata = '{"mimetype":"image/png","size":10}'
+     where bucket_id = 'team-logos'
+       and name = '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000022.webp'$$),
+  1, 'a team member can replace their team''s logo');
 select is(
   public._t_rows($$delete from storage.objects where bucket_id = 'team-logos'
      and name = '7e5a0000-0000-4000-8000-000000000a01/7e5a0000-0000-4000-8000-000000000022.webp'$$),
@@ -259,6 +318,10 @@ select throws_ok(
 select is(
   public._t_rows($$delete from storage.objects where bucket_id = 'team-logos' and name = '7e5a0000-0000-4000-8000-000000000a01/logo.png'$$),
   0, 'an outsider cannot delete a logo');
+select is(
+  public._t_rows($$update storage.objects set metadata = '{"mimetype":"image/png","size":10}'
+     where bucket_id = 'team-logos' and name = '7e5a0000-0000-4000-8000-000000000a01/logo.png'$$),
+  0, 'an outsider cannot replace a logo');
 
 set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';

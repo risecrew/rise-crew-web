@@ -25,7 +25,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(108);
+select plan(110);
 
 -- How many rows a statement touched, as the caller. Row level security answers
 -- an update it does not allow with zero rows, not an error.
@@ -304,6 +304,11 @@ select is(
      where user_id = '7e590000-0000-4000-8000-000000000003'$$),
   0, 'a team member cannot remove a member, even themselves');
 
+select throws_ok(
+  $$insert into public.team_members (team_id, user_id)
+    values ('7e590000-0000-4000-8000-000000000a01', '7e590000-0000-4000-8000-000000000001')$$,
+  '42501', null, 'adding a guest as a non-operator says the same as adding anyone: no role is revealed');
+
 select lives_ok(
   $$insert into public.team_posts (id, team_id, author_id, title, body, visibility)
     values ('7e590000-0000-4000-8000-000000000e01', '7e590000-0000-4000-8000-000000000a01',
@@ -478,6 +483,9 @@ select throws_ok(
 select throws_ok(
   $$update public.team_posts set body = 'x' where id = '7e590000-0000-4000-8000-000000000d05'$$,
   '42501', null, 'an operator outside the team cannot edit a post body');
+select throws_ok(
+  $$update public.team_posts set visibility = 'signed_in' where id = '7e590000-0000-4000-8000-000000000d05'$$,
+  '42501', null, 'an operator outside the team cannot change who can read a post');
 select throws_ok(
   $$insert into public.team_posts (team_id, author_id, title)
     values ('7e590000-0000-4000-8000-000000000b01', '7e590000-0000-4000-8000-000000000005', 'x')$$,
