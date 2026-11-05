@@ -26,10 +26,7 @@ export async function Ask({
     >
       <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[1.4fr_1fr] md:items-end">
         <div>
-          <h2
-            id="ask-title"
-            className="font-display text-[clamp(2.6rem,6vw,5.5rem)] leading-[0.98] font-[850] text-balance break-keep"
-          >
+          <h2 id="ask-title" className="font-display text-hero text-balance break-keep">
             {t('ask.title')}
           </h2>
           <p className="mt-5 text-lg break-keep text-white/80">{t('ask.body')}</p>

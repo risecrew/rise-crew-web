@@ -18,41 +18,34 @@ colors:
   ink: "#13203a"
   ink-soft: "#46546d"
 typography:
-  chapter:
-    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "calc(100cqw / <word-em> * 0.98)"
-    fontWeight: 900
-    lineHeight: 0.82
-    letterSpacing: "-0.03em"
-  display:
-    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(3rem, 8.5vw, 8rem)"
-    fontWeight: 900
-    lineHeight: 0.92
-    letterSpacing: "-0.025em"
-  slogan:
-    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(2.6rem, 7.4vw, 6rem)"
-    fontWeight: 850
-    lineHeight: 0.95
-    letterSpacing: "-0.02em"
   numeral:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
     fontSize: "clamp(5rem, 13vw, 11rem)"
     fontWeight: 900
     lineHeight: 0.85
     fontFeature: "\"tnum\" 1"
-  account-title:
+  display:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(3.25rem, 9vw, 6rem)"
+    fontSize: "clamp(3rem, 8.5vw, 8rem)"
+    fontWeight: 900
+    lineHeight: 0.92
+    letterSpacing: "-0.025em"
+  hero:
+    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
+    fontSize: "clamp(2.6rem, 7vw, 6rem)"
     fontWeight: 900
     lineHeight: 0.95
     letterSpacing: "-0.025em"
   headline:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(1.9rem, 4vw, 3.4rem)"
+    fontSize: "clamp(2.125rem, 4vw, 3.4rem)"
     fontWeight: 850
     lineHeight: 1.04
+  subhead:
+    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
+    fontSize: "clamp(1.75rem, 2.6vw, 2.25rem)"
+    fontWeight: 850
+    lineHeight: 1.15
   title:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
     fontSize: "1.5rem"
@@ -174,7 +167,7 @@ components:
 
 사이트 전체가 불이 꺼진 객석에서 올려다보는 하나의 무대다. 바탕은 색이 거의 없는 무대 검정이고, 빛은 로고에서만 온다. 로고 코발트는 숫자 구간과 사진 없는 장면을 물들이는 조명이고, 라임은 무대 위에서 손을 드는 순간(행동 버튼, R·I·S·E 머리글자, 거대한 숫자)에만 켜진다. 실제 사람이 찍힌 사진이 화면 폭을 채우고, 그 위에 Wanted Sans의 매우 굵은 글자가 직접 올라간다.
 
-밀도는 낮고 크기 대비는 극단적이다. 장(章) 이름 Campus · Domestic · Global은 콘텐츠 폭을 끝에서 끝까지 가로지르고, 숫자는 최대 11rem까지 커진다. 그 사이의 정보는 카드가 아니라 얇은 흰 선(15~20% 불투명) 위에 라벨과 값을 쌓는 발표 자료 부록 같은 표로 정리된다. 상자, 그림자, 둥근 카드가 없는 평면이고, 깊이는 사진, 어둡게 까는 그라데이션, 코발트 빛 번짐으로만 만든다.
+밀도는 낮고 크기 대비는 극단적이다. 장(章) 이름 Campus · Domestic · Global은 안쪽 페이지 제목과 같은 최대 8rem으로 서고, 숫자는 최대 11rem까지 커진다. 그 사이의 정보는 카드가 아니라 얇은 흰 선(15~20% 불투명) 위에 라벨과 값을 쌓는 발표 자료 부록 같은 표로 정리된다. 상자, 그림자, 둥근 카드가 없는 평면이고, 깊이는 사진, 어둡게 까는 그라데이션, 코발트 빛 번짐으로만 만든다.
 
 움직임은 확실히 체감되되 항상 스크롤 방향을 따른다. 첫 화면 사진은 고정된 채 물러나며 어두워지고, 숫자는 같은 박자로 올라가며 굵어지고, Global은 화면을 고정한 채 도시 사진을 아래에서 위로 덮는다. JavaScript가 없거나 `prefers-reduced-motion`이면 모든 연출이 최종 상태로 멈춰 보인다. 16:9 슬라이드 틀, 슬라이드 번호, 단체 사진 히어로 아래 카드 격자는 이 세계가 거부한 형식이다.
 
@@ -229,13 +222,14 @@ components:
 **Loading:** Wanted Sans Variable과 Pretendard Variable은 사이트가 직접 호스팅한다. 공식 npm 패키지(`pretendard`, `wanted-sans`)의 동적 부분집합(unicode-range로 나눈 작은 woff2) 파일을 `pnpm fonts:vendor`로 `public/fonts/<패키지>-<버전>/`에 복사하고, `src/lib/fonts.ts`의 CSS로 불러온다. 폴더 이름에 버전이 있어 1년 캐시(immutable)를 건다(`next.config.ts`). 외부 CDN은 쓰지 않는다. JetBrains Mono는 `next/font/google`로 빌드 때 내려받아 `--font-jetbrains` 변수로 연결한다.
 
 ### Hierarchy
-- **Chapter** (900, 콘텐츠 폭에 맞춘 `calc(100cqw / 단어폭 * 0.98)`, 0.82, -0.03em): Campus · Domestic · Global 장 이름. 컨테이너 쿼리로 단어가 콘텐츠 폭 전체를 가로지르도록 크기를 정하고, 줄바꿈하지 않는다. 단어폭(em)은 Wanted Sans 900, -0.03em에서 잰 값이다.
-- **Display** (900, `clamp(3rem, 8.5vw, 8rem)`, 0.92, -0.025em): 안쪽 페이지 표지 제목.
-- **Slogan** (850, `clamp(2.6rem, 7.4vw, 6rem)`, 0.95, -0.02em): 첫 화면 R·I·S·E 슬로건. 한 줄에 한 문장, 머리글자만 라임.
-- **Numeral** (스크롤에 따라 400 → 950, 정지 상태 900, `clamp(5rem, 13vw, 11rem)`, 0.85, 고정폭 숫자): 90+ · 22+ · 33, VCC 18. 대회 숫자는 한 단계 작은 `clamp(4.5rem, 9vw, 8rem)`. 라벨은 숫자 아래에 놓는다.
-- **Account Title** (900, `clamp(3.25rem, 9vw, 6rem)`, 0.95, -0.025em, `text-wrap: balance`): 로그인, 가입 정보("반가워요!"), 마이페이지 제목. 회원 관리는 표 폭을 위해 `clamp(2.5rem, 6vw, 4rem)`, 로그인 링크를 보낸 뒤의 "메일함을 확인해 주세요"는 `clamp(2rem, 6vw, 3.4rem)` 850, 1.04로 한 단계 낮춘다. 계정 화면 제목은 이 세 가지뿐이다.
-- **Headline** (850, `clamp(1.9rem, 4vw, 3.4rem)`, 1.04): 안쪽 페이지의 섹션 제목. 홈 장 안의 제목은 30px → 48px(md)로 같은 굵기를 쓴다. `text-wrap: balance`.
-- **Title** (800~850, 20~30px): 프로그램 이름, 멘토 이름, 사실 값(MOU 날짜, 팀당 500만 원).
+큰 글자는 아래 다섯 단계만 쓴다. 단계마다 넓은 화면에서 위 단계의 약 0.7배라 이웃한 두 단계가 같은 크기로 보이지 않는다. 값은 `globals.css`의 `--text-*` 토큰(`text-numeral`, `text-display`, `text-hero`, `text-headline`, `text-subhead`)에 있고, 화면 코드에 `text-[clamp(...)]` 같은 임의 크기를 새로 쓰지 않는다. subhead 아래는 Tailwind 기본 단계(2xl 이하)를 쓴다.
+
+- **Numeral** (`clamp(5rem, 13vw, 11rem)`, 0.85, 고정폭 숫자, 스크롤에 따라 400 → 950, 정지 상태 900): 90+ · 22+ · 33, VCC 18. 라벨은 숫자 아래에 놓는다.
+- **Display** (900, `clamp(3rem, 8.5vw, 8rem)`, 0.92, -0.025em): 안쪽 페이지 표지 제목, 홈의 장 이름 Campus · Domestic · Global, 대회 숫자(5개국 · 15팀). 장 이름 세 개는 단어 길이와 상관없이 같은 크기이고 줄바꿈하지 않는다.
+- **Hero** (900, `clamp(2.6rem, 7vw, 6rem)`, 0.95, -0.025em): 첫 화면 슬로건, 마지막 지원 권유 제목, 계정 화면 제목(로그인, 가입 정보, 마이페이지). 슬로건은 머리글자 R·I·S·E를 따로 한 열에 세워 열 가운데에 맞추고(좁은 I도 가운데), 머리글자는 1000 굵기 라임, 나머지 글자는 0.8배 750 흰색이다. 머리글자가 세로로 RISE라는 단어로 읽힌다.
+- **Headline** (850, `clamp(2.125rem, 4vw, 3.4rem)`, 1.04, `text-wrap: balance`): 섹션 제목. 안쪽 페이지 섹션, 홈 장 안의 제목, "숫자로 보는 RISE CREW", 회원 관리 제목, "메일함을 확인해 주세요".
+- **Subhead** (850, `clamp(1.75rem, 2.6vw, 2.25rem)`, 1.15): 섹션 안의 제목. 해외 무대 각 도시의 행사 이름, 사실 값(MOU 날짜, 팀당 500만 원), 소개 페이지의 R·I·S·E 목록.
+- **Title** (800~850, 20~24px): 프로그램 이름, 멘토 이름.
 - **Body Lead** (400, 18px): 제목 아래 설명 문장. 최대 폭 42~48rem(`max-w-2xl`~`max-w-3xl`), 75% 흰색.
 - **Body** (400, 16px): 일반 문단과 목록. 계정 화면의 입력 문장, 오류·확인 메시지(흰색), 동의 문장(85%)도 16px이다. 로그인과 가입의 리드 문장은 18px 85%, `break-keep`.
 - **Label** (500, 14px): 사실 목록의 라벨(60% 흰색), 보도 출처 줄, 프로그램 요약. 계정 화면의 입력칸 라벨(75% 흰색), 회원 표의 머리글(60%), 역할 칩(600)도 이 크기다.

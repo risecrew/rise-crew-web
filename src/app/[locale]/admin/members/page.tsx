@@ -34,8 +34,7 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   return accountMetadata(t('metaTitle'));
 }
 
-const TITLE =
-  'font-display text-[clamp(2.5rem,6vw,4rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance break-keep';
+const TITLE = 'font-display text-headline text-balance break-keep';
 const PILL =
   'inline-flex min-h-12 items-center justify-center rounded-full border border-white/50 px-6 py-3 text-base font-semibold break-keep text-white transition-[transform,background-color] duration-150 ease-out hover:bg-white/10 active:scale-[0.97] motion-reduce:transition-none';
 const FIELD =

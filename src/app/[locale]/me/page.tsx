@@ -25,8 +25,7 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   return accountMetadata(t('metaTitle'));
 }
 
-const TITLE =
-  'font-display text-[clamp(3.25rem,9vw,6rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance break-keep';
+const TITLE = 'font-display text-hero text-balance break-keep';
 
 // My page: what the account has told us, with the ways to change it, to leave it, and to delete
 // it. Editing is the same page with `?edit=1` (a link, so it works without JavaScript and the
