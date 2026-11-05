@@ -59,6 +59,28 @@ test('an operator creates a team, which stays off the list until it is published
   await expect(page.getByRole('link', { name: new RegExp(`새 팀 ${id}`) })).toBeVisible();
 });
 
+test('the startups list offers staff the way to create a team, and nobody else', async ({
+  page,
+  browser,
+  baseURL,
+}) => {
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/startups');
+  await page.getByRole('link', { name: '팀 만들기' }).click();
+  await expect(page).toHaveURL(`${baseURL}/ko/admin/teams/new`);
+
+  const others = await browser.newContext();
+  const visitor = await others.newPage();
+  await visitor.goto('/ko/startups');
+  await expect(visitor.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(visitor.getByRole('link', { name: '팀 만들기' })).toHaveCount(0);
+  await signIn(visitor, MEMBER, baseURL!);
+  await visitor.goto('/ko/startups');
+  await expect(visitor.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(visitor.getByRole('link', { name: '팀 만들기' })).toHaveCount(0);
+  await others.close();
+});
+
 test('a duplicate address shows a message at the field', async ({ page, baseURL }, testInfo) => {
   const id = unique(testInfo);
   await createTeam({ slug: `taken-${id}`, name: `있는 팀 ${id}`, cohort: 5 });

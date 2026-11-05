@@ -2,11 +2,14 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageCover } from '@/components/site/page-cover';
+import { PRIMARY, TEXT_BUTTON } from '@/components/teams/form-parts';
 import { Pager } from '@/components/teams/pager';
 import { TeamCard } from '@/components/teams/team-card';
 import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
+import { atLeast } from '@/lib/auth/roles';
+import { getViewer } from '@/lib/auth/viewer';
 import { localizedAlternates } from '@/lib/metadata';
 import { TEAM_FIELDS } from '@/lib/teams/fields';
 import { listTeams, logoUrl, pageCount } from '@/lib/teams/queries';
@@ -49,6 +52,10 @@ export default async function StartupsPage({ params, searchParams }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('Teams');
+  const adminT = await getTranslations('Admin.teams');
+
+  const viewer = await getViewer();
+  const isStaff = viewer !== null && !viewer.blocked && atLeast(viewer.role, 'operator');
 
   const q = parseTeamsQuery(await searchParams);
   const { teams, cohorts, total } = await listTeams(q);
@@ -56,7 +63,18 @@ export default async function StartupsPage({ params, searchParams }: Props) {
 
   return (
     <main id="main" className="bg-stage">
-      <PageCover title={t('title')} lead={t('lead')} />
+      <PageCover title={t('title')} lead={t('lead')}>
+        {isStaff ? (
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Link href="/admin/teams/new" className={PRIMARY}>
+              {adminT('new')}
+            </Link>
+            <Link href="/admin/teams" className={TEXT_BUTTON}>
+              {adminT('title')}
+            </Link>
+          </div>
+        ) : null}
+      </PageCover>
 
       <section className="border-t border-white/10 bg-stage text-white">
         <div className="mx-auto max-w-7xl px-5 py-14 md:px-10 md:py-20">
