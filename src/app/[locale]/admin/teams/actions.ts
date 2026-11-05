@@ -18,7 +18,8 @@ export type TeamAdminState =
   | { ok: true }
   | {
       ok: false;
-      error: 'denied' | 'invalid' | 'failed' | 'needsMember' | 'noAccount' | 'alreadyInTeam';
+      error:
+        'denied' | 'invalid' | 'failed' | 'needsMember' | 'blocked' | 'noAccount' | 'alreadyInTeam';
       fields?: Record<string, string>;
     }
   | null;
@@ -114,6 +115,8 @@ export async function addTeamMember(
   if (!isUuid(teamId)) return DENIED;
   const email = text(form, 'email').trim().toLowerCase();
   if (!email) return { ok: false, error: 'invalid', fields: { email: 'required' } };
+  // The search below treats * as "anything". This asks for one address, not a pattern.
+  if (email.includes('*')) return { ok: false, error: 'noAccount' };
 
   // An unfinished sign-up is on nobody's list, so it counts as no account.
   const { data: person, error: findError } = await context.supabase
@@ -123,7 +126,8 @@ export async function addTeamMember(
     .maybeSingle();
   if (findError) return FAILED;
   if (!person?.id) return { ok: false, error: 'noAccount' };
-  if (person.blocked_at || person.role === 'guest') return { ok: false, error: 'needsMember' };
+  if (person.blocked_at) return { ok: false, error: 'blocked' };
+  if (person.role === 'guest') return { ok: false, error: 'needsMember' };
 
   const { error } = await context.supabase
     .from('team_members')

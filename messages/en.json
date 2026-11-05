@@ -657,7 +657,8 @@
         "failed": "That did not save. Please try again in a moment.",
         "needsMember": "This person is not a member yet. Make them a member first.",
         "noAccount": "Nobody has signed up with this email.",
-        "alreadyInTeam": "This person is already on the team."
+        "alreadyInTeam": "This person is already on the team.",
+        "blocked": "A blocked account cannot join a team. Unblock it on the members screen first."
       }
     }
   },
@@ -728,7 +729,7 @@
       "editPost": "Edit post",
       "edit": "Edit",
       "logo": "Logo",
-      "logoHint": "JPEG, PNG or WebP, up to 2MB.",
+      "logoHint": "JPEG, PNG or WebP. Large files are made smaller automatically.",
       "removeLogo": "Remove the current logo",
       "tagline": "One-line intro",
       "intro": "Intro",
@@ -740,7 +741,7 @@
       "postTitle": "Title",
       "postBody": "Text",
       "addPhotos": "Add photos",
-      "photoHint": "JPEG, PNG or WebP. Up to 5MB each, 4 per post.",
+      "photoHint": "JPEG, PNG or WebP, up to 4 per post. Large photos are made smaller, and location data is removed.",
       "photoNotice": "Please check the people in your photos and any personal details in your post before you share them.",
       "removePhoto": "Remove photo {number}",
       "visibility": "Who can read this",
@@ -762,15 +763,14 @@
         "invalidUrl": "Enter an address that starts with http:// or https://.",
         "tooLong": "This is too long.",
         "titleRequired": "Please write a title.",
-        "tooLarge": "Each photo can be up to 5MB.",
-        "logoTooLarge": "A logo can be up to 2MB.",
+        "tooLarge": "Each photo can be up to 30MB.",
         "badType": "Only JPEG, PNG and WebP photos can be uploaded.",
         "tooMany": "A post can have up to 4 photos.",
         "uploadFailed": "The photos did not upload. What you wrote is still here, so please try again.",
-        "coverTooLarge": "A cover photo can be up to 5MB."
+        "unreadable": "This photo could not be read. Please choose another file."
       },
       "cover": "Cover photo",
-      "coverHint": "Shown large at the top of the team page, to everyone. JPEG, PNG or WebP, up to 5MB. Without one, the photo from the latest public post appears.",
+      "coverHint": "Shown large at the top of the team page, to everyone. Large files are made smaller automatically. Without one, the photo from the latest public post appears.",
       "removeCover": "Remove the current cover photo"
     }
   },

@@ -16,6 +16,8 @@ export const TEAM_LIMITS = {
   photoBytes: 5 * MB,
   logoBytes: 2 * MB,
   coverBytes: 5 * MB,
+  // What a person may pick. It is made smaller in the browser before it goes up.
+  inputBytes: 30 * MB,
   pageSize: 10,
 } as const;
 

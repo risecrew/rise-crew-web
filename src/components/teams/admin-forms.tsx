@@ -157,6 +157,14 @@ export function AddMemberForm({ teamId }: { teamId: string }) {
   const locale = useCurrentLocale();
   const [state, action, pending] = useActionState<TeamAdminState, FormData>(addTeamMember, null);
   const fields = state && !state.ok ? (state.fields ?? {}) : {};
+  // Kept here because React empties a form after its action. A refusal leaves the address to fix; a
+  // person who was added clears it for the next one.
+  const [email, setEmail] = useState('');
+  const [seen, setSeen] = useState(state);
+  if (seen !== state) {
+    setSeen(state);
+    if (state?.ok) setEmail('');
+  }
 
   return (
     <form action={action} className="mt-5" noValidate>
@@ -170,6 +178,8 @@ export function AddMemberForm({ teamId }: { teamId: string }) {
           id="member-email"
           name="email"
           type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
           autoComplete="off"
           autoCapitalize="none"
           aria-invalid={fields.email ? true : undefined}

@@ -1,6 +1,7 @@
 'use server';
 
 import type { PostgrestError } from '@supabase/supabase-js';
+import { revalidatePath } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 import { z } from 'zod';
 import { asLocale } from '@/i18n/as-locale';
@@ -68,6 +69,12 @@ function refused(context: Awaited<ReturnType<typeof begin>>): context is TeamAct
   return context === null || 'ok' in context;
 }
 
+// So the back button shows what was saved, not the text from before: the browser keeps pages it has
+// seen, and this tells it to ask again for everything under the team.
+function forgetTeamPages(locale: string, slug: string) {
+  revalidatePath(`/${locale}/startups/${slug}`, 'layout');
+}
+
 const IMAGE_PATH = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
 
 // What the form did with the team's logo or cover: kept it, removed it, or put up a new file.
@@ -127,6 +134,7 @@ export async function saveIntro(_prev: TeamActionState, form: FormData): Promise
   if (cover.changes && team.cover_path && team.cover_path !== cover.path) {
     await supabase.storage.from('team-covers').remove([team.cover_path]);
   }
+  forgetTeamPages(locale, team.slug);
   redirect(`/${locale}/startups/${team.slug}`);
 }
 
@@ -167,6 +175,7 @@ export async function createPost(_prev: TeamActionState, form: FormData): Promis
     const stopped = refusal(error, data);
     if (stopped) return stopped;
   }
+  forgetTeamPages(locale, team.slug);
   redirect(`/${locale}/startups/${team.slug}/posts/${id}`);
 }
 
@@ -207,6 +216,7 @@ export async function updatePost(_prev: TeamActionState, form: FormData): Promis
 
   // Only now are the photos taken off the post unused.
   if (removed.length > 0) await supabase.storage.from('team-post-photos').remove(removed);
+  forgetTeamPages(locale, team.slug);
   redirect(`/${locale}/startups/${team.slug}/posts/${id}`);
 }
 
@@ -232,5 +242,6 @@ export async function deletePost(_prev: TeamActionState, form: FormData): Promis
   if (before.photo_paths.length > 0) {
     await supabase.storage.from('team-post-photos').remove(before.photo_paths);
   }
+  forgetTeamPages(locale, team.slug);
   redirect(`/${locale}/startups/${team.slug}`);
 }

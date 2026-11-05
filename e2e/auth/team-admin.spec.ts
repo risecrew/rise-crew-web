@@ -2,6 +2,7 @@ import { expect, test, type TestInfo } from '@playwright/test';
 import { collectConsoleErrors, expectAccessible, expectNoHorizontalScroll } from '../helpers';
 import {
   addTeamMember,
+  adminClient,
   createOnboardedAccount,
   createPost,
   createTeam,
@@ -13,6 +14,15 @@ import {
 const OPERATOR = 'operator@example.test';
 const GUEST = 'guest@example.test';
 const MEMBER = 'member@example.test';
+
+async function createBlockedAccountFinished(email: string) {
+  const id = await createOnboardedAccount(email, { role: 'member' });
+  const { error } = await adminClient()
+    .from('user_roles')
+    .update({ blocked_at: new Date().toISOString() })
+    .eq('user_id', id);
+  if (error) throw error;
+}
 
 let counter = 0;
 const created: string[] = [];
@@ -128,13 +138,29 @@ test('adding a guest is refused, adding a member lets them post, removing them c
   await page.getByRole('button', { name: '팀원 넣기' }).click();
   await expect(page.getByText('먼저 회원으로 바꿔 주세요')).toBeVisible();
 
+  // A refusal leaves the address in the field, to fix a typo.
   await page.getByLabel('이메일').fill(`nobody-${id}@example.test`);
   await page.getByRole('button', { name: '팀원 넣기' }).click();
   await expect(page.getByText('이 이메일로 가입한 사람이 없어요.')).toBeVisible();
+  await expect(page.getByLabel('이메일')).toHaveValue(`nobody-${id}@example.test`);
+
+  // A pattern is not an address, even if it would match somebody.
+  await page.getByLabel('이메일').fill('*@example.test');
+  await page.getByRole('button', { name: '팀원 넣기' }).click();
+  await expect(page.getByText('이 이메일로 가입한 사람이 없어요.')).toBeVisible();
+
+  // A blocked person is told apart: making them a member would not help.
+  const blockedEmail = `team-blocked-${id}@example.test`;
+  created.push(blockedEmail);
+  await createBlockedAccountFinished(blockedEmail);
+  await page.getByLabel('이메일').fill(blockedEmail);
+  await page.getByRole('button', { name: '팀원 넣기' }).click();
+  await expect(page.getByText('차단된 계정은 팀에 넣을 수 없어요.')).toBeVisible();
 
   await page.getByLabel('이메일').fill(memberEmail);
   await page.getByRole('button', { name: '팀원 넣기' }).click();
   await expect(page.getByRole('listitem').filter({ hasText: memberEmail })).toBeVisible();
+  await expect(page.getByLabel('이메일')).toHaveValue('');
 
   const theirs = await browser.newContext();
   const member = await theirs.newPage();

@@ -12,7 +12,13 @@ import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { getViewer } from '@/lib/auth/viewer';
 import { localizedAlternates } from '@/lib/metadata';
-import { getPost, getTeamAccess, getTeamBySlug, signPhotos } from '@/lib/teams/queries';
+import {
+  getPost,
+  getTeamAccess,
+  getTeamBySlug,
+  signPhotos,
+  teamShareImage,
+} from '@/lib/teams/queries';
 import { isUuid } from '@/lib/teams/query';
 import { postDate } from '@/lib/teams/text';
 
@@ -32,9 +38,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = asLocale(raw);
   const found = await readPost(slug, id);
   if (!found) return {};
+  const { team, post } = found;
+  const path = `/startups/${team.slug}/posts/${post.id}` as const;
+  const image = teamShareImage(team);
   return {
-    title: `${found.post.title} | ${found.team.name}`,
-    alternates: localizedAlternates(locale, `/startups/${found.team.slug}/posts/${found.post.id}`),
+    title: `${post.title} | ${team.name}`,
+    alternates: localizedAlternates(locale, path),
+    // A card only for a post anyone may read: a signed-in post's link tells nothing when shared.
+    ...(post.visibility === 'public' && !post.hidden_at
+      ? {
+          description: post.body.slice(0, 120) || undefined,
+          openGraph: {
+            type: 'article',
+            title: `${post.title} | ${team.name}`,
+            description: post.body.slice(0, 120) || undefined,
+            url: `/${locale}${path}`,
+            ...(image ? { images: [image] } : {}),
+          },
+          twitter: { card: 'summary_large_image' },
+        }
+      : {}),
   };
 }
 

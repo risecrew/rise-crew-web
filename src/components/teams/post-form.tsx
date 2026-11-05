@@ -68,7 +68,7 @@ export function PostForm({ team, post }: Props) {
       return;
     }
     for (const file of files) {
-      const check = checkPhoto(file, TEAM_LIMITS.photoBytes);
+      const check = checkPhoto(file, TEAM_LIMITS.inputBytes);
       if (check !== 'ok') {
         setNotice(check === 'tooLarge' ? t('errors.tooLarge') : t('errors.badType'));
         return;
@@ -94,7 +94,9 @@ export function PostForm({ team, post }: Props) {
               ? t('errors.tooLarge')
               : upload.error === 'badType'
                 ? t('errors.badType')
-                : t('errors.uploadFailed'),
+                : upload.error === 'unreadable'
+                  ? t('errors.unreadable')
+                  : t('errors.uploadFailed'),
           );
           return;
         }

@@ -33,8 +33,8 @@ export type Team = {
 };
 export type TeamCard = Pick<
   Team,
-  'id' | 'slug' | 'name' | 'field' | 'cohort' | 'tagline' | 'logo_path'
->;
+  'id' | 'slug' | 'name' | 'field' | 'cohort' | 'tagline' | 'logo_path' | 'cover_path'
+> & { cover: string | null };
 
 export type Post = {
   id: string;
@@ -47,6 +47,9 @@ export type Post = {
   created_at: string;
   edited_at: string | null;
 };
+
+// A post in a list, with an address for its first photo.
+export type ListedPost = Post & { thumbnail: string | null };
 
 // A page past the end comes back from the Data API as this error. It is an empty page, not a fault.
 const PAGE_OUT_OF_RANGE = 'PGRST103';
@@ -69,7 +72,7 @@ export async function listTeams(
 
   let query = supabase
     .from('teams')
-    .select('id, slug, name, field, cohort, tagline, logo_path', { count: 'exact' })
+    .select('id, slug, name, field, cohort, tagline, logo_path, cover_path', { count: 'exact' })
     .eq('is_published', true);
   if (q.field) query = query.eq('field', q.field);
   if (q.cohort) query = query.eq('cohort', q.cohort);
@@ -87,11 +90,59 @@ export async function listTeams(
   const cohorts = [...new Set((cohortRows.data ?? []).map((row) => row.cohort))].sort(
     (a, b) => b - a,
   );
+  const rows = list.error ? [] : (list.data as Omit<TeamCard, 'cover'>[]);
   return {
-    teams: list.error ? [] : (list.data as TeamCard[]),
+    teams: await withCovers(rows),
     cohorts,
     total: list.count ?? 0,
   };
+}
+
+// The cover of each team in a list, by the same rule as a team's page. One query for the whole
+// list, newest first, keeping the first photo found for each team.
+async function withCovers(rows: Omit<TeamCard, 'cover'>[]): Promise<TeamCard[]> {
+  const needing = rows.filter((team) => !team.cover_path).map((team) => team.id);
+  const photoOf = new Map<string, string>();
+  if (needing.length > 0) {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from('team_posts')
+      .select('team_id, photo_paths')
+      .in('team_id', needing)
+      .eq('visibility', 'public')
+      .is('hidden_at', null)
+      .not('photo_paths', 'eq', '{}')
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    for (const post of data) {
+      if (!photoOf.has(post.team_id)) photoOf.set(post.team_id, post.photo_paths[0]);
+    }
+  }
+  const signed = await signPhotoPairs([...photoOf.values()]);
+  const urlOf = new Map(signed.map((photo) => [photo.path, photo.url]));
+  return rows.map((team) => {
+    const path = photoOf.get(team.id);
+    return {
+      ...team,
+      cover: team.cover_path
+        ? publicCoverUrl(team.cover_path)
+        : path
+          ? (urlOf.get(path) ?? null)
+          : null,
+    };
+  });
+}
+
+function publicCoverUrl(path: string): string {
+  return `${getSupabasePublicConfig().url}/storage/v1/object/public/team-covers/${path}`;
+}
+
+// The picture on a shared link. It must outlast the link, so only the team's own public files count,
+// never a post photo, whose address expires. Next.js falls back to the site's image without one.
+export function teamShareImage(team: Pick<Team, 'cover_path' | 'logo_path'>): string | undefined {
+  if (team.cover_path) return publicCoverUrl(team.cover_path);
+  return logoUrl(team.logo_path) ?? undefined;
 }
 
 // Shared within one request, so the metadata and the page do not query twice.
@@ -148,7 +199,7 @@ export async function listPosts(
   teamId: string,
   page: number,
   countLocked: boolean,
-): Promise<{ posts: Post[]; total: number; lockedCount: number }> {
+): Promise<{ posts: ListedPost[]; total: number; lockedCount: number }> {
   const supabase = await createSupabaseServerClient();
   const [list, locked] = await Promise.all([
     supabase
@@ -164,8 +215,14 @@ export async function listPosts(
   ]);
   if (list.error && list.error.code !== PAGE_OUT_OF_RANGE) throw new Error(list.error.message);
   if (locked.error) throw new Error(locked.error.message);
+  const rows = list.error ? [] : (list.data as Post[]);
+  const signed = await signPhotoPairs(rows.flatMap((post) => post.photo_paths.slice(0, 1)));
+  const urlOf = new Map(signed.map((photo) => [photo.path, photo.url]));
   return {
-    posts: list.error ? [] : (list.data as Post[]),
+    posts: rows.map((post) => ({
+      ...post,
+      thumbnail: post.photo_paths[0] ? (urlOf.get(post.photo_paths[0]) ?? null) : null,
+    })),
     total: list.count ?? 0,
     lockedCount: locked.data ?? 0,
   };
@@ -216,7 +273,7 @@ export async function signPhotoPairs(
 // cover, and a post's photo leaves the cover when the post is hidden or closed.
 export async function getTeamCover(team: Pick<Team, 'id' | 'cover_path'>): Promise<string | null> {
   if (team.cover_path) {
-    return `${getSupabasePublicConfig().url}/storage/v1/object/public/team-covers/${team.cover_path}`;
+    return publicCoverUrl(team.cover_path);
   }
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase

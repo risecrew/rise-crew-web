@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { collectConsoleErrors, expectAccessible, expectNoHorizontalScroll } from '../helpers';
 import {
@@ -50,6 +51,26 @@ const PIXEL = Buffer.from(
 
 function png(name: string) {
   return { name, mimeType: 'image/png', buffer: PIXEL };
+}
+
+// A real photo that is over the old 5MB limit and carries a location tag, the way a phone's would:
+// a metadata segment right after the start of the JPEG, and padding after its end.
+const SECRET = 'GPS-SECRET-LOCATION';
+function phonePhoto(name = 'phone.jpg') {
+  const jpeg = readFileSync('public/images/activities/workshop-2026-01.jpg');
+  const payload = Buffer.from(`Exif\0\0${SECRET}`);
+  const app1 = Buffer.alloc(4 + payload.length);
+  app1[0] = 0xff;
+  app1[1] = 0xe1;
+  app1.writeUInt16BE(payload.length + 2, 2);
+  payload.copy(app1, 4);
+  const buffer = Buffer.concat([
+    jpeg.subarray(0, 2),
+    app1,
+    jpeg.subarray(2),
+    Buffer.alloc(6 * 1024 * 1024),
+  ]);
+  return { name, mimeType: 'image/jpeg', buffer };
 }
 
 async function openNewPost(page: Page, slug: string) {
@@ -267,7 +288,7 @@ test('a chosen cover opens the team page ahead of any post photo, until it is re
   await stranger.close();
 });
 
-test('a cover that is too big is refused before any upload and leaves the field empty', async ({
+test('a cover over 30MB is refused before any upload and leaves the field empty', async ({
   page,
   baseURL,
 }, testInfo) => {
@@ -277,9 +298,9 @@ test('a cover that is too big is refused before any upload and leaves the field 
   await page.getByLabel('표지 사진', { exact: true }).setInputFiles({
     name: 'big.png',
     mimeType: 'image/png',
-    buffer: Buffer.alloc(6 * 1024 * 1024),
+    buffer: Buffer.alloc(31 * 1024 * 1024),
   });
-  await expect(page.getByText('표지 사진은 5MB까지 올릴 수 있어요.')).toBeVisible();
+  await expect(page.getByText('사진은 한 장에 30MB까지 올릴 수 있어요.')).toBeVisible();
   await expect(page.getByLabel('표지 사진', { exact: true })).toHaveValue('');
 });
 
@@ -607,7 +628,7 @@ test('the site asks for photo addresses that last 10 minutes', async ({
   expect(claims.exp - claims.iat).toBe(600);
 });
 
-test('a file that is too big or an SVG is refused before any upload', async ({
+test('a file over 30MB or an SVG is refused before any upload', async ({
   page,
   baseURL,
 }, testInfo) => {
@@ -624,9 +645,9 @@ test('a file that is too big or an SVG is refused before any upload', async ({
   await page.getByLabel('사진 추가').setInputFiles({
     name: 'big.png',
     mimeType: 'image/png',
-    buffer: Buffer.alloc(6 * 1024 * 1024),
+    buffer: Buffer.alloc(31 * 1024 * 1024),
   });
-  await expect(page.getByText('사진은 한 장에 5MB까지 올릴 수 있어요.')).toBeVisible();
+  await expect(page.getByText('사진은 한 장에 30MB까지 올릴 수 있어요.')).toBeVisible();
 
   await page.getByLabel('사진 추가').setInputFiles({
     name: 'x.svg',
@@ -642,6 +663,137 @@ test('a file that is too big or an SVG is refused before any upload', async ({
     page.getByRole('heading', { level: 1, name: `파일 없는 글 ${id}` }),
   ).toBeVisible();
   expect(uploads).toBe(0);
+});
+
+test('a large phone photo goes up smaller and without its location', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug, teamId } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`폰 사진 글 ${id}`);
+  await page.getByLabel('사진 추가').setInputFiles(phonePhoto());
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByRole('heading', { level: 1, name: `폰 사진 글 ${id}` })).toBeVisible();
+  const postId = page.url().split('/').pop()!;
+
+  const [name] = await filesOf(teamId, postId);
+  const { data, error } = await adminClient()
+    .storage.from('team-post-photos')
+    .download(`${teamId}/${postId}/${name}`);
+  if (error) throw error;
+  const bytes = Buffer.from(await data.arrayBuffer());
+  expect(bytes.length).toBeLessThan(2 * 1024 * 1024);
+  expect(bytes.includes(SECRET)).toBe(false);
+  await expect(page.locator('main article img')).toHaveCount(1);
+});
+
+test('a file the browser cannot read as a picture says so, and the text stays', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`못 읽는 사진 ${id}`);
+  await page.getByLabel('사진 추가').setInputFiles({
+    name: 'broken.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from('this is not a picture'),
+  });
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByText('사진을 읽지 못했어요.')).toBeVisible();
+  await expect(page.getByLabel('제목')).toHaveValue(`못 읽는 사진 ${id}`);
+});
+
+test('photos show in the lists, and a closed post leaves them', async ({
+  page,
+  baseURL,
+  browser,
+}, testInfo) => {
+  const { id, email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await openNewPost(page, slug);
+  await page.getByLabel('제목').fill(`썸네일 글 ${id}`);
+  await page.getByLabel('사진 추가').setInputFiles(png('a.png'));
+  await page.getByRole('button', { name: '올리기' }).click();
+  await afterSave(page.getByRole('heading', { level: 1, name: `썸네일 글 ${id}` })).toBeVisible();
+
+  const stranger = await browser.newContext();
+  const visitor = await stranger.newPage();
+  await visitor.goto(`/ko/startups/${slug}`);
+  const row = visitor.getByRole('link', { name: new RegExp(`썸네일 글 ${id}`) });
+  await expect(row.locator('img')).toHaveCount(1);
+  expect(
+    (await visitor.request.get((await row.locator('img').getAttribute('src'))!)).status(),
+  ).toBe(200);
+
+  await page.goto(`/ko/startups/${slug}`);
+  await page.getByRole('link', { name: new RegExp(`썸네일 글 ${id}`) }).click();
+  await page.getByRole('link', { name: '수정', exact: true }).click();
+  await page.getByRole('radio', { name: '가입자만' }).check();
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page).toHaveURL(/\/posts\/[0-9a-f-]+$/);
+
+  await visitor.goto(`/ko/startups/${slug}`);
+  await expect(visitor.getByText(`썸네일 글 ${id}`)).toHaveCount(0);
+  await expect(visitor.locator('main section img[src*="team-post-photos"]')).toHaveCount(0);
+  await stranger.close();
+});
+
+test('going back after a save shows what was saved, not the old text', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const { id, email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await page.goto(`/ko/startups/${slug}`);
+  await page.getByRole('link', { name: '소개 수정' }).click();
+  await page.getByLabel('한 줄 소개').fill(`저장한 한 줄 ${id}`);
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page.getByText(`저장한 한 줄 ${id}`)).toBeVisible();
+  await page.goBack();
+  await expect(page.getByLabel('한 줄 소개')).toHaveValue(`저장한 한 줄 ${id}`);
+});
+
+test('a shared team link carries the team name, its line and its cover', async ({
+  page,
+  baseURL,
+  request,
+}, testInfo) => {
+  const { id, email, slug } = await teamWithMember(testInfo);
+  await signIn(page, email, baseURL!);
+  await page.goto(`/ko/startups/${slug}/edit`);
+  await page.getByLabel('한 줄 소개').fill(`공유되는 한 줄 ${id}`);
+  await page.getByLabel('표지 사진', { exact: true }).setInputFiles(png('cover.png'));
+  await page.getByRole('button', { name: '저장' }).click();
+  await afterSave(page).toHaveURL(new RegExp(`/ko/startups/${slug}$`));
+
+  const html = await (await request.get(`/ko/startups/${slug}`)).text();
+  expect(html).toContain(`property="og:title" content="글쓰는 팀 ${id}`);
+  expect(html).toContain(`property="og:description" content="공유되는 한 줄 ${id}"`);
+  expect(html).toMatch(/property="og:image" content="[^"]*team-covers/);
+  // A shared card must not hold a temporary photo address.
+  expect(html).not.toMatch(/property="og:image" content="[^"]*token=/);
+});
+
+test('a shared public post link carries its title, and a closed one tells nothing', async ({
+  request,
+}, testInfo) => {
+  const { id, email, slug, teamId } = await teamWithMember(testInfo);
+  const open = await createPost(email, teamId, { title: `공유 글 ${id}`, body: '공유 본문' });
+  const closed = await createPost(email, teamId, {
+    title: `비밀 글 ${id}`,
+    body: '비밀 본문',
+    visibility: 'signed_in',
+  });
+  const html = await (await request.get(`/ko/startups/${slug}/posts/${open}`)).text();
+  expect(html).toContain(`property="og:title" content="공유 글 ${id}`);
+  expect(html).toContain('property="og:description" content="공유 본문"');
+  const refused = await request.get(`/ko/startups/${slug}/posts/${closed}`);
+  expect(refused.status()).toBe(404);
+  expect(await refused.text()).not.toContain(`비밀 글 ${id}`);
 });
 
 // The bucket limits are not asked on a copy, so the database policies have to hold them, on the real

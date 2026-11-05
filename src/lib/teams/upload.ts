@@ -1,15 +1,26 @@
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { PHOTO_TYPES, TEAM_LIMITS, checkPhoto } from './forms';
+import { shrinkImage, type ImageKind } from './shrink';
 
-export type UploadError = 'tooLarge' | 'badType' | 'failed';
+export type UploadError = 'tooLarge' | 'badType' | 'unreadable' | 'failed';
 
-function extensionOf(file: File): string {
-  return PHOTO_TYPES[file.type as keyof typeof PHOTO_TYPES];
+function extensionOf(blob: Blob): string {
+  return PHOTO_TYPES[blob.type as keyof typeof PHOTO_TYPES];
+}
+
+// Checks and shrinks one picture. Nothing has gone up yet at this point.
+async function prepare(
+  file: File,
+  kind: ImageKind,
+): Promise<{ blob: Blob } | { error: UploadError }> {
+  const check = checkPhoto(file, TEAM_LIMITS.inputBytes);
+  if (check !== 'ok') return { error: check };
+  return shrinkImage(file, kind);
 }
 
 // Photos go straight from the browser to Storage as the signed-in person: they do not fit through a
-// server action. Storage checks the size, the type and who is asking again, so this check is only
-// here to give a person a sentence instead of a refusal.
+// server action. Storage checks the size, the type and who is asking again, so the checks here are
+// only to give a person a sentence instead of a refusal.
 //
 // All or nothing: when one file fails, the ones already up are taken down again.
 export async function uploadPhotos(
@@ -17,18 +28,20 @@ export async function uploadPhotos(
   postId: string,
   files: File[],
 ): Promise<{ paths: string[] } | { error: UploadError }> {
+  const blobs: Blob[] = [];
   for (const file of files) {
-    const check = checkPhoto(file, TEAM_LIMITS.photoBytes);
-    if (check !== 'ok') return { error: check };
+    const prepared = await prepare(file, 'photo');
+    if ('error' in prepared) return prepared;
+    blobs.push(prepared.blob);
   }
 
   const bucket = createSupabaseBrowserClient().storage.from('team-post-photos');
   const paths: string[] = [];
-  for (const file of files) {
-    const path = `${teamId}/${postId}/${crypto.randomUUID()}.${extensionOf(file)}`;
+  for (const blob of blobs) {
+    const path = `${teamId}/${postId}/${crypto.randomUUID()}.${extensionOf(blob)}`;
     let failed = false;
     try {
-      const { error } = await bucket.upload(path, file, { contentType: file.type, upsert: false });
+      const { error } = await bucket.upload(path, blob, { contentType: blob.type, upsert: false });
       failed = error !== null;
     } catch {
       failed = true;
@@ -54,25 +67,20 @@ export async function removePhotos(paths: string[]): Promise<void> {
 
 type TeamImageBucket = 'team-logos' | 'team-covers';
 
-const IMAGE_LIMITS: Record<TeamImageBucket, number> = {
-  'team-logos': TEAM_LIMITS.logoBytes,
-  'team-covers': TEAM_LIMITS.coverBytes,
-};
-
 // A team's logo or cover: one public file in the team's folder.
 export async function uploadTeamImage(
   bucket: TeamImageBucket,
   teamId: string,
   file: File,
 ): Promise<{ path: string } | { error: UploadError }> {
-  const check = checkPhoto(file, IMAGE_LIMITS[bucket]);
-  if (check !== 'ok') return { error: check };
+  const prepared = await prepare(file, bucket === 'team-logos' ? 'logo' : 'cover');
+  if ('error' in prepared) return prepared;
 
-  const path = `${teamId}/${crypto.randomUUID()}.${extensionOf(file)}`;
+  const path = `${teamId}/${crypto.randomUUID()}.${extensionOf(prepared.blob)}`;
   try {
     const { error } = await createSupabaseBrowserClient()
       .storage.from(bucket)
-      .upload(path, file, { contentType: file.type, upsert: false });
+      .upload(path, prepared.blob, { contentType: prepared.blob.type, upsert: false });
     return error ? { error: 'failed' } : { path };
   } catch {
     return { error: 'failed' };

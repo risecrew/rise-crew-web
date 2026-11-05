@@ -98,6 +98,13 @@ test('nonsense in the address is ignored, not an error', async ({ request }) => 
   expect((await request.get(`/ko/startups/${SLUG}?page=abc`)).status()).toBe(200);
 });
 
+test('a team row shows its cover when it has one, and none otherwise', async ({ page }) => {
+  await page.goto(`/ko/startups?cohort=${cohort}`);
+  const row = page.getByRole('link', { name: new RegExp(`다른 팀 ${stamp}`) });
+  await expect(row).toBeVisible();
+  await expect(row.locator('img[src*="team-"]')).toHaveCount(0);
+});
+
 test('a filter nothing matches says so', async ({ page }) => {
   await page.goto('/ko/startups?cohort=9999&field=healthcare');
   await expect(page.getByText('조건에 맞는 팀이 없어요.')).toBeVisible();

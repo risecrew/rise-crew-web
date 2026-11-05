@@ -20,6 +20,7 @@ import {
   listPosts,
   logoUrl,
   pageCount,
+  teamShareImage,
 } from '@/lib/teams/queries';
 import { parseTeamsQuery } from '@/lib/teams/query';
 
@@ -34,10 +35,20 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   const locale = asLocale(raw);
   const team = await getTeamBySlug(slug);
   if (!team) return {};
+  const description = team.tagline || team.intro.slice(0, 120) || undefined;
+  const image = teamShareImage(team);
   return {
     title: team.name,
-    description: team.tagline || undefined,
+    description,
     alternates: localizedAlternates(locale, `/startups/${team.slug}`),
+    openGraph: {
+      type: 'website',
+      title: `${team.name} | RISE CREW`,
+      description,
+      url: `/${locale}/startups/${team.slug}`,
+      ...(image ? { images: [image] } : {}),
+    },
+    twitter: { card: 'summary_large_image' },
   };
 }
 

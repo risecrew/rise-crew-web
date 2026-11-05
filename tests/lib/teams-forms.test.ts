@@ -41,6 +41,7 @@ describe('TEAM_LIMITS', () => {
       photoBytes: 5 * MB,
       logoBytes: 2 * MB,
       coverBytes: 5 * MB,
+      inputBytes: 30 * MB,
       pageSize: 10,
     });
   });

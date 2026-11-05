@@ -7,7 +7,7 @@ import { saveIntro, type TeamActionState } from '@/app/[locale]/startups/[slug]/
 import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { Link } from '@/i18n/navigation';
 import { TEAM_LIMITS, TEAM_LINK_KINDS, checkPhoto, type TeamLink } from '@/lib/teams/forms';
-import { removeTeamImage, uploadTeamImage } from '@/lib/teams/upload';
+import { removeTeamImage, uploadTeamImage, type UploadError } from '@/lib/teams/upload';
 import { AREA, FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from './form-parts';
 
 type Props = {
@@ -53,24 +53,26 @@ export function IntroForm({ team }: Props) {
   }
 
   // A refused file does not stay named in the field, where it would look chosen.
-  function pickImage(
-    input: HTMLInputElement,
-    maxBytes: number,
-    tooLarge: string,
-    keep: (file: File | null) => void,
-  ) {
+  function pickImage(input: HTMLInputElement, keep: (file: File | null) => void) {
     const file = input.files?.[0] ?? null;
     setNotice(null);
     if (file) {
-      const check = checkPhoto(file, maxBytes);
+      const check = checkPhoto(file, TEAM_LIMITS.inputBytes);
       if (check !== 'ok') {
-        setNotice(check === 'tooLarge' ? tooLarge : t('errors.badType'));
+        setNotice(check === 'tooLarge' ? t('errors.tooLarge') : t('errors.badType'));
         keep(null);
         input.value = '';
         return;
       }
     }
     keep(file);
+  }
+
+  function uploadSentence(error: UploadError): string {
+    if (error === 'tooLarge') return t('errors.tooLarge');
+    if (error === 'badType') return t('errors.badType');
+    if (error === 'unreadable') return t('errors.unreadable');
+    return t('errors.uploadFailed');
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -83,7 +85,7 @@ export function IntroForm({ team }: Props) {
       if (logo) {
         const result = await uploadTeamImage('team-logos', team.id, logo);
         if ('error' in result) {
-          setNotice(t('errors.uploadFailed'));
+          setNotice(uploadSentence(result.error));
           return;
         }
         newLogo = result.path;
@@ -92,7 +94,7 @@ export function IntroForm({ team }: Props) {
       if (cover) {
         const result = await uploadTeamImage('team-covers', team.id, cover);
         if ('error' in result) {
-          setNotice(t('errors.uploadFailed'));
+          setNotice(uploadSentence(result.error));
           if (newLogo) await removeTeamImage('team-logos', newLogo);
           return;
         }
@@ -142,9 +144,7 @@ export function IntroForm({ team }: Props) {
           id="team-logo"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(event) =>
-            pickImage(event.target, TEAM_LIMITS.logoBytes, t('errors.logoTooLarge'), setLogo)
-          }
+          onChange={(event) => pickImage(event.target, setLogo)}
           className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white"
         />
         <p className="mt-2 px-2 text-sm text-white/75">{t('logoHint')}</p>
@@ -169,9 +169,7 @@ export function IntroForm({ team }: Props) {
           id="team-cover"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(event) =>
-            pickImage(event.target, TEAM_LIMITS.coverBytes, t('errors.coverTooLarge'), setCover)
-          }
+          onChange={(event) => pickImage(event.target, setCover)}
           className="mt-3 block w-full text-base text-white/85 file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-white/50 file:bg-transparent file:px-5 file:py-2.5 file:font-semibold file:text-white"
         />
         <p className="mt-2 px-2 text-sm break-keep text-white/75">{t('coverHint')}</p>
