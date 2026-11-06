@@ -36,6 +36,8 @@ update public.user_roles set role = 'operator'
 update public.user_roles set blocked_at = now()
  where user_id = '7e5c0000-0000-4000-8000-000000000003';
 
+-- Notices others left on a local stack do not count here. All of this rolls back.
+delete from public.notices;
 insert into public.notices (id, title_ko, body_ko) values
   ('7e5c0000-0000-4000-8000-00000000a001', '기존 공지', '본문');
 insert into storage.objects (bucket_id, name) values
@@ -45,7 +47,11 @@ select results_eq(
   $$select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'activity-photos'$$,
   $$values (true, 5242880::bigint, array['image/jpeg', 'image/png', 'image/webp']::text[])$$,
   'the bucket is public, with the same limits as a post photo');
-select is((select count(*)::integer from public.activities), 15, 'the 15 activities moved over');
+-- The moved rows went in together, so they share a created_at. Anything added later does not.
+select is(
+  (select count(*)::integer from public.activities
+    where created_at = (select min(created_at) from public.activities)),
+  15, 'the 15 activities moved over');
 select is(
   (select count(*)::integer from public.activities where is_planned), 2,
   'the two planned events stay planned');
@@ -57,7 +63,7 @@ select is(
 set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
-select is((select count(*)::integer from public.activities), 15, 'anon reads activities');
+select ok((select count(*) from public.activities) >= 15, 'anon reads activities');
 select is((select count(*)::integer from public.notices), 1, 'anon reads notices');
 select throws_ok(
   $$insert into public.notices (title_ko, body_ko) values ('x', 'x')$$,
