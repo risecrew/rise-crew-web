@@ -45,9 +45,9 @@ export async function SiteHeader() {
       >
         {t('skip')}
       </a>
-      {/* The same side padding as the home's opening, edge to edge: the logo stands over the R of
-          the slogan and the last item over the hero's button. */}
-      <div className="flex items-center justify-between gap-6 px-5 py-5 md:px-10">
+      {/* The content width every page uses; the home's opening sets its slogan in the same width,
+          so the logo stands over the R and the last item over the hero's button. */}
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-5 md:px-10">
         <Link href="/" className="flex items-center gap-2 text-white">
           <RiseSymbol className="h-8 w-auto" />
           <span className="font-display text-lg font-[800] tracking-wide">RISE CREW</span>

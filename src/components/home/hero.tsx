@@ -47,7 +47,9 @@ export async function Hero({
         ) : null
       }
     >
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-8 px-5 pb-14 md:flex-row md:items-end md:justify-between md:px-10 md:pb-16">
+      {/* The slogan and the buttons sit in the content width the header uses, so they line up with
+          it on every screen. */}
+      <div className="absolute inset-x-0 bottom-0 mx-auto flex max-w-7xl flex-col gap-8 px-5 pb-14 md:flex-row md:items-end md:justify-between md:px-10 md:pb-16">
         <div>
           <h1 lang="en" className="font-display text-hero text-white">
             {/* Read as four plain lines; the split below is only how they are drawn. */}
