@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import type { NextRequest } from 'next/server';
 import {
   authRouteLocale,
@@ -11,13 +12,13 @@ import {
 import { safeNext } from '@/lib/auth/redirect';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-// Where an emailed link lands: `?next=...&token_hash=...&type=...`. The type is `signup` for the first
-// mail to a new address, `recovery` for a password reset, `email` for a sign-in link. A new account
-// and a reset go on to choose a password; a password set before the mail was confirmed has been
-// cleared by then (see the migration). The one-time token is checked here, on the server, so the link
-// works in any browser, including the in-app browser of a mail app, and on whichever address asked
-// for it (the email template builds the link from the address given when asking).
+// No mail links here: the mails carry codes, entered on the screen that asked for them. A GET that
+// signs the browser in cannot tell whether this browser asked for it, so a link to here could put a
+// visitor into somebody else's account. It answers only where AUTH_CONFIRM_ROUTE is on, which is the
+// accounts e2e (playwright.auth.config.ts), whose tests use it to sign in without a mail. Never set it
+// on Vercel.
 export async function GET(request: NextRequest, context: AuthRouteParams) {
+  if (process.env.AUTH_CONFIRM_ROUTE !== 'on') notFound();
   const locale = await authRouteLocale(context);
   const { searchParams } = request.nextUrl;
 

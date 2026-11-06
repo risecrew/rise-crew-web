@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { expect, type BrowserContext, type Cookie, type Page } from '@playwright/test';
-import { clearMessagesFor, latestLinkFor } from './mailpit';
 
 // The local stack's address and keys, put in the environment by playwright.auth.config.ts.
 function localEnv(name: string): string {
@@ -15,33 +14,25 @@ export function anonymousClient() {
   });
 }
 
-// Asks the local Supabase Auth for a sign-in email, the way the login form does, and returns the
-// link from it. `emailRedirectTo` names this site (`origin`, the server under test) and always
-// holds a "?": the email template adds the token to it with "&token_hash=...".
+// A one-time sign-in link for `email`, made by the Auth admin API, so no mail goes out. It makes the
+// account if there is none. The mails carry codes; tests that are about them enter the code. `origin`
+// is the server under test.
 export async function requestSignInLink(
   email: string,
   origin: string,
   { locale = 'ko', next = `/${locale}` }: { locale?: string; next?: string } = {},
 ): Promise<string> {
-  await clearMessagesFor(email);
-  const options = {
-    emailRedirectTo: `${origin}/${locale}/auth/confirm?next=${encodeURIComponent(next)}`,
-  };
-
-  // Auth lets one account ask for an email once a second. Two tests in a row can land inside that
-  // second, so a refusal for that reason is retried.
-  for (let attempt = 1; ; attempt++) {
-    const { error } = await anonymousClient().auth.signInWithOtp({ email, options });
-    if (!error) break;
-    if (error.code !== 'over_email_send_rate_limit' || attempt === 4) throw error;
-    await new Promise((resolve) => setTimeout(resolve, 1100));
-  }
-  // The first mail to a new address leads to the password step, which these tests are not about.
-  // Its token also works as a plain sign-in link.
-  return (await latestLinkFor(email)).replace('type=signup', 'type=email');
+  const { data, error } = await adminClient().auth.admin.generateLink({ type: 'magiclink', email });
+  if (error) throw error;
+  const query = new URLSearchParams({
+    next,
+    token_hash: data.properties.hashed_token,
+    type: 'email',
+  });
+  return `${origin}/${locale}/auth/confirm?${query}`;
 }
 
-// Signs `page` in through an emailed link and waits for the page to go quiet. Right after landing,
+// Signs `page` in through a one-time link and waits for the page to go quiet. Right after landing,
 // the router prefetches the other pages, and a prefetch that is still running when a test changes
 // the session would answer with cookies of its own and undo the change.
 export async function signIn(page: Page, email: string, origin: string): Promise<void> {

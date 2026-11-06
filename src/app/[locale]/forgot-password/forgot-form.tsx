@@ -15,7 +15,7 @@ import {
 import { InboxScreen } from '@/components/auth/inbox-screen';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
-import { confirmUrl, isEmailAddress } from '@/lib/auth/login';
+import { isEmailAddress } from '@/lib/auth/login';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { cn } from '@/lib/utils';
 
@@ -27,8 +27,9 @@ type Props = {
 };
 type Notice = 'sendFailed' | 'tooMany';
 
-// Asks for the mail that opens the new-password screen. Nothing changes until its owner uses the
-// link. Every address gets the same answer, so this form cannot be used to find out who has signed up.
+// Asks for the mail with the code that opens the new-password screen. Nothing changes until its owner
+// uses the code. The screen looks the same for every address. Auth itself refuses a second request
+// for a known address made too soon, which the site cannot hide, so this is no promise of secrecy.
 export function ForgotForm({ locale, next, email: known }: Props) {
   const t = useTranslations('Auth.forgot');
   const login = useTranslations('Auth.login');
@@ -44,9 +45,7 @@ export function ForgotForm({ locale, next, email: known }: Props) {
   async function send(address: string): Promise<Notice | null> {
     let error: { status?: number; code?: string } | null;
     try {
-      ({ error } = await createSupabaseBrowserClient().auth.resetPasswordForEmail(address, {
-        redirectTo: confirmUrl(window.location.origin, locale, next),
-      }));
+      ({ error } = await createSupabaseBrowserClient().auth.resetPasswordForEmail(address));
     } catch {
       error = {};
     }

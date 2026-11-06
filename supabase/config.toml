@@ -230,9 +230,9 @@ secure_password_change = true
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
-otp_length = 6
-# Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+otp_length = 8
+# Number of seconds before the email OTP expires. Also OTP_LENGTH in src/lib/auth/login.ts.
+otp_expiry = 600
 
 # Use a production-ready SMTP server
 # [auth.email.smtp]
@@ -244,23 +244,19 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# The sign-in email: Korean first, then English. Its link carries the one-time token (token_hash),
-# so it works when opened in another browser or an in-app browser. The page asking for the link
-# passes emailRedirectTo as <origin>/<locale>/auth/confirm?next=..., which already holds a "?";
-# that is why the template appends "&token_hash=...".
+# The mails: Korean first, then English. Each carries a code to enter on the screen that asked for it,
+# not a link, because a link opens another window. Keep "RISE CREW" at the start of every subject: the
+# Gmail filter that clears sent copies matches it (see CONTRIBUTING.md).
 [auth.email.template.magic_link]
-subject = "RISE CREW 로그인 링크 / Sign-in link"
+subject = "RISE CREW 로그인 인증번호 / Your sign-in code"
 content_path = "./supabase/templates/magic_link.html"
 
-# The mail that confirms a new address, and the one that opens the new-password screen. Their links
-# work the same way as the one above. Keep "RISE CREW" at the start of every subject: the Gmail
-# filter that clears sent copies matches it (see CONTRIBUTING.md).
 [auth.email.template.confirmation]
-subject = "RISE CREW 가입 확인 / Confirm your email"
+subject = "RISE CREW 가입 인증번호 / Your sign-up code"
 content_path = "./supabase/templates/confirmation.html"
 
 [auth.email.template.recovery]
-subject = "RISE CREW 비밀번호 재설정 / Reset your password"
+subject = "RISE CREW 비밀번호 재설정 인증번호 / Your password reset code"
 content_path = "./supabase/templates/recovery.html"
 
 # Uncomment to customize email template

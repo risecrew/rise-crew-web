@@ -35,9 +35,13 @@ export default async function ResetPasswordPage({ params, searchParams }: Props)
   if (!viewer) redirect(`/${locale}/login?error=link`);
   if (viewer.blocked) redirect(`/${locale}/login?error=blocked`);
 
+  // Someone who "signed up" with an address that already has a finished account has simply signed in.
+  const first = single(query.first) === '1';
+  if (first && viewer.onboarded) redirect(next);
+
   return (
     <AccountLayout>
-      <ResetForm locale={locale} next={next} first={single(query.first) === '1'} />
+      <ResetForm locale={locale} next={next} first={first} />
     </AccountLayout>
   );
 }

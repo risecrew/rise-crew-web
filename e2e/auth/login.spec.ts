@@ -13,7 +13,7 @@ import {
   requestSignInLink,
   signIn,
 } from './helpers';
-import { clearMessagesFor, latestLinkFor } from './mailpit';
+import { clearMessagesFor, latestCodeFor } from './mailpit';
 
 // Phones keep the account entries inside the menu panel; on a desktop they sit in the bar.
 async function openMenu(page: Page) {
@@ -31,8 +31,8 @@ function initialCircle(page: Page) {
   return page.locator('header [data-account-initial]:visible');
 }
 
-// The newest mail's link right now, without waiting for one to arrive.
-async function latestLinkForNow(email: string): Promise<string | null> {
+// The newest mail's id right now, without waiting for one to arrive.
+async function newestMailFor(email: string): Promise<string | null> {
   const base = process.env.E2E_MAILPIT_URL ?? 'http://127.0.0.1:54324';
   const query = encodeURIComponent(`to:${email}`);
   const response = await fetch(`${base}/api/v1/search?query=${query}`);
@@ -225,6 +225,11 @@ async function signUpForm(page: Page, email: string) {
   await page.getByRole('button', { name: '가입하기' }).click();
 }
 
+async function enterCode(page: Page, code: string) {
+  await page.getByLabel('인증번호').fill(code);
+  await page.getByRole('button', { name: '확인', exact: true }).click();
+}
+
 function uniqueEmail(name: string, testInfo: { project: { name: string } }) {
   return `${name}-${testInfo.project.name}-${Date.now()}@example.test`;
 }
@@ -248,7 +253,7 @@ test('an email and password sign in without any mail, and go where the visitor w
     await expect(
       page.locator('header').getByRole('link', { name: '로그인', exact: true }),
     ).toHaveCount(0);
-    expect(await latestLinkForNow(email)).toBeNull();
+    expect(await newestMailFor(email)).toBeNull();
   } finally {
     await deleteAccount(email);
   }
@@ -290,7 +295,7 @@ test('the password can be shown, and has what a password manager looks for', asy
   await expectNoHorizontalScroll(page);
 });
 
-test('signing up confirms the address once, then the password works from then on', async ({
+test('signing up happens in one window: code, password, then the password works from then on', async ({
   page,
   context,
   baseURL,
@@ -303,18 +308,18 @@ test('signing up confirms the address once, then the password works from then on
       page.getByRole('heading', { level: 1, name: '메일함을 확인해 주세요' }),
     ).toBeVisible();
     await expect(page.getByText(email)).toBeVisible();
-    await expect(page.getByRole('button', { name: /링크 다시 받기/ })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /인증번호 다시 받기/ })).toBeDisabled();
+    await expect(page.getByLabel('인증번호')).toHaveAttribute('autocomplete', 'one-time-code');
+    await expect(page.getByLabel('인증번호')).toHaveAttribute('inputmode', 'numeric');
     await expectAccessible(page);
+    await expectNoHorizontalScroll(page);
 
-    const link = new URL(await latestLinkFor(email));
-    expect(link.origin).toBe(baseURL);
-    expect(link.pathname).toBe('/ko/auth/confirm');
-    expect(link.searchParams.get('next')).toBe('/ko/about');
-    expect(link.searchParams.get('type')).toBe('signup');
-    await page.goto(link.toString());
-    await expect(page).toHaveURL(/\/ko\/reset-password\?next=%2Fko%2Fabout&first=1$/);
+    await enterCode(page, await latestCodeFor(email));
+    await expect(page).toHaveURL(`${baseURL}/ko/reset-password?next=%2Fko%2Fabout&first=1`);
     await expect(page.getByRole('heading', { level: 1, name: '비밀번호 정하기' })).toBeVisible();
     await expectAccessible(page);
+    // Nothing opened another window.
+    expect(context.pages()).toHaveLength(1);
 
     // The rule is checked here now, before anything is saved.
     for (const weak of ['short1', 'onlyletters']) {
@@ -338,7 +343,33 @@ test('signing up confirms the address once, then the password works from then on
   }
 });
 
-test('signing up with an address that has an account looks the same and sends a sign-in link', async ({
+test('a wrong code is refused and can be tried again, a short one is not sent at all', async ({
+  page,
+}, testInfo) => {
+  const email = uniqueEmail('code', testInfo);
+  try {
+    await page.goto('/ko/signup');
+    await signUpForm(page, email);
+    const code = await latestCodeFor(email);
+
+    await enterCode(page, '123');
+    await expect(notice(page)).toContainText('인증번호 8자리를 입력해 주세요.');
+
+    await page.getByLabel('인증번호').fill('abc-12');
+    await expect(page.getByLabel('인증번호')).toHaveValue('12');
+
+    await enterCode(page, code === '00000000' ? '11111111' : '00000000');
+    await expect(notice(page)).toContainText('번호가 맞지 않거나 만료됐어요.');
+    await expect(page.getByLabel('인증번호')).toHaveValue('');
+
+    await enterCode(page, code);
+    await expect(page).toHaveURL(/\/ko\/reset-password/);
+  } finally {
+    await deleteAccount(email);
+  }
+});
+
+test('signing up with a finished account looks the same, and its code simply signs in', async ({
   page,
   baseURL,
 }, testInfo) => {
@@ -352,94 +383,45 @@ test('signing up with an address that has an account looks the same and sends a 
     await signUpForm(page, email);
     await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
 
-    const link = new URL(await latestLinkFor(email));
-    expect(link.searchParams.get('type')).toBe('email');
-    await page.goto(link.toString());
+    await enterCode(page, await latestCodeFor(email));
     await expect(page).toHaveURL(`${baseURL}/ko`);
   } finally {
     await deleteAccount(email);
   }
 });
 
-test('the waiting tab moves on by itself once the link was opened in another tab', async ({
-  page,
-  context,
-}, testInfo) => {
-  const email = uniqueEmail('waiting', testInfo);
-  try {
-    await page.goto('/ko/signup?next=%2Fko%2Fabout');
-    await signUpForm(page, email);
-    await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
-
-    const mailTab = await context.newPage();
-    await mailTab.goto(await latestLinkFor(email));
-    await expect(mailTab).toHaveURL(/\/ko\/reset-password/);
-    await mailTab.close();
-
-    await expect(page).toHaveURL(/\/ko\/reset-password\?first=1&next=%2Fko%2Fabout$/);
-  } finally {
-    await deleteAccount(email);
-  }
-});
-
-test('the waiting screen stays put for a session this browser already had', async ({
-  page,
-  baseURL,
-}, testInfo) => {
-  const signedIn = uniqueEmail('had', testInfo);
-  const other = uniqueEmail('other', testInfo);
-  await createPasswordAccount(signedIn);
-  try {
-    await page.goto(await requestSignInLink(signedIn, baseURL!));
-    await expect(page).toHaveURL(/\/ko\/welcome/);
-    await page.goto('/ko/signup');
-    await signUpForm(page, other);
-
-    const heading = page.getByRole('heading', { name: '메일함을 확인해 주세요' });
-    await expect(heading).toBeVisible();
-    await page.waitForTimeout(3_000);
-    await expect(heading).toBeVisible();
-  } finally {
-    await deleteAccount(signedIn);
-    await deleteAccount(other);
-  }
-});
-
-test('the English sign-up sends the visitor back to the English page', async ({
-  page,
-}, testInfo) => {
+test('the English sign-up keeps the English pages', async ({ page }, testInfo) => {
   const email = uniqueEmail('english', testInfo);
   try {
     await page.goto('/en/signup?next=%2Fen%2Fabout');
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Sign up' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible();
-
-    const link = new URL(await latestLinkFor(email));
-    expect(link.pathname).toBe('/en/auth/confirm');
-    await page.goto(link.toString());
+    await page.getByLabel('Code').fill(await latestCodeFor(email));
+    await page.getByRole('button', { name: 'Confirm', exact: true }).click();
     await expect(page).toHaveURL(/\/en\/reset-password\?next=%2Fen%2Fabout&first=1$/);
   } finally {
     await deleteAccount(email);
   }
 });
 
-test('a next that leaves the site or the language is not carried into the link', async ({
+test('a next that leaves the site or the language is not followed after the code', async ({
   page,
+  baseURL,
 }, testInfo) => {
   const email = uniqueEmail('next', testInfo);
   try {
     await page.goto('/ko/signup?next=https%3A%2F%2Fevil.example%2Fko');
     await signUpForm(page, email);
-    await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
-    expect(new URL(await latestLinkFor(email)).searchParams.get('next')).toBe('/ko');
+    await enterCode(page, await latestCodeFor(email));
+    await expect(page).toHaveURL(`${baseURL}/ko/reset-password?next=%2Fko&first=1`);
   } finally {
     await deleteAccount(email);
   }
 });
 
 test.describe('a forgotten password', () => {
-  test('is reset through the mail: the old one stops working and other devices are signed out', async ({
+  test('is reset with a mailed code: the old one stops working and other devices are signed out', async ({
     page,
   }, testInfo) => {
     const email = uniqueEmail('reset', testInfo);
@@ -458,17 +440,16 @@ test.describe('a forgotten password', () => {
       await page.getByRole('link', { name: '비밀번호를 잊었어요' }).click();
       await expect(page).toHaveURL(/\/ko\/forgot-password$/);
       await page.getByLabel('이메일').fill(email);
-      await page.getByRole('button', { name: '재설정 링크 받기' }).click();
+      await page.getByRole('button', { name: '인증번호 받기' }).click();
       await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
 
-      // Asking changes nothing: the old password still works until the link is used.
-      const link = new URL(await latestLinkFor(email));
-      expect(link.pathname).toBe('/ko/auth/confirm');
-      expect(link.searchParams.get('type')).toBe('recovery');
+      // Asking changes nothing: the old password still works until the code is used.
+      const code = await latestCodeFor(email);
       expect((await anonymousSignIn(email, TEST_PASSWORD)).error).toBeNull();
 
-      await page.goto(link.toString());
+      await enterCode(page, code);
       await expect(page).toHaveURL(/\/ko\/reset-password/);
+      await expect(page.getByRole('heading', { level: 1, name: '새 비밀번호' })).toBeVisible();
       await expectAccessible(page);
 
       await passwordBox(page, '새 비밀번호').fill('short1');
@@ -498,26 +479,30 @@ test.describe('a forgotten password', () => {
     const email = uniqueEmail('nobody', testInfo);
     await page.goto('/ko/forgot-password');
     await page.getByLabel('이메일').fill(email);
-    await page.getByRole('button', { name: '재설정 링크 받기' }).click();
+    await page.getByRole('button', { name: '인증번호 받기' }).click();
     await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
     await page.waitForTimeout(1_000);
-    expect(await latestLinkForNow(email)).toBeNull();
+    expect(await newestMailFor(email)).toBeNull();
   });
 
-  test('a reset link can be used only once', async ({ page, context, baseURL }, testInfo) => {
+  test('a code can be used only once', async ({ page, context }, testInfo) => {
     const email = uniqueEmail('once', testInfo);
     await createPasswordAccount(email);
     try {
       await page.goto('/ko/forgot-password');
       await page.getByLabel('이메일').fill(email);
-      await page.getByRole('button', { name: '재설정 링크 받기' }).click();
-      await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
-      const link = await latestLinkFor(email);
-      await page.goto(link);
+      await page.getByRole('button', { name: '인증번호 받기' }).click();
+      const code = await latestCodeFor(email);
+      await enterCode(page, code);
       await expect(page).toHaveURL(/\/ko\/reset-password/);
+
       await context.clearCookies();
-      await page.goto(link);
-      await expect(page).toHaveURL(`${baseURL}/ko/login?error=link`);
+      const again = await anonymousClient().auth.verifyOtp({
+        email,
+        token: code,
+        type: 'recovery',
+      });
+      expect(again.error).not.toBeNull();
     } finally {
       await deleteAccount(email);
     }
@@ -528,7 +513,7 @@ test.describe('a forgotten password', () => {
     await expect(page).toHaveURL(`${baseURL}/ko/login?error=link`);
   });
 
-  test('the resend button works once a minute has passed, and the address can be changed', async ({
+  test('a new code can be asked for once a minute has passed, and the address can be changed', async ({
     page,
   }, testInfo) => {
     const email = uniqueEmail('resend', testInfo);
@@ -537,10 +522,10 @@ test.describe('a forgotten password', () => {
       await page.clock.install();
       await page.goto('/ko/forgot-password');
       await page.getByLabel('이메일').fill(email);
-      await page.getByRole('button', { name: '재설정 링크 받기' }).click();
+      await page.getByRole('button', { name: '인증번호 받기' }).click();
       await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
 
-      const resend = page.getByRole('button', { name: /링크 다시 받기/ });
+      const resend = page.getByRole('button', { name: /인증번호 다시 받기/ });
       await expect(resend).toBeDisabled();
       await page.clock.fastForward(30_000);
       await expect(resend).toBeDisabled();
@@ -550,7 +535,7 @@ test.describe('a forgotten password', () => {
       // The page's clock is fake, but Auth's one-email-a-second limit runs on real time.
       await new Promise((resolve) => setTimeout(resolve, 1200));
       await resend.click();
-      await expect(page.getByText('링크를 다시 보냈어요.')).toBeVisible();
+      await expect(page.getByText('인증번호를 다시 보냈어요.')).toBeVisible();
       await expect(resend).toBeDisabled();
 
       // DESIGN.md's Outline pill: a 50% white border (0.5, not 0.25).

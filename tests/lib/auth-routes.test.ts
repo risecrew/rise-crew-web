@@ -183,6 +183,19 @@ describe('finishSignIn', () => {
 });
 
 describe('GET /{locale}/auth/confirm', () => {
+  beforeEach(() => {
+    vi.stubEnv('AUTH_CONFIRM_ROUTE', 'on');
+  });
+
+  it('is not a page anywhere the switch is off, and asks Supabase nothing', async () => {
+    vi.stubEnv('AUTH_CONFIRM_ROUTE', '');
+    const auth = fakeSupabase();
+    await expect(
+      confirm(request('/ko/auth/confirm?token_hash=abc&type=email'), params('ko')),
+    ).rejects.toThrow();
+    expect(auth.verifyOtp).not.toHaveBeenCalled();
+  });
+
   it('verifies the one-time token as an email token and finishes the sign-in', async () => {
     const auth = fakeSupabase();
     viewer(true);

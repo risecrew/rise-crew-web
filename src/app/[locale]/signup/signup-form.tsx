@@ -16,7 +16,7 @@ import { GoogleButton } from '@/components/auth/google-button';
 import { InboxScreen } from '@/components/auth/inbox-screen';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
-import { confirmUrl, isEmailAddress } from '@/lib/auth/login';
+import { isEmailAddress } from '@/lib/auth/login';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { cn } from '@/lib/utils';
 
@@ -31,7 +31,7 @@ function mailProblem(error: { status?: number; code?: string }): 'sendFailed' | 
 
 // A new account by email: the address first, and the password after the mail confirms it, because a
 // password chosen before that proves nothing (see the migration that clears one). An address that
-// already has an account gets the same screen and a sign-in link, so this form cannot be used to find
+// already has an account gets the same screen and a sign-in code, so this form cannot be used to find
 // out who has signed up.
 export function SignupForm({ locale, next }: Props) {
   const t = useTranslations('Auth.signup');
@@ -49,10 +49,7 @@ export function SignupForm({ locale, next }: Props) {
   async function send(address: string): Promise<'sendFailed' | 'tooMany' | null> {
     let error: { status?: number; code?: string } | null;
     try {
-      ({ error } = await createSupabaseBrowserClient().auth.signInWithOtp({
-        email: address,
-        options: { emailRedirectTo: confirmUrl(window.location.origin, locale, next) },
-      }));
+      ({ error } = await createSupabaseBrowserClient().auth.signInWithOtp({ email: address }));
     } catch {
       error = {};
     }

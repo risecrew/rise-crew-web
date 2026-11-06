@@ -128,10 +128,11 @@ pnpm exec supabase migration list --linked   # 로컬과 원격의 목록이 같
 ### 4. 로그인 메일: SMTP, 메일 양식, 필터
 
 - **SMTP**: 대시보드의 SMTP 설정을 켭니다. Host `smtp.gmail.com`, Port `465`, 사용자와 보내는 사람은 웹사이트 전용 Google 계정, 비밀번호는 그 계정의 **앱 비밀번호**입니다. 앱 비밀번호는 2단계 인증을 켠 뒤 Google 계정에서 만듭니다. Gmail은 하루 발송량에 한도가 있습니다.
-- **메일 양식**: Authentication의 Email Templates에서 세 양식을 저장소의 파일 내용으로 바꿉니다. 제목은 `supabase/config.toml`에 있는 값을 그대로 씁니다.
-  - "Confirm signup": `supabase/templates/confirmation.html`, 제목 `RISE CREW 가입 확인 / Confirm your email`
-  - "Reset password": `supabase/templates/recovery.html`, 제목 `RISE CREW 비밀번호 재설정 / Reset your password`
-  - "Magic Link": `supabase/templates/magic_link.html`, 제목 `RISE CREW 로그인 링크 / Sign-in link`. 화면에서는 쓰지 않지만 Auth API에는 남아 있는 기능이라 같은 형식으로 둡니다.
+- **메일 양식**: 메일에는 링크가 아니라 인증번호가 들어갑니다. Authentication의 Email Templates에서 세 양식을 저장소의 파일 내용으로 바꿉니다. 제목은 아래와 같습니다.
+  - "Confirm signup": `supabase/templates/confirmation.html`, 제목 `RISE CREW 가입 인증번호 / Your sign-up code`
+  - "Reset password": `supabase/templates/recovery.html`, 제목 `RISE CREW 비밀번호 재설정 인증번호 / Your password reset code`
+  - "Magic Link": `supabase/templates/magic_link.html`, 제목 `RISE CREW 로그인 인증번호 / Your sign-in code`. 이미 가입한 사람이 가입 화면에 이메일을 넣으면 나갑니다.
+- **인증번호**: Sign In / Providers → Email에서 Email OTP Length **8**, Email OTP Expiration **600**초. `OTP_LENGTH`(`src/lib/auth/login.ts`)와 같아야 합니다.
 - **비밀번호 규칙**: Authentication의 Sign In / Providers → Email에서 최소 길이 8, 문자 조건 "Letters and digits", **Secure password change** 켬. `src/lib/auth/password.ts`와 같아야 합니다.
 - **"Confirm email"은 켠 채로 둡니다.** 끄면 누구나 공개 키로 남의 이메일을 넣어 가입하고, 그 메일함이 없어도 세션을 받을 수 있습니다. 로컬(`config.toml`)도 같게 켜 둡니다.
 - **Gmail 필터**: 웹사이트 전용 Google 계정의 Gmail에 필터를 만듭니다. 보낸 사람은 그 계정 자신, 제목은 `RISE CREW`, 동작은 삭제(휴지통으로 이동)입니다. 보낸 계정 메일의 사본이 보낼 때 휴지통으로 가고, Gmail이 휴지통을 30일 뒤에 비웁니다. 개인정보 처리방침이 "사본은 30일 안에 자동으로 삭제된다"고 적고 있으니, 이 필터가 없으면 처리방침이 사실이 아닙니다.

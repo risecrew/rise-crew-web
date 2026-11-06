@@ -19,32 +19,25 @@
             <!-- 한국어 -->
             <tr>
               <td style="padding:8px 28px 0 28px;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.7;color:#13203a;">
-                <p style="margin:0 0 8px 0;font-size:18px;font-weight:700;">로그인 링크</p>
-                <p style="margin:0 0 20px 0;">아래 버튼을 누르면 RISE CREW에 로그인됩니다. 링크는 한 번만 쓸 수 있고, 시간이 지나면 만료됩니다. 직접 요청하지 않았다면 이 메일을 무시하셔도 됩니다.</p>
+                <p style="margin:0 0 8px 0;font-size:18px;font-weight:700;">로그인 인증번호</p>
+                <p style="margin:0 0 20px 0;">아래 번호를 화면에 입력하면 RISE CREW에 로그인됩니다. 번호는 10분 동안 쓸 수 있습니다. 직접 요청하지 않았다면 이 메일을 무시하셔도 됩니다. 이 번호를 누구에게도 알려 주지 마세요.</p>
               </td>
             </tr>
 
             <!-- English -->
             <tr>
               <td style="padding:0 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.7;color:#46546d;">
-                <p style="margin:0 0 8px 0;font-size:16px;font-weight:700;color:#13203a;">Sign-in link</p>
-                <p style="margin:0 0 24px 0;">Use the button below to sign in to RISE CREW. The link works once and expires after a while. If you did not ask for it, you can ignore this email.</p>
+                <p style="margin:0 0 8px 0;font-size:16px;font-weight:700;color:#13203a;">Your sign-in code</p>
+                <p style="margin:0 0 24px 0;">Enter this code on screen to sign in to RISE CREW. The code works for 10 minutes. If you did not ask for it, you can ignore this email. Do not share this code with anyone.</p>
               </td>
             </tr>
 
             <tr>
               <td style="padding:0 28px 24px 28px;">
-                <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email" style="display:inline-block;padding:12px 24px;background-color:#9fc952;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',Arial,sans-serif;font-size:15px;font-weight:700;color:#003e91;text-decoration:none;">로그인 / Sign in</a>
+                <p style="margin:0;padding:14px 16px;background-color:#f4f9f7;border:1px solid #dbe9e4;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:28px;font-weight:700;letter-spacing:4px;text-align:center;color:#003e91;">{{ .Token }}</p>
               </td>
             </tr>
-
-            <tr>
-              <td style="padding:0 28px 32px 28px;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#46546d;">
-                버튼이 열리지 않으면 이 주소를 브라우저에 붙여넣어 주세요.<br />
-                If the button does not open, paste this address into your browser.<br />
-                <span style="word-break:break-all;color:#0175ba;">{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email</span>
-              </td>
-            </tr>
+            <tr><td style="padding:0 0 8px 0;"></td></tr>
           </table>
         </td>
       </tr>
