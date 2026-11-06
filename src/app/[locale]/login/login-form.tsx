@@ -3,16 +3,17 @@
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
+  AUTH_COLUMN,
   Alert,
   FIELD_ERROR,
   FIELD_LABEL,
-  INLINE_LINK,
+  QUIET_LINK,
   INPUT,
   PILL,
-  SCREEN_TITLE,
   afterSignIn,
   withNext,
 } from '@/components/auth/form-parts';
+import { AuthSwitch } from '@/components/auth/auth-switch';
 import { GoogleButton } from '@/components/auth/google-button';
 import { PasswordField } from '@/components/auth/password-field';
 import type { Locale } from '@/i18n/locales';
@@ -105,9 +106,11 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
   }
 
   return (
-    <div className="w-full max-w-md">
-      <h1 className={SCREEN_TITLE}>{t('title')}</h1>
-      <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
+    <div className={AUTH_COLUMN}>
+      {/* The screen opens on the choice between signing in and signing up; the title is there for
+          screen readers and the tab. */}
+      <h1 className="sr-only">{t('title')}</h1>
+      <AuthSwitch locale={locale} next={next} current="login" />
       {notice ? <Alert>{t(`errors.${notice}`)}</Alert> : null}
 
       <GoogleButton
@@ -182,39 +185,15 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
         </button>
       </form>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4">
+      <div className="mt-2 flex justify-end">
         <Link
           href={{ pathname: '/forgot-password', query: withNext(locale, next) }}
           prefetch={false}
-          className={INLINE_LINK}
+          className={QUIET_LINK}
         >
           {t('forgot')}
         </Link>
-        <p className="flex items-center gap-2 text-base text-white/75">
-          {t('signupPrompt')}
-          <Link
-            href={{ pathname: '/signup', query: withNext(locale, next) }}
-            prefetch={false}
-            className={INLINE_LINK}
-          >
-            {t('signupLink')}
-          </Link>
-        </p>
       </div>
-
-      {/* What signing up keeps before anything is agreed to, said once, quietly, under the ways in.
-          The link is small text with a finger-sized target; when the sentence fills its line the
-          link takes the next one rather than stretching a line in the middle of it. */}
-      <p className="mt-6 flex flex-wrap items-center gap-x-2 text-sm text-pretty break-keep text-white/75">
-        <span>{t('storage')}</span>
-        <Link
-          href="/privacy"
-          prefetch={false}
-          className="inline-flex min-h-11 items-center underline underline-offset-4 hover:text-white"
-        >
-          {t('policyLink')}
-        </Link>
-      </p>
     </div>
   );
 }

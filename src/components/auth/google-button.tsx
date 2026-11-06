@@ -81,7 +81,7 @@ export function GoogleButton({ locale, next, disabled, onStart, onFail }: Props)
       type="button"
       onClick={start}
       disabled={busy || disabled}
-      className={cn(PILL, 'mt-10 gap-3 bg-white text-stage')}
+      className={cn(PILL, 'mt-8 gap-3 bg-white text-stage')}
     >
       <GoogleMark />
       {t('google')}

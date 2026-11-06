@@ -388,7 +388,6 @@
     },
     "login": {
       "title": "Sign in",
-      "lead": "Sign in with your email and password",
       "google": "Continue with Google",
       "emailLabel": "Email",
       "emailPlaceholder": "name@example.com",
@@ -398,9 +397,6 @@
       "emailInvalid": "Enter a valid email address.",
       "passwordRequired": "Enter your password.",
       "forgot": "Forgot your password?",
-      "signupPrompt": "New here?",
-      "signupLink": "Sign up",
-      "storage": "Signing up stores your email address. If you never finish the sign-up form, it is deleted after 7 days.",
       "policyLink": "Privacy policy",
       "errors": {
         "link": "That link has expired or was already used. Request a new one.",
@@ -418,9 +414,7 @@
       "title": "Sign up",
       "lead": "Confirm your email, then choose a password",
       "submit": "Sign up",
-      "sending": "Sending",
-      "loginPrompt": "Already signed up?",
-      "loginLink": "Sign in"
+      "sending": "Sending"
     },
     "forgot": {
       "metaTitle": "Reset your password",
@@ -560,6 +554,11 @@
       },
       "deleted": "Your account has been deleted. Thanks for being part of RISE CREW.",
       "changePassword": "Change password"
+    },
+    "switch": {
+      "label": "Sign in or sign up",
+      "login": "Sign in",
+      "signup": "Sign up"
     }
   },
   "Admin": {
