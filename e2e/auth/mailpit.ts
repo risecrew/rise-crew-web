@@ -1,4 +1,4 @@
-// Reads the sign-in emails that the local Supabase stack catches in Mailpit. Local only: the
+// Reads the account emails that the local Supabase stack catches in Mailpit. Local only: the
 // stack never sends real mail.
 
 const MAILPIT_URL = process.env.E2E_MAILPIT_URL ?? 'http://127.0.0.1:54324';
@@ -14,9 +14,7 @@ async function getJson<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-// Deletes every message sent to `email`, so the next latestLinkFor cannot return an older link.
-// Each new link also invalidates the previous one for the same account, so a stale link is never
-// a usable answer anyway.
+// Deletes every message sent to `email`, so the next latestCodeFor cannot return an older code.
 export async function clearMessagesFor(email: string): Promise<void> {
   const query = encodeURIComponent(`to:${email}`);
   const response = await fetch(`${MAILPIT_URL}/api/v1/search?query=${query}`, { method: 'DELETE' });
@@ -24,8 +22,8 @@ export async function clearMessagesFor(email: string): Promise<void> {
     throw new Error(`Mailpit could not clear mail for ${email}: ${response.status}`);
 }
 
-// The sign-in link from the newest message sent to `email`. Waits for the message to arrive.
-export async function latestLinkFor(email: string): Promise<string> {
+// The code in the newest message sent to `email`. Waits for the message to arrive.
+export async function latestCodeFor(email: string): Promise<string> {
   const wanted = email.toLowerCase();
   const deadline = Date.now() + POLL_TIMEOUT_MS;
 
@@ -37,9 +35,10 @@ export async function latestLinkFor(email: string): Promise<string> {
 
     if (newest) {
       const { HTML } = await getJson<MailpitMessage>(`message/${newest.ID}`);
-      const href = /href="(https?:\/\/[^"]+)"/.exec(HTML)?.[1];
-      if (!href) throw new Error(`The newest email to ${email} has no link in it.`);
-      return href.replaceAll('&amp;', '&');
+      const code = />\s*(\d{8})\s*</.exec(HTML)?.[1];
+      if (!code) throw new Error(`The newest email to ${email} has no code in it.`);
+      if (/href="/.test(HTML)) throw new Error(`The newest email to ${email} has a link in it.`);
+      return code;
     }
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
   }

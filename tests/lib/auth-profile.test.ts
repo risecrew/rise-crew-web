@@ -142,7 +142,7 @@ describe('profileSchema', () => {
 
 describe('PRIVACY_POLICY_VERSION', () => {
   it('is the version of the published privacy policy', () => {
-    expect(PRIVACY_POLICY_VERSION).toBe('2026-10-27');
+    expect(PRIVACY_POLICY_VERSION).toBe('2026-11-06');
   });
 });
 

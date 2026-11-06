@@ -2,15 +2,22 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import {
+  Alert,
+  FIELD_ERROR,
+  FIELD_LABEL,
+  INLINE_LINK,
+  INPUT,
+  PILL,
+  SCREEN_TITLE,
+  afterSignIn,
+  withNext,
+} from '@/components/auth/form-parts';
+import { GoogleButton } from '@/components/auth/google-button';
+import { PasswordField } from '@/components/auth/password-field';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
-import {
-  RESEND_SECONDS,
-  callbackUrl,
-  confirmUrl,
-  isEmailAddress,
-  type LoginNotice,
-} from '@/lib/auth/login';
+import { isEmailAddress, type LoginNotice } from '@/lib/auth/login';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { cn } from '@/lib/utils';
 
@@ -24,53 +31,22 @@ type Props = {
   endSession: boolean;
 };
 
-type Notice = LoginNotice | 'sendFailed' | 'tooMany';
-
-const PILL =
-  'inline-flex w-full items-center justify-center rounded-full px-6 py-3 font-semibold transition-transform duration-150 ease-out hover:-translate-y-0.5 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60';
-
-// Google's own "G", which their sign-in branding guidelines ask for on a custom button. It keeps
-// Google's four colours (they live only in this mark) and is decoration: the label names the button.
-function GoogleMark() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 48 48" className="size-[1.15em] shrink-0">
-      <path
-        fill="#EA4335"
-        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-      />
-      <path
-        fill="#4285F4"
-        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-      />
-    </svg>
-  );
-}
+type Notice = LoginNotice | 'credentials' | 'failed' | 'tooMany';
 
 export function LoginForm({ locale, next, notice: initialNotice, endSession }: Props) {
   const t = useTranslations('Auth.login');
 
   const [email, setEmail] = useState('');
-  // The address a link was sent to; the screen shows "check your inbox" once there is one.
-  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [password, setPassword] = useState('');
   // How many times the address has been refused since it was last edited (0 = not refused). It
   // is a count, not a flag, so that sending the same bad address again shows the message anew.
-  const [fieldErrors, setFieldErrors] = useState(0);
+  const [emailErrors, setEmailErrors] = useState(0);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice | null>(initialNotice);
-  const [busy, setBusy] = useState<'email' | 'google' | null>(null);
-  const [resent, setResent] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
 
   const emailRef = useRef<HTMLInputElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const resendAt = useRef(0);
 
   // A blocked account is shown as signed out, so the browser stops holding its session too. This
   // only clears the cookies here; the server already refuses the account.
@@ -81,227 +57,72 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
       .catch(() => {});
   }, [endSession]);
 
-  // Coming back to this page with the browser's back button can restore it as it was left, with
-  // the Google button still busy. A page restored from the cache gets its button back.
-  useEffect(() => {
-    const restore = (event: PageTransitionEvent) => {
-      if (event.persisted) setBusy(null);
-    };
-    window.addEventListener('pageshow', restore);
-    return () => window.removeEventListener('pageshow', restore);
-  }, []);
-
-  // The wait before "send again" works again. It counts down from the clock rather than by
-  // subtracting one per tick, so a tab that slept does not lose time.
-  const counting = secondsLeft > 0;
-  useEffect(() => {
-    if (!counting) return;
-    const timer = window.setInterval(() => {
-      setSecondsLeft(Math.max(0, Math.ceil((resendAt.current - Date.now()) / 1000)));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [counting]);
-
-  // Moves to the "check your inbox" screen: focus goes to its heading so that a screen reader
-  // announces the change.
-  useEffect(() => {
-    if (sentTo !== null) headingRef.current?.focus();
-  }, [sentTo]);
-
-  // The emailed link usually opens in a new tab of this same browser, which signs in there and leaves
-  // this tab saying "check your inbox". The session cookies are shared, so this tab sees them appear
-  // and moves on too. Only a new session counts: one this browser already had must not end the wait.
-  // Reading the cookies decides nothing but where to go; the page there checks the session itself.
-  // The welcome page sends a finished account straight on to `next`.
-  const waiting = sentTo !== null;
-  useEffect(() => {
-    if (!waiting) return;
-    const { auth } = createSupabaseBrowserClient();
-    const currentToken = () =>
-      auth.getSession().then(
-        ({ data }) => data.session?.access_token ?? null,
-        () => null,
-      );
-    const before = currentToken();
-    let done = false;
-
-    const check = async () => {
-      const [had, now] = await Promise.all([before, currentToken()]);
-      if (done || !now || now === had) return;
-      done = true;
-      window.location.replace(`/${locale}/welcome?next=${encodeURIComponent(next)}`);
-    };
-
-    // A phone stops the timer of a tab in the background, so coming back to the tab checks as well.
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') void check();
-    };
-    const timer = window.setInterval(check, 2000);
-    document.addEventListener('visibilitychange', onVisible);
-    window.addEventListener('focus', check);
-    window.addEventListener('pageshow', check);
-    return () => {
-      done = true;
-      window.clearInterval(timer);
-      document.removeEventListener('visibilitychange', onVisible);
-      window.removeEventListener('focus', check);
-      window.removeEventListener('pageshow', check);
-    };
-  }, [waiting, locale, next]);
-
-  async function sendLink(address: string): Promise<boolean> {
-    let error: { status?: number; code?: string } | null;
-    try {
-      ({ error } = await createSupabaseBrowserClient().auth.signInWithOtp({
-        email: address,
-        options: { emailRedirectTo: confirmUrl(window.location.origin, locale, next) },
-      }));
-    } catch {
-      error = {};
-    }
-    if (error) {
-      setNotice(
-        error.status === 429 || error.code === 'over_email_send_rate_limit'
-          ? 'tooMany'
-          : 'sendFailed',
-      );
-      return false;
-    }
-    resendAt.current = Date.now() + RESEND_SECONDS * 1000;
-    setSecondsLeft(RESEND_SECONDS);
-    setNotice(null);
-    return true;
-  }
-
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
 
     const address = email.trim();
     if (!isEmailAddress(address)) {
-      setFieldErrors((count) => count + 1);
+      setEmailErrors((count) => count + 1);
       emailRef.current?.focus();
       return;
     }
-
-    setBusy('email');
-    setNotice(null);
-    const sent = await sendLink(address);
-    setBusy(null);
-    if (sent) {
-      setEmail(address);
-      setSentTo(address);
+    if (password === '') {
+      setPasswordError(t('passwordRequired'));
+      return;
     }
-  }
 
-  async function onResend() {
-    if (busy || sentTo === null || secondsLeft > 0) return;
-    setBusy('email');
-    setResent(false);
-    const sent = await sendLink(sentTo);
-    setBusy(null);
-    setResent(sent);
-  }
-
-  function changeAddress() {
-    setSentTo(null);
-    setResent(false);
+    setBusy(true);
     setNotice(null);
-    setSecondsLeft(0);
-    // The input is back on screen after this render.
-    window.setTimeout(() => emailRef.current?.focus(), 0);
-  }
-
-  async function continueWithGoogle() {
-    if (busy) return;
-    setBusy('google');
-    setNotice(null);
-    let failed = false;
+    let error: { status?: number; code?: string } | null;
     try {
-      const { error } = await createSupabaseBrowserClient().auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: callbackUrl(window.location.origin, locale, next) },
-      });
-      failed = error !== null;
+      ({ error } = await createSupabaseBrowserClient().auth.signInWithPassword({
+        email: address,
+        password,
+      }));
     } catch {
-      failed = true;
+      error = {};
     }
-    // Without a failure the browser is already on its way to Google.
-    if (failed) {
-      setBusy(null);
-      setNotice('oauth');
+    if (!error) {
+      window.location.replace(afterSignIn(locale, next));
+      return;
     }
-  }
 
-  const message =
-    notice === null
-      ? null
-      : notice === 'sendFailed' || notice === 'tooMany'
-        ? t(notice)
-        : t(`errors.${notice}`);
-  const alert = message ? (
-    <p
-      role="alert"
-      className="mt-6 rounded-lg border border-white/25 px-4 py-3 text-base text-pretty break-keep text-white"
-    >
-      {message}
-    </p>
-  ) : null;
-
-  if (sentTo !== null) {
-    return (
-      <div className="w-full max-w-md">
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          className="font-display text-headline text-balance break-keep focus:outline-none"
-        >
-          {t('sent.title')}
-        </h1>
-        <p className="mt-4 text-lg break-keep text-white/85">{t('sent.body')}</p>
-        <p className="mt-1 text-lg font-semibold break-all text-white">{sentTo}</p>
-        <p className="mt-4 text-base break-keep text-white/75">{t('sent.spam')}</p>
-        {alert}
-        <div className="mt-8">
-          <button
-            type="button"
-            onClick={onResend}
-            disabled={secondsLeft > 0 || busy !== null}
-            className={cn(PILL, 'border border-white/50 text-white hover:bg-white/10')}
-          >
-            {secondsLeft > 0 ? t('sent.resendIn', { seconds: secondsLeft }) : t('sent.resend')}
-          </button>
-          {/* Always on the page, so a screen reader announces the text when it appears. */}
-          <p role="status" className={cn('text-center text-base text-white/85', resent && 'mt-3')}>
-            {resent ? t('sent.resent') : null}
-          </p>
-          <button
-            type="button"
-            onClick={changeAddress}
-            className="mx-auto mt-5 flex min-h-11 items-center text-base text-white underline underline-offset-4"
-          >
-            {t('sent.change')}
-          </button>
-        </div>
-      </div>
-    );
+    setBusy(false);
+    setEmail(address);
+    if (error.code === 'invalid_credentials' || error.code === 'email_not_confirmed') {
+      // The same answer for both: only someone who already had the right password could tell them
+      // apart, and an unconfirmed account has no password that anyone chose through this site.
+      setPassword('');
+      setNotice('credentials');
+    } else if (error.code === 'user_banned') {
+      setNotice('blocked');
+    } else if (error.status === 429) {
+      setNotice('tooMany');
+    } else {
+      setNotice('failed');
+    }
   }
 
   return (
     <div className="w-full max-w-md">
-      <h1 className="font-display text-hero text-balance break-keep">{t('title')}</h1>
+      <h1 className={SCREEN_TITLE}>{t('title')}</h1>
       <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
-      {alert}
+      {notice ? <Alert>{t(`errors.${notice}`)}</Alert> : null}
 
-      <button
-        type="button"
-        onClick={continueWithGoogle}
-        disabled={busy !== null}
-        className={cn(PILL, 'mt-10 gap-3 bg-white text-stage')}
-      >
-        <GoogleMark />
-        {t('google')}
-      </button>
+      <GoogleButton
+        locale={locale}
+        next={next}
+        disabled={busy}
+        onStart={() => {
+          setGoogleBusy(true);
+          setNotice(null);
+        }}
+        onFail={() => {
+          setGoogleBusy(false);
+          setNotice('oauth');
+        }}
+      />
 
       <div className="my-6 flex items-center gap-4 text-sm text-white/60">
         <span aria-hidden className="h-px flex-1 bg-white/15" />
@@ -309,10 +130,10 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
         <span aria-hidden className="h-px flex-1 bg-white/15" />
       </div>
 
-      {/* The input has no name on purpose: a submit that happens before this page is interactive
-          falls back to a plain GET, and the address must not end up in the URL. */}
+      {/* The inputs have no name on purpose: a submit that happens before this page is interactive
+          falls back to a plain GET, and neither may end up in the URL. */}
       <form noValidate onSubmit={onSubmit}>
-        <label htmlFor="login-email" className="block text-sm font-medium text-white/75">
+        <label htmlFor="login-email" className={FIELD_LABEL}>
           {t('emailLabel')}
         </label>
         <input
@@ -322,44 +143,69 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);
-            setFieldErrors(0);
+            setEmailErrors(0);
           }}
           autoComplete="email"
           inputMode="email"
           autoCapitalize="none"
           spellCheck={false}
-          enterKeyHint="send"
           placeholder={t('emailPlaceholder')}
-          aria-invalid={fieldErrors > 0}
-          aria-describedby={fieldErrors > 0 ? 'login-email-error' : undefined}
-          className="mt-2 w-full rounded-full border border-white/50 bg-white/5 px-5 py-3.5 text-base text-white placeholder:text-white/55 aria-invalid:border-white"
+          aria-invalid={emailErrors > 0}
+          aria-describedby={emailErrors > 0 ? 'login-email-error' : undefined}
+          className={cn('mt-2', INPUT)}
         />
         {/* An alert, because focus is often on the input already (Enter, or a phone keyboard's send
             key), and moving focus to where it is says nothing. The key makes the same message a new
             element each time, which a screen reader reads out again. */}
-        {fieldErrors > 0 ? (
-          <p
-            key={fieldErrors}
-            id="login-email-error"
-            role="alert"
-            className="mt-2 px-2 text-base break-keep text-white"
-          >
+        {emailErrors > 0 ? (
+          <p key={emailErrors} id="login-email-error" role="alert" className={FIELD_ERROR}>
             {t('emailInvalid')}
           </p>
         ) : null}
+        <PasswordField
+          id="login-password"
+          label={t('passwordLabel')}
+          value={password}
+          onChange={(value) => {
+            setPassword(value);
+            setPasswordError(null);
+          }}
+          autoComplete="current-password"
+          error={passwordError}
+        />
         <button
           type="submit"
-          disabled={busy !== null}
+          disabled={busy || googleBusy}
           className={cn(PILL, 'mt-4 bg-lime text-cobalt')}
         >
-          {busy === 'email' ? t('sending') : t('submit')}
+          {busy ? t('signingIn') : t('submit')}
         </button>
       </form>
 
-      {/* What signing in keeps before anything is agreed to, said once, quietly, under both ways
-          in. The link is small text with a finger-sized target; when the sentence fills its line
-          the link takes the next one rather than stretching a line in the middle of it. */}
-      <p className="mt-8 flex flex-wrap items-center gap-x-2 text-sm text-pretty break-keep text-white/75">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4">
+        <Link
+          href={{ pathname: '/forgot-password', query: withNext(locale, next) }}
+          prefetch={false}
+          className={INLINE_LINK}
+        >
+          {t('forgot')}
+        </Link>
+        <p className="flex items-center gap-2 text-base text-white/75">
+          {t('signupPrompt')}
+          <Link
+            href={{ pathname: '/signup', query: withNext(locale, next) }}
+            prefetch={false}
+            className={INLINE_LINK}
+          >
+            {t('signupLink')}
+          </Link>
+        </p>
+      </div>
+
+      {/* What signing up keeps before anything is agreed to, said once, quietly, under the ways in.
+          The link is small text with a finger-sized target; when the sentence fills its line the
+          link takes the next one rather than stretching a line in the middle of it. */}
+      <p className="mt-6 flex flex-wrap items-center gap-x-2 text-sm text-pretty break-keep text-white/75">
         <span>{t('storage')}</span>
         <Link
           href="/privacy"

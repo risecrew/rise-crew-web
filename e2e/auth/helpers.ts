@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { expect, type BrowserContext, type Cookie, type Page } from '@playwright/test';
-import { clearMessagesFor, latestLinkFor } from './mailpit';
 
 // The local stack's address and keys, put in the environment by playwright.auth.config.ts.
 function localEnv(name: string): string {
@@ -15,31 +14,25 @@ export function anonymousClient() {
   });
 }
 
-// Asks the local Supabase Auth for a sign-in email, the way the login form does, and returns the
-// link from it. `emailRedirectTo` names this site (`origin`, the server under test) and always
-// holds a "?": the email template adds the token to it with "&token_hash=...".
+// A one-time sign-in link for `email`, made by the Auth admin API, so no mail goes out. It makes the
+// account if there is none. The mails carry codes; tests that are about them enter the code. `origin`
+// is the server under test.
 export async function requestSignInLink(
   email: string,
   origin: string,
   { locale = 'ko', next = `/${locale}` }: { locale?: string; next?: string } = {},
 ): Promise<string> {
-  await clearMessagesFor(email);
-  const options = {
-    emailRedirectTo: `${origin}/${locale}/auth/confirm?next=${encodeURIComponent(next)}`,
-  };
-
-  // Auth lets one account ask for an email once a second. Two tests in a row can land inside that
-  // second, so a refusal for that reason is retried.
-  for (let attempt = 1; ; attempt++) {
-    const { error } = await anonymousClient().auth.signInWithOtp({ email, options });
-    if (!error) break;
-    if (error.code !== 'over_email_send_rate_limit' || attempt === 4) throw error;
-    await new Promise((resolve) => setTimeout(resolve, 1100));
-  }
-  return latestLinkFor(email);
+  const { data, error } = await adminClient().auth.admin.generateLink({ type: 'magiclink', email });
+  if (error) throw error;
+  const query = new URLSearchParams({
+    next,
+    token_hash: data.properties.hashed_token,
+    type: 'email',
+  });
+  return `${origin}/${locale}/auth/confirm?${query}`;
 }
 
-// Signs `page` in through an emailed link and waits for the page to go quiet. Right after landing,
+// Signs `page` in through a one-time link and waits for the page to go quiet. Right after landing,
 // the router prefetches the other pages, and a prefetch that is still running when a test changes
 // the session would answer with cookies of its own and undo the change.
 export async function signIn(page: Page, email: string, origin: string): Promise<void> {
@@ -319,4 +312,31 @@ export async function hidePost(id: string): Promise<void> {
     .update({ hidden_at: new Date().toISOString() })
     .eq('id', id);
   if (error) throw error;
+}
+
+// An account that signs in with a password: confirmed, with no sign-up form filled in yet. The
+// password is a throwaway for the local stack. Remove it afterwards with deleteAccount.
+export const TEST_PASSWORD = 'local-test-pass-1';
+
+export async function createPasswordAccount(email: string): Promise<string> {
+  // Two steps: Auth confirms a new account in a write of its own, and the trigger that clears a
+  // password set before confirmation cannot tell that one apart from anybody else's.
+  const admin = adminClient();
+  const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true });
+  if (error) throw error;
+  const updated = await admin.auth.admin.updateUserById(data.user.id, { password: TEST_PASSWORD });
+  if (updated.error) throw updated.error;
+  return data.user.id;
+}
+
+// Gives an account that already exists the throwaway password.
+export async function setTestPassword(email: string): Promise<string> {
+  const admin = adminClient();
+  const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 });
+  if (error) throw error;
+  const user = data.users.find((u) => u.email === email);
+  if (!user) throw new Error(`No account for ${email}.`);
+  const updated = await admin.auth.admin.updateUserById(user.id, { password: TEST_PASSWORD });
+  if (updated.error) throw updated.error;
+  return user.id;
 }

@@ -165,9 +165,18 @@ export default async function MyPage({ params, searchParams }: Props) {
           >
             {t('edit')}
           </Link>
+          <div className="mt-4 text-center">
+            <Link
+              href="/forgot-password"
+              prefetch={false}
+              className="inline-flex min-h-11 items-center px-3 text-base text-white underline underline-offset-4"
+            >
+              {t('changePassword')}
+            </Link>
+          </div>
           {/* A plain form, so signing out works before the page has finished loading. Only a POST
               signs anyone out. */}
-          <form method="post" action={`/${locale}/auth/signout`} className="mt-4 text-center">
+          <form method="post" action={`/${locale}/auth/signout`} className="text-center">
             <button
               type="submit"
               className="inline-flex min-h-11 items-center px-3 text-base text-white underline underline-offset-4"

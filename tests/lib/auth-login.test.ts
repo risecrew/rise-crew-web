@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   RESEND_SECONDS,
   callbackUrl,
-  confirmUrl,
   isEmailAddress,
   leaveLogin,
   leaveWelcome,
@@ -64,20 +63,7 @@ describe('leaveWelcome', () => {
   });
 });
 
-describe('the links the sign-in form hands to Supabase', () => {
-  it('sends the emailed link to the confirm route of this site and language', () => {
-    expect(confirmUrl('http://127.0.0.1:3200', 'ko', '/ko/about')).toBe(
-      'http://127.0.0.1:3200/ko/auth/confirm?next=%2Fko%2Fabout',
-    );
-    expect(confirmUrl('https://example.test', 'en', '/en')).toBe(
-      'https://example.test/en/auth/confirm?next=%2Fen',
-    );
-  });
-
-  it('always holds a "?", because the email template appends "&token_hash=..."', () => {
-    expect(confirmUrl('https://example.test', 'ko', '/ko')).toContain('?next=');
-  });
-
+describe('the link the sign-in form hands to Supabase', () => {
   it('sends Google back to the callback route', () => {
     expect(callbackUrl('http://127.0.0.1:3200', 'ko', '/ko/about?x=1')).toBe(
       'http://127.0.0.1:3200/ko/auth/callback?next=%2Fko%2Fabout%3Fx%3D1',
@@ -85,9 +71,6 @@ describe('the links the sign-in form hands to Supabase', () => {
   });
 
   it('vets next again, so a hostile value cannot ride along', () => {
-    expect(confirmUrl('https://example.test', 'ko', 'https://evil.example')).toBe(
-      'https://example.test/ko/auth/confirm?next=%2Fko',
-    );
     expect(callbackUrl('https://example.test', 'ko', '//evil.example')).toBe(
       'https://example.test/ko/auth/callback?next=%2Fko',
     );

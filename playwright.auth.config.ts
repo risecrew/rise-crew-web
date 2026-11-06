@@ -78,6 +78,9 @@ export default defineConfig({
     env: {
       NEXT_DIST_DIR: '.next-auth',
       NEXT_PUBLIC_AUTH_ENABLED: 'true',
+      // Lets the tests sign in through a link made with the Auth admin API. See the route for why it is
+      // off everywhere else.
+      AUTH_CONFIRM_ROUTE: 'on',
       NEXT_PUBLIC_SUPABASE_URL: supabase.url,
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: supabase.publishableKey,
       // Server only (no NEXT_PUBLIC_ prefix): the site deletes an account with it. The local

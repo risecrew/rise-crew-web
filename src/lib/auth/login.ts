@@ -5,6 +5,11 @@ import { safeNext } from './redirect';
 // of emails.
 export const RESEND_SECONDS = 60;
 
+// How long the code in a mail is. The same as otp_length in supabase/config.toml and the dashboard of
+// each project. Auth limits tries by address of the visitor but not per code, so it is longer than the
+// usual six digits, and it stays valid for 10 minutes (otp_expiry).
+export const OTP_LENGTH = 8;
+
 // Where to go on from a screen that has nothing more to do for the visitor: where they were
 // heading, as safeNext decides it, except the screen itself. Sending them there would only bring
 // them back. The path is judged the way the router reads it (percent-escapes decoded, a trailing
@@ -31,13 +36,6 @@ export function leaveLogin(next: string | null | undefined, locale: Locale): str
 // For a visitor who opens the sign-up form with nothing left to fill in, or who has just finished it.
 export function leaveWelcome(next: string | null | undefined, locale: Locale): string {
   return leaveScreen(next, locale, 'welcome');
-}
-
-// The address the emailed link opens. It always holds a "?": the email template adds the token
-// with "&token_hash=...". `next` is vetted here as well, so a value that never went through
-// safeNext cannot get into a link.
-export function confirmUrl(origin: string, locale: Locale, next: string): string {
-  return `${origin}/${locale}/auth/confirm?next=${encodeURIComponent(safeNext(next, locale))}`;
 }
 
 // The address Google (through Supabase) sends the visitor back to.

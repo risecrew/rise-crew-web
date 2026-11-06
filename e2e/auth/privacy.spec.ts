@@ -32,9 +32,9 @@ const POLICY = {
     ],
     notCollected: /전화번호와 학번은 받지 않습니다/,
     footerLink: '개인정보 처리방침',
-    // The sign-in emails go out through the club's Gmail account, so Google is more than the
+    // The account emails go out through the club's Gmail account, so Google is more than the
     // Google sign-in button.
-    googleSender: /Gmail 계정이 로그인 이메일을 보냅니다/,
+    googleSender: /Gmail 계정이 가입 확인과 비밀번호 재설정 메일을 보냅니다/,
     // A Gmail filter on the sending account moves every sign-in email to Trash when it is sent,
     // and Gmail empties Trash after 30 days. Nobody deletes anything by hand.
     sentCopies: /30일 안에 자동으로 삭제됩니다/,
@@ -56,11 +56,11 @@ const POLICY = {
     adminDashboard: /Supabase 관리 화면에서 모든 계정/,
     noExport: /회원 관리 화면에는 명단을 파일로 내려받는 기능이 없습니다/,
     destroy: /데이터베이스에서 삭제하는 방법으로 파기합니다/,
-    // The database is in Seoul, but the site's server functions run in the US (Vercel iad1).
+    // The database and the site's server functions are in Seoul (Vercel icn1); Vercel is a US company.
     transferDatabase: /데이터베이스는 대한민국\(서울\)에 있지만/,
-    transferServer: /미국 \(웹사이트 서버가 실행되는 지역\)/,
+    transferServer: /대한민국 \(웹사이트 서버가 실행되는 지역, 서울\)/,
     transferRefuse: /국외 이전을 원하지 않으면/,
-    noPasswords: /이 사이트는 비밀번호를 받지 않습니다/,
+    noPasswords: /비밀번호는 해시로만 저장하고 메일로 보내지 않습니다/,
   },
   en: {
     title: 'Privacy policy',
@@ -83,7 +83,7 @@ const POLICY = {
     ],
     notCollected: /We do not collect phone numbers or student IDs/,
     footerLink: 'Privacy policy',
-    googleSender: /Gmail account sends the sign-in emails/,
+    googleSender: /Gmail account sends sign-up confirmation and password reset emails/,
     sentCopies: /deleted automatically within 30 days/,
     oldChore: /Sent folder|operators delete them periodically/,
     languageCookie: /remembers that language/,
@@ -100,9 +100,9 @@ const POLICY = {
     noExport: /member management screen has no way to download the member list/,
     destroy: /destroy it by deleting it from the database/,
     transferDatabase: /The database that stores sign-up information is in South Korea \(Seoul\)/,
-    transferServer: /United States \(where the website’s server runs\)/,
+    transferServer: /South Korea \(where the website’s server runs, Seoul\)/,
     transferRefuse: /If you do not want this transfer/,
-    noPasswords: /This site does not ask for passwords/,
+    noPasswords: /Passwords are stored only as hashes and are never emailed/,
   },
 } as const;
 

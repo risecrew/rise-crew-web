@@ -183,6 +183,19 @@ describe('finishSignIn', () => {
 });
 
 describe('GET /{locale}/auth/confirm', () => {
+  beforeEach(() => {
+    vi.stubEnv('AUTH_CONFIRM_ROUTE', 'on');
+  });
+
+  it('is not a page anywhere the switch is off, and asks Supabase nothing', async () => {
+    vi.stubEnv('AUTH_CONFIRM_ROUTE', '');
+    const auth = fakeSupabase();
+    await expect(
+      confirm(request('/ko/auth/confirm?token_hash=abc&type=email'), params('ko')),
+    ).rejects.toThrow();
+    expect(auth.verifyOtp).not.toHaveBeenCalled();
+  });
+
   it('verifies the one-time token as an email token and finishes the sign-in', async () => {
     const auth = fakeSupabase();
     viewer(true);
@@ -241,12 +254,50 @@ describe('GET /{locale}/auth/confirm', () => {
     ['no token', '/ko/auth/confirm?type=email'],
     ['an empty token', '/ko/auth/confirm?token_hash=&type=email'],
     ['no type', '/ko/auth/confirm?token_hash=abc'],
-    ['another type', '/ko/auth/confirm?token_hash=abc&type=recovery'],
+    ['another type', '/ko/auth/confirm?token_hash=abc&type=magiclink'],
   ])('does not ask Supabase when the link has %s', async (_name, path) => {
     const auth = fakeSupabase();
     const response = await confirm(request(path), params('ko'));
     expect(response.headers.get('location')).toBe('/ko/login?error=link');
     expect(auth.verifyOtp).not.toHaveBeenCalled();
+  });
+
+  it('sends a password reset link on to the new-password screen, with where to go after', async () => {
+    const auth = fakeSupabase();
+    const response = await confirm(
+      request('/ko/auth/confirm?token_hash=abc&type=recovery&next=%2Fko%2Fabout'),
+      params('ko'),
+    );
+    expect(auth.verifyOtp).toHaveBeenCalledWith({ type: 'recovery', token_hash: 'abc' });
+    expect(response.headers.get('location')).toBe('/ko/reset-password?next=%2Fko%2Fabout');
+  });
+
+  it('sends the first mail to a new address on to choosing a password', async () => {
+    const auth = fakeSupabase();
+    const response = await confirm(
+      request('/ko/auth/confirm?token_hash=abc&type=signup&next=%2Fko%2Fabout'),
+      params('ko'),
+    );
+    expect(auth.verifyOtp).toHaveBeenCalledWith({ type: 'email', token_hash: 'abc' });
+    expect(response.headers.get('location')).toBe('/ko/reset-password?next=%2Fko%2Fabout&first=1');
+  });
+
+  it('does not carry a next that leaves the site into the new-password screen', async () => {
+    fakeSupabase();
+    const response = await confirm(
+      request('/ko/auth/confirm?token_hash=abc&type=recovery&next=https%3A%2F%2Fevil.example'),
+      params('ko'),
+    );
+    expect(response.headers.get('location')).toBe('/ko/reset-password?next=%2Fko');
+  });
+
+  it('refuses a used reset link', async () => {
+    fakeSupabase({ verifyOtp: { error: { message: 'Token has expired or is invalid' } } });
+    const response = await confirm(
+      request('/ko/auth/confirm?token_hash=abc&type=recovery'),
+      params('ko'),
+    );
+    expect(response.headers.get('location')).toBe('/ko/login?error=link');
   });
 
   it('reads one next value when the parameter is repeated', async () => {
