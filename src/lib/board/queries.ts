@@ -19,7 +19,12 @@ export function sortActivities(rows: Activity[]): Activity[] {
 }
 
 export async function getActivities(): Promise<Activity[]> {
-  const { data, error } = await createSupabasePublicClient().from('activities').select('*');
+  // In a fixed order first, so activities with the same date do not swap places between visits.
+  const { data, error } = await createSupabasePublicClient()
+    .from('activities')
+    .select('*')
+    .order('created_at')
+    .order('id');
   if (error) throw new Error(error.message);
   return sortActivities(data);
 }

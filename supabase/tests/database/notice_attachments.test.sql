@@ -7,7 +7,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(16);
+select plan(17);
 
 insert into auth.users (id, email) values
   ('7e5d0000-0000-4000-8000-000000000001', 'pgtap-notice-member@example.test'),
@@ -79,6 +79,9 @@ select throws_ok(
 select throws_ok(
   $$insert into public.notices (title_ko, body_ko, photo_paths) values ('a', 'b', array['https://example.test/a.jpg'])$$,
   '23514', null, 'a photo is not an address elsewhere');
+select throws_ok(
+  $$insert into public.notices (title_ko, body_ko, photo_paths) values ('a', 'b', array[null]::text[])$$,
+  '23514', null, 'a photo is not an empty value');
 select throws_ok(
   $$insert into public.notices (title_ko, body_ko, attachments) values ('a', 'b',
     (select jsonb_agg(jsonb_build_object('path', '7e5d0000-0000-4000-8000-00000000c020.pdf', 'name', 'a.pdf', 'size', 1))

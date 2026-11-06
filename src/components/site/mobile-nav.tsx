@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
 import { LocaleSwitch } from './locale-switch';
 
 type Item = { href: string; label: string };
@@ -10,11 +11,14 @@ export function MobileNav({
   items,
   menuLabel,
   account,
+  className,
 }: {
   items: Item[];
   menuLabel: string;
   // The sign-in link or the signed-in rows, when accounts are switched on.
   account?: ReactNode;
+  // From which width the full menu takes over.
+  className: string;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
   const pathname = usePathname();
@@ -24,7 +28,7 @@ export function MobileNav({
   }, [pathname]);
 
   return (
-    <details ref={ref} className="relative md:hidden">
+    <details ref={ref} className={cn('relative', className)}>
       <summary className="cursor-pointer list-none rounded border border-white/50 px-3 py-2 text-xs font-semibold tracking-[0.2em] text-white uppercase [&::-webkit-details-marker]:hidden">
         {menuLabel}
       </summary>

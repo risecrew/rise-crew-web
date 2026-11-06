@@ -429,3 +429,66 @@ test('an activity without a photo shows the club mark instead of a word', async 
   const box = await card.locator('[data-activity-mark]').boundingBox();
   expect(box!.width / box!.height).toBeCloseTo(1.5, 1);
 });
+
+test('a refused activity keeps the picked photo and the tick, and the next save uses them', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const title = `거절 ${unique(testInfo)}`;
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/admin/activities/new');
+  await page.getByLabel('사진 (선택, 한 장)').setInputFiles({
+    name: 'photo.jpg',
+    mimeType: 'image/jpeg',
+    buffer: JPEG,
+  });
+  await page.getByLabel('아직 안 열린 행사').check();
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page.getByText('꼭 입력해 주세요.').first()).toBeVisible();
+
+  await expect(page.getByLabel('아직 안 열린 행사')).toBeChecked();
+  await page.getByLabel('제목', { exact: true }).fill(title);
+  await page.getByLabel('도시', { exact: true }).fill('서울');
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
+
+  const { data, error } = await adminClient()
+    .from('activities')
+    .select('photo, is_planned')
+    .eq('title_ko', title)
+    .single();
+  if (error) throw error;
+  expect(data.photo).toMatch(/^[0-9a-f-]{36}\.jpg$/);
+  expect(data.is_planned).toBe(true);
+  await cleanUpActivity(title);
+  await adminClient().storage.from('activity-photos').remove([data.photo!]);
+});
+
+test('removing the photo also cancels one just picked', async ({ page, baseURL }, testInfo) => {
+  const title = `사진 빼기 ${unique(testInfo)}`;
+  await signIn(page, OPERATOR, baseURL!);
+  await addActivity(page, { title, photo: true });
+  const first = (await photoOf(title))!;
+
+  await page.getByRole('link', { name: new RegExp(title) }).click();
+  await page.getByLabel('사진 (선택, 한 장)').setInputFiles({
+    name: 'other.jpg',
+    mimeType: 'image/jpeg',
+    buffer: JPEG,
+  });
+  await page.getByRole('button', { name: '사진 빼기' }).click();
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
+  expect(await photoOf(title)).toBeNull();
+  expect(await fileExists(first)).toBe(false);
+  await cleanUpActivity(title);
+});
+
+test('a refused notice keeps the pin', async ({ page, baseURL }) => {
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/admin/notices/new');
+  await page.getByLabel('맨 위에 고정').check();
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page.getByText('꼭 입력해 주세요.').first()).toBeVisible();
+  await expect(page.getByLabel('맨 위에 고정')).toBeChecked();
+});

@@ -2,7 +2,15 @@
 
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useActionState, useEffect, useRef, useState, type ChangeEvent } from 'react';
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from 'react';
 import { createNotice, updateNotice } from '@/app/[locale]/admin/notices/actions';
 import { FieldNotice } from '@/components/teams/field-notice';
 import { LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from '@/components/teams/form-parts';
@@ -76,6 +84,14 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
     formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
   }, [state]);
 
+  // Not the form's `action` prop: React resets a form when its action ends, which would empty a picked
+  // file and untick a box after a refusal.
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    startTransition(() => action(form));
+  }
+
   function onPhotos(event: ChangeEvent<HTMLInputElement>) {
     const picked = [...(event.target.files ?? [])];
     event.target.value = '';
@@ -147,7 +163,7 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
   }
 
   return (
-    <form ref={formRef} action={action} className="mt-8" noValidate>
+    <form ref={formRef} onSubmit={onSubmit} className="mt-8" noValidate>
       <input type="hidden" name="locale" value={locale} />
       {notice ? <input type="hidden" name="id" value={notice.id} /> : null}
       {field('title_ko', t('titleKo'), BOARD_LIMITS.noticeTitle)}

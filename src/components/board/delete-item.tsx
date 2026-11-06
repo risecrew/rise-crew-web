@@ -40,7 +40,11 @@ export function DeleteItem({ id, question, action }: Props) {
         </button>
       </div>
       <div role="alert">
-        {state && !state.ok ? <p className={MESSAGE}>{t(`errors.${state.error}`)}</p> : null}
+        {state && !state.ok ? (
+          <p className={MESSAGE}>
+            {t(state.error === 'failed' ? 'deleteFailed' : `errors.${state.error}`)}
+          </p>
+        ) : null}
       </div>
     </form>
   );

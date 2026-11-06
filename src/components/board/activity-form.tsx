@@ -2,7 +2,14 @@
 
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useActionState, useEffect, useRef, useState } from 'react';
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react';
 import { createActivity, updateActivity } from '@/app/[locale]/admin/activities/actions';
 import { FieldNotice } from '@/components/teams/field-notice';
 import { LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from '@/components/teams/form-parts';
@@ -72,6 +79,14 @@ export function ActivityForm({ activity }: { activity?: Activity }) {
     formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
   }, [state]);
 
+  // Not the form's `action` prop: React resets a form when its action ends, which would empty a picked
+  // file and untick a box after a refusal.
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    startTransition(() => action(form));
+  }
+
   function field(name: keyof typeof values, label: string, maxLength?: number, rows?: number) {
     return (
       <BoardField
@@ -88,7 +103,7 @@ export function ActivityForm({ activity }: { activity?: Activity }) {
   }
 
   return (
-    <form ref={formRef} action={action} className="mt-8" noValidate>
+    <form ref={formRef} onSubmit={onSubmit} className="mt-8" noValidate>
       <input type="hidden" name="locale" value={locale} />
       {activity ? <input type="hidden" name="id" value={activity.id} /> : null}
       <input type="hidden" name="photo" value={photo ?? ''} />
@@ -117,7 +132,16 @@ export function ActivityForm({ activity }: { activity?: Activity }) {
               unoptimized
               className="aspect-[3/2] w-40 rounded-2xl object-cover"
             />
-            <button type="button" className={TEXT_BUTTON} onClick={() => setPhoto(null)}>
+            <button
+              type="button"
+              className={TEXT_BUTTON}
+              onClick={() => {
+                setPhoto(null);
+                // Also a file just picked: "remove the photo" should leave no photo.
+                if (fileRef.current) fileRef.current.value = '';
+                setPhotoProblem(null);
+              }}
+            >
               {t('removePhoto')}
             </button>
           </div>

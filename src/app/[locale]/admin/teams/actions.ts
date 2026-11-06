@@ -197,19 +197,29 @@ export async function deleteTeam(_prev: BoardState, form: FormData): Promise<Boa
   if (!isUuid(id)) return { ok: false, error: 'denied' };
   const { supabase } = context;
 
-  const [posts, logos, covers] = await Promise.all([
-    supabase.from('team_posts').select('photo_paths').eq('team_id', id),
-    supabase.storage.from('team-logos').list(id),
-    supabase.storage.from('team-covers').list(id),
+  const everything = { limit: 1000 };
+  const [logos, covers, postFolders] = await Promise.all([
+    supabase.storage.from('team-logos').list(id, everything),
+    supabase.storage.from('team-covers').list(id, everything),
+    supabase.storage.from('team-post-photos').list(id, everything),
   ]);
-  if (posts.error || logos.error || covers.error) return { ok: false, error: 'failed' };
+  if (logos.error || covers.error || postFolders.error) return { ok: false, error: 'failed' };
+  // By folder, not from the posts: this also finds photos from a post that was never saved.
+  const postFiles = await Promise.all(
+    postFolders.data.map(async ({ name: post }) => {
+      const { data: files } = await supabase.storage
+        .from('team-post-photos')
+        .list(`${id}/${post}`, everything);
+      return (files ?? []).map((file) => `${id}/${post}/${file.name}`);
+    }),
+  );
 
   const { data, error } = await supabase.from('teams').delete().eq('id', id).select('id');
   if (error) return { ok: false, error: error.code === '42501' ? 'denied' : 'failed' };
   if (!data || data.length === 0) return { ok: false, error: 'denied' };
 
   const inFolder = (files: { name: string }[]) => files.map((file) => `${id}/${file.name}`);
-  const photos = posts.data.flatMap((post) => post.photo_paths);
+  const photos = postFiles.flat();
   await Promise.all([
     logos.data.length > 0 ? supabase.storage.from('team-logos').remove(inFolder(logos.data)) : null,
     covers.data.length > 0
