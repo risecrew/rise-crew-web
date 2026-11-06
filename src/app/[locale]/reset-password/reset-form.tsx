@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils';
 type Props = { locale: Locale; next: string; first: boolean };
 type Problem = 'same' | 'stale' | 'failed';
 
-// Where a reset mail, or the first mail to a new address, lands. The link has already signed the
-// visitor in, so this only sets the password. Anyone else signed in to the account elsewhere is
+// Where a mailed code leads, for a reset or a new address. The code has already signed the visitor
+// in, so this only sets the password. Anyone else signed in to the account elsewhere is
 // signed out: someone resetting a password may have lost a device or suspect another person got in.
 export function ResetForm({ locale, next, first }: Props) {
   const t = useTranslations('Auth.reset');

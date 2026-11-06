@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   return accountMetadata(t('metaTitle'));
 }
 
-// Only with a session, which the emailed link gives. Without one there is no account to change, and
-// the visitor is told the link did not work. A new account chooses its first password here (`first`
+// Only with a session, which the mailed code gives. Without one there is no account to change, and
+// the visitor is sent back to sign in. A new account chooses its first password here (`first`
 // only changes the wording), and finishes signing up afterwards.
 export default async function ResetPasswordPage({ params, searchParams }: Props) {
   if (!isAuthEnabled()) notFound();
