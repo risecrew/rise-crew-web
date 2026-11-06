@@ -259,6 +259,16 @@ describe('GET /{locale}/auth/confirm', () => {
     expect(response.headers.get('location')).toBe('/ko/reset-password?next=%2Fko%2Fabout');
   });
 
+  it('sends the first mail to a new address on to choosing a password', async () => {
+    const auth = fakeSupabase();
+    const response = await confirm(
+      request('/ko/auth/confirm?token_hash=abc&type=signup&next=%2Fko%2Fabout'),
+      params('ko'),
+    );
+    expect(auth.verifyOtp).toHaveBeenCalledWith({ type: 'email', token_hash: 'abc' });
+    expect(response.headers.get('location')).toBe('/ko/reset-password?next=%2Fko%2Fabout&first=1');
+  });
+
   it('does not carry a next that leaves the site into the new-password screen', async () => {
     fakeSupabase();
     const response = await confirm(

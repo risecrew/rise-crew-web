@@ -399,13 +399,11 @@
       "signupLink": "Sign up",
       "storage": "Signing up stores your email address. If you never finish the sign-up form, it is deleted after 7 days.",
       "policyLink": "Privacy policy",
-      "resendConfirm": "Send the confirmation email again",
       "errors": {
         "link": "That link has expired or was already used. Request a new one.",
         "blocked": "This account has been suspended.",
         "oauth": "Google sign-in didn't finish. Please try again.",
         "credentials": "That email or password is not right. If you never set a password, you can create one with Forgot your password.",
-        "notConfirmed": "You have not confirmed your email yet. Use the link in the email we sent.",
         "failed": "We could not sign you in. Try again in a moment.",
         "sendFailed": "We could not send the email. Try again in a moment.",
         "tooMany": "Too many requests. Try again in a moment."
@@ -415,8 +413,7 @@
     "signup": {
       "metaTitle": "Sign up",
       "title": "Sign up",
-      "lead": "You confirm your email once, the first time",
-      "passwordHint": "At least 8 characters, with both letters and numbers.",
+      "lead": "Confirm your email, then choose a password",
       "submit": "Sign up",
       "sending": "Sending",
       "loginPrompt": "Already signed up?",
@@ -443,7 +440,10 @@
         "same": "It has to differ from your current password.",
         "stale": "You signed in too long ago to change it directly. Request an email under Forgot your password and try again.",
         "failed": "We could not save it. Try again in a moment."
-      }
+      },
+      "firstTitle": "Choose a password",
+      "firstLead": "You will sign in with it from now on",
+      "firstLabel": "Password"
     },
     "password": {
       "show": "Show",
@@ -455,7 +455,7 @@
       "title": "Check your inbox",
       "signupBody": "We sent a confirmation link to this address.",
       "resetBody": "We sent a password reset link to this address.",
-      "signupKnown": "If this email already has an account, no email comes. Sign in or use Forgot your password instead.",
+      "signupKnown": "If this email already has an account, you get a sign-in link instead.",
       "resetKnown": "If this email has no account, no email comes.",
       "spam": "If you cannot see it, check your spam folder.",
       "resend": "Resend the link",

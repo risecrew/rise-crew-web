@@ -6,7 +6,7 @@ import type { Locale } from '@/i18n/locales';
 import { RESEND_SECONDS } from '@/lib/auth/login';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { cn } from '@/lib/utils';
-import { Alert, PILL, afterSignIn } from './form-parts';
+import { Alert, PILL } from './form-parts';
 
 type Props = {
   locale: Locale;
@@ -65,7 +65,7 @@ export function InboxScreen({ locale, next, email, kind, resend, onChangeAddress
       const [had, now] = await Promise.all([before, currentToken()]);
       if (done || !now || now === had) return;
       done = true;
-      window.location.replace(afterSignIn(locale, next));
+      window.location.replace(`/${locale}/reset-password?first=1&next=${encodeURIComponent(next)}`);
     };
 
     // A phone stops the timer of a tab in the background, so coming back to the tab checks as well.

@@ -9,13 +9,13 @@ import { passwordProblem } from '@/lib/auth/password';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { cn } from '@/lib/utils';
 
-type Props = { locale: Locale; next: string };
+type Props = { locale: Locale; next: string; first: boolean };
 type Problem = 'same' | 'stale' | 'failed';
 
-// Where the reset mail lands. The link has already signed the visitor in, so this only sets the new
-// password. Anyone else signed in to the account elsewhere is signed out: someone resetting a
-// password may be doing it because they lost a device or suspect another person got in.
-export function ResetForm({ locale, next }: Props) {
+// Where a reset mail, or the first mail to a new address, lands. The link has already signed the
+// visitor in, so this only sets the password. Anyone else signed in to the account elsewhere is
+// signed out: someone resetting a password may have lost a device or suspect another person got in.
+export function ResetForm({ locale, next, first }: Props) {
   const t = useTranslations('Auth.reset');
   const pass = useTranslations('Auth.password');
 
@@ -59,6 +59,11 @@ export function ResetForm({ locale, next }: Props) {
 
     // The password is saved either way; a failure here must not say otherwise.
     await auth.signOut({ scope: 'others' }).catch(() => {});
+    // A first password is one step of signing up, with nothing to report.
+    if (first) {
+      window.location.replace(afterSignIn(locale, next));
+      return;
+    }
     setBusy(false);
     setPassword('');
     setDone(true);
@@ -85,14 +90,14 @@ export function ResetForm({ locale, next }: Props) {
 
   return (
     <div className="w-full max-w-md">
-      <h1 className={SCREEN_TITLE}>{t('title')}</h1>
-      <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
+      <h1 className={SCREEN_TITLE}>{t(first ? 'firstTitle' : 'title')}</h1>
+      <p className="mt-5 text-lg break-keep text-white/85">{t(first ? 'firstLead' : 'lead')}</p>
       {problem ? <Alert>{t(`errors.${problem}`)}</Alert> : null}
 
       <form noValidate onSubmit={onSubmit} className="mt-6">
         <PasswordField
           id="reset-password"
-          label={t('passwordLabel')}
+          label={t(first ? 'firstLabel' : 'passwordLabel')}
           value={password}
           onChange={(value) => {
             setPassword(value);

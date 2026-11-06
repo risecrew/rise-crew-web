@@ -220,9 +220,8 @@ function passwordBox(page: Page, label = '비밀번호') {
   return page.getByLabel(label, { exact: true });
 }
 
-async function signUpForm(page: Page, email: string, password = TEST_PASSWORD) {
+async function signUpForm(page: Page, email: string) {
   await page.getByLabel('이메일').fill(email);
-  await passwordBox(page).fill(password);
   await page.getByRole('button', { name: '가입하기' }).click();
 }
 
@@ -284,7 +283,6 @@ test('the password can be shown, and has what a password manager looks for', asy
   await expect(box).toHaveAttribute('type', 'text');
   await expectAccessible(page);
   await page.goto('/ko/signup');
-  await expect(passwordBox(page)).toHaveAttribute('autocomplete', 'new-password');
   await expectAccessible(page);
   await expectNoHorizontalScroll(page);
   await page.goto('/ko/forgot-password');
@@ -292,10 +290,10 @@ test('the password can be shown, and has what a password manager looks for', asy
   await expectNoHorizontalScroll(page);
 });
 
-test('signing up confirms the address once, and the password works from then on', async ({
+test('signing up confirms the address once, then the password works from then on', async ({
   page,
-  baseURL,
   context,
+  baseURL,
 }, testInfo) => {
   const email = uniqueEmail('signup', testInfo);
   try {
@@ -312,8 +310,20 @@ test('signing up confirms the address once, and the password works from then on'
     expect(link.origin).toBe(baseURL);
     expect(link.pathname).toBe('/ko/auth/confirm');
     expect(link.searchParams.get('next')).toBe('/ko/about');
-    expect(link.searchParams.get('type')).toBe('email');
+    expect(link.searchParams.get('type')).toBe('signup');
     await page.goto(link.toString());
+    await expect(page).toHaveURL(/\/ko\/reset-password\?next=%2Fko%2Fabout&first=1$/);
+    await expect(page.getByRole('heading', { level: 1, name: '비밀번호 정하기' })).toBeVisible();
+    await expectAccessible(page);
+
+    // The rule is checked here now, before anything is saved.
+    for (const weak of ['short1', 'onlyletters']) {
+      await passwordBox(page).fill(weak);
+      await page.getByRole('button', { name: '비밀번호 저장' }).click();
+      await expect(page.getByRole('main').getByRole('alert')).toContainText('8자 이상');
+    }
+    await passwordBox(page).fill(TEST_PASSWORD);
+    await page.getByRole('button', { name: '비밀번호 저장' }).click();
     await expect(page).toHaveURL(/\/ko\/welcome\?next=%2Fko%2Fabout$/);
 
     // Later, somewhere else: no mail, only the password.
@@ -328,57 +338,24 @@ test('signing up confirms the address once, and the password works from then on'
   }
 });
 
-test('a password that breaks the rule is refused before any mail goes out', async ({
+test('signing up with an address that has an account looks the same and sends a sign-in link', async ({
   page,
-}, testInfo) => {
-  const email = uniqueEmail('weak', testInfo);
-  await page.goto('/ko/signup');
-  await signUpForm(page, email, 'short1');
-  await expect(
-    page.getByRole('main').getByText('8자 이상, 영문과 숫자를 함께 써 주세요.'),
-  ).toBeVisible();
-  await signUpForm(page, email, 'onlyletters');
-  await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toHaveCount(0);
-});
-
-test('signing up with an address that has an account looks the same and sends nothing', async ({
-  page,
+  baseURL,
 }, testInfo) => {
   const email = uniqueEmail('taken', testInfo);
-  await createPasswordAccount(email);
+  await createOnboardedAccount(email);
   try {
     await clearMessagesFor(email);
-    await page.goto('/ko/signup');
-    await signUpForm(page, email, 'another-pass-2');
-    await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
-    await page.waitForTimeout(1_000);
-    expect(await latestLinkForNow(email)).toBeNull();
-  } finally {
-    await deleteAccount(email);
-  }
-});
-
-test('an address not confirmed yet is told so at sign-in, and can get the mail again', async ({
-  page,
-}, testInfo) => {
-  const email = uniqueEmail('unconfirmed', testInfo);
-  try {
+    // Making the account above counted as a mail for Auth's one-a-second limit.
+    await page.waitForTimeout(1_200);
     await page.goto('/ko/signup');
     await signUpForm(page, email);
     await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
-    await latestLinkFor(email);
-    await clearMessagesFor(email);
 
-    await page.goto('/ko/login');
-    await page.getByLabel('이메일').fill(email);
-    await passwordBox(page).fill(TEST_PASSWORD);
-    await page.getByRole('button', { name: '로그인', exact: true }).click();
-    await expect(notice(page)).toContainText('아직 이메일 확인을 마치지 않았어요.');
-
-    await page.waitForTimeout(1_200);
-    await page.getByRole('button', { name: '확인 메일 다시 받기' }).click();
-    await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
-    expect(new URL(await latestLinkFor(email)).searchParams.get('type')).toBe('email');
+    const link = new URL(await latestLinkFor(email));
+    expect(link.searchParams.get('type')).toBe('email');
+    await page.goto(link.toString());
+    await expect(page).toHaveURL(`${baseURL}/ko`);
   } finally {
     await deleteAccount(email);
   }
@@ -396,10 +373,10 @@ test('the waiting tab moves on by itself once the link was opened in another tab
 
     const mailTab = await context.newPage();
     await mailTab.goto(await latestLinkFor(email));
-    await expect(mailTab).toHaveURL(/\/ko\/welcome/);
+    await expect(mailTab).toHaveURL(/\/ko\/reset-password/);
     await mailTab.close();
 
-    await expect(page).toHaveURL(/\/ko\/welcome\?next=%2Fko%2Fabout$/);
+    await expect(page).toHaveURL(/\/ko\/reset-password\?first=1&next=%2Fko%2Fabout$/);
   } finally {
     await deleteAccount(email);
   }
@@ -435,14 +412,13 @@ test('the English sign-up sends the visitor back to the English page', async ({
   try {
     await page.goto('/en/signup?next=%2Fen%2Fabout');
     await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password', { exact: true }).fill(TEST_PASSWORD);
     await page.getByRole('button', { name: 'Sign up' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible();
 
     const link = new URL(await latestLinkFor(email));
     expect(link.pathname).toBe('/en/auth/confirm');
     await page.goto(link.toString());
-    await expect(page).toHaveURL(/\/en\/welcome\?next=%2Fen%2Fabout$/);
+    await expect(page).toHaveURL(/\/en\/reset-password\?next=%2Fen%2Fabout&first=1$/);
   } finally {
     await deleteAccount(email);
   }

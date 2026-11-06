@@ -14,11 +14,10 @@ import {
   withNext,
 } from '@/components/auth/form-parts';
 import { GoogleButton } from '@/components/auth/google-button';
-import { InboxScreen } from '@/components/auth/inbox-screen';
 import { PasswordField } from '@/components/auth/password-field';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
-import { confirmUrl, isEmailAddress, type LoginNotice } from '@/lib/auth/login';
+import { isEmailAddress, type LoginNotice } from '@/lib/auth/login';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { cn } from '@/lib/utils';
 
@@ -32,7 +31,7 @@ type Props = {
   endSession: boolean;
 };
 
-type Notice = LoginNotice | 'credentials' | 'notConfirmed' | 'failed' | 'sendFailed' | 'tooMany';
+type Notice = LoginNotice | 'credentials' | 'failed' | 'tooMany';
 
 export function LoginForm({ locale, next, notice: initialNotice, endSession }: Props) {
   const t = useTranslations('Auth.login');
@@ -46,8 +45,6 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
   const [notice, setNotice] = useState<Notice | null>(initialNotice);
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
-  // The address a confirmation mail just went to again.
-  const [sentTo, setSentTo] = useState<string | null>(null);
 
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -93,11 +90,11 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
 
     setBusy(false);
     setEmail(address);
-    if (error.code === 'invalid_credentials') {
+    if (error.code === 'invalid_credentials' || error.code === 'email_not_confirmed') {
+      // The same answer for both: only someone who already had the right password could tell them
+      // apart, and an unconfirmed account has no password that anyone chose through this site.
       setPassword('');
       setNotice('credentials');
-    } else if (error.code === 'email_not_confirmed') {
-      setNotice('notConfirmed');
     } else if (error.code === 'user_banned') {
       setNotice('blocked');
     } else if (error.status === 429) {
@@ -107,67 +104,11 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
     }
   }
 
-  async function sendConfirmation(address: string): Promise<'sendFailed' | 'tooMany' | null> {
-    let error: { status?: number; code?: string } | null;
-    try {
-      ({ error } = await createSupabaseBrowserClient().auth.resend({
-        type: 'signup',
-        email: address,
-        options: { emailRedirectTo: confirmUrl(window.location.origin, locale, next) },
-      }));
-    } catch {
-      error = {};
-    }
-    if (!error) return null;
-    return error.status === 429 || error.code === 'over_email_send_rate_limit'
-      ? 'tooMany'
-      : 'sendFailed';
-  }
-
-  async function onResendConfirmation() {
-    if (busy) return;
-    setBusy(true);
-    const problem = await sendConfirmation(email);
-    setBusy(false);
-    if (problem) setNotice(problem);
-    else setSentTo(email);
-  }
-
-  if (sentTo !== null) {
-    return (
-      <InboxScreen
-        locale={locale}
-        next={next}
-        email={sentTo}
-        kind="signup"
-        resend={async () => {
-          const problem = await sendConfirmation(sentTo);
-          return problem ? t(`errors.${problem}`) : null;
-        }}
-        onChangeAddress={() => {
-          setSentTo(null);
-          setNotice(null);
-          setPassword('');
-        }}
-      />
-    );
-  }
-
   return (
     <div className="w-full max-w-md">
       <h1 className={SCREEN_TITLE}>{t('title')}</h1>
       <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
       {notice ? <Alert>{t(`errors.${notice}`)}</Alert> : null}
-      {notice === 'notConfirmed' ? (
-        <button
-          type="button"
-          onClick={onResendConfirmation}
-          disabled={busy}
-          className={INLINE_LINK}
-        >
-          {t('resendConfirm')}
-        </button>
-      ) : null}
 
       <GoogleButton
         locale={locale}

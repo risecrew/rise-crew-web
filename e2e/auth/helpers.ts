@@ -36,7 +36,9 @@ export async function requestSignInLink(
     if (error.code !== 'over_email_send_rate_limit' || attempt === 4) throw error;
     await new Promise((resolve) => setTimeout(resolve, 1100));
   }
-  return latestLinkFor(email);
+  // The first mail to a new address leads to the password step, which these tests are not about.
+  // Its token also works as a plain sign-in link.
+  return (await latestLinkFor(email)).replace('type=signup', 'type=email');
 }
 
 // Signs `page` in through an emailed link and waits for the page to go quiet. Right after landing,
@@ -326,12 +328,13 @@ export async function hidePost(id: string): Promise<void> {
 export const TEST_PASSWORD = 'local-test-pass-1';
 
 export async function createPasswordAccount(email: string): Promise<string> {
-  const { data, error } = await adminClient().auth.admin.createUser({
-    email,
-    password: TEST_PASSWORD,
-    email_confirm: true,
-  });
+  // Two steps: Auth confirms a new account in a write of its own, and the trigger that clears a
+  // password set before confirmation cannot tell that one apart from anybody else's.
+  const admin = adminClient();
+  const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true });
   if (error) throw error;
+  const updated = await admin.auth.admin.updateUserById(data.user.id, { password: TEST_PASSWORD });
+  if (updated.error) throw updated.error;
   return data.user.id;
 }
 

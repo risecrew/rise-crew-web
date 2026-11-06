@@ -10,16 +10,13 @@ import {
   INPUT,
   PILL,
   SCREEN_TITLE,
-  afterSignIn,
   withNext,
 } from '@/components/auth/form-parts';
 import { GoogleButton } from '@/components/auth/google-button';
 import { InboxScreen } from '@/components/auth/inbox-screen';
-import { PasswordField } from '@/components/auth/password-field';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
 import { confirmUrl, isEmailAddress } from '@/lib/auth/login';
-import { passwordProblem } from '@/lib/auth/password';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { cn } from '@/lib/utils';
 
@@ -32,24 +29,35 @@ function mailProblem(error: { status?: number; code?: string }): 'sendFailed' | 
     : 'sendFailed';
 }
 
-// A new account by email: an address and a password, then one confirmation mail. An address that
-// already has an account gets the same "check your inbox" (and no mail), so this form cannot be used
-// to find out who has signed up.
+// A new account by email: the address first, and the password after the mail confirms it, because a
+// password chosen before that proves nothing (see the migration that clears one). An address that
+// already has an account gets the same screen and a sign-in link, so this form cannot be used to find
+// out who has signed up.
 export function SignupForm({ locale, next }: Props) {
   const t = useTranslations('Auth.signup');
   const login = useTranslations('Auth.login');
-  const pass = useTranslations('Auth.password');
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [emailErrors, setEmailErrors] = useState(0);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
   const emailRef = useRef<HTMLInputElement>(null);
+
+  async function send(address: string): Promise<'sendFailed' | 'tooMany' | null> {
+    let error: { status?: number; code?: string } | null;
+    try {
+      ({ error } = await createSupabaseBrowserClient().auth.signInWithOtp({
+        email: address,
+        options: { emailRedirectTo: confirmUrl(window.location.origin, locale, next) },
+      }));
+    } catch {
+      error = {};
+    }
+    return error ? mailProblem(error) : null;
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,41 +69,17 @@ export function SignupForm({ locale, next }: Props) {
       emailRef.current?.focus();
       return;
     }
-    const problem = passwordProblem(password);
-    if (problem) {
-      setPasswordError(pass(problem));
-      return;
-    }
 
     setBusy(true);
     setNotice(null);
-    let error: { status?: number; code?: string } | null;
-    let hasSession = false;
-    try {
-      const answer = await createSupabaseBrowserClient().auth.signUp({
-        email: address,
-        password,
-        options: { emailRedirectTo: confirmUrl(window.location.origin, locale, next) },
-      });
-      error = answer.error;
-      hasSession = answer.data.session !== null;
-    } catch {
-      error = {};
-    }
-    if (!error && hasSession) {
-      window.location.replace(afterSignIn(locale, next));
+    const problem = await send(address);
+    setBusy(false);
+    if (problem) {
+      setNotice(problem);
       return;
     }
-    setBusy(false);
-    if (error?.code === 'weak_password') {
-      setPasswordError(pass('invalid'));
-    } else if (error && error.code !== 'user_already_exists') {
-      setNotice(mailProblem(error));
-    } else {
-      setPassword('');
-      setEmail(address);
-      setSentTo(address);
-    }
+    setEmail(address);
+    setSentTo(address);
   }
 
   if (sentTo !== null) {
@@ -106,17 +90,8 @@ export function SignupForm({ locale, next }: Props) {
         email={sentTo}
         kind="signup"
         resend={async () => {
-          let error: { status?: number; code?: string } | null;
-          try {
-            ({ error } = await createSupabaseBrowserClient().auth.resend({
-              type: 'signup',
-              email: sentTo,
-              options: { emailRedirectTo: confirmUrl(window.location.origin, locale, next) },
-            }));
-          } catch {
-            error = {};
-          }
-          return error ? login(`errors.${mailProblem(error)}`) : null;
+          const problem = await send(sentTo);
+          return problem ? login(`errors.${problem}`) : null;
         }}
         onChangeAddress={() => {
           setSentTo(null);
@@ -152,7 +127,7 @@ export function SignupForm({ locale, next }: Props) {
         <span aria-hidden className="h-px flex-1 bg-white/15" />
       </div>
 
-      {/* No names on the inputs, for the same reason as on the sign-in form. */}
+      {/* No name on the input, for the same reason as on the sign-in form. */}
       <form noValidate onSubmit={onSubmit}>
         <label htmlFor="signup-email" className={FIELD_LABEL}>
           {login('emailLabel')}
@@ -180,18 +155,6 @@ export function SignupForm({ locale, next }: Props) {
             {login('emailInvalid')}
           </p>
         ) : null}
-        <PasswordField
-          id="signup-password"
-          label={login('passwordLabel')}
-          value={password}
-          onChange={(value) => {
-            setPassword(value);
-            setPasswordError(null);
-          }}
-          autoComplete="new-password"
-          hint={t('passwordHint')}
-          error={passwordError}
-        />
         <button
           type="submit"
           disabled={busy || googleBusy}
