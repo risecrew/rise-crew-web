@@ -9,6 +9,7 @@ import { profileValues } from '@/lib/auth/profile-values';
 import { isStudent } from '@/lib/auth/occupation';
 import { requireViewer } from '@/lib/auth/viewer';
 import { single } from '@/lib/search-params';
+import { listMyTeams } from '@/lib/teams/queries';
 import { AccountLayout, accountMetadata } from '../account-layout';
 import { ProfileForm } from '../welcome/profile-form';
 import { DeleteAccount } from './delete-account';
@@ -72,6 +73,7 @@ export default async function MyPage({ params, searchParams }: Props) {
 
   const profile = viewer.profile;
   const name = displayName(profile, locale) || viewer.email;
+  const teams = await listMyTeams(viewer);
   const occupation = await getTranslations('Auth.profile');
   const menu = await getTranslations('Auth.menu');
   const student = profile.occupation !== null && isStudent(profile.occupation);
@@ -133,6 +135,26 @@ export default async function MyPage({ params, searchParams }: Props) {
               </dd>
             </div>
           ))}
+          {teams.length > 0 ? (
+            <div className="border-t border-white/15 py-4">
+              <dt className="text-sm font-medium text-white/60">{t('rows.teams')}</dt>
+              <dd className="mt-1">
+                <ul>
+                  {teams.map((team) => (
+                    <li key={team.slug}>
+                      <Link
+                        href={`/startups/${team.slug}`}
+                        prefetch={false}
+                        className="inline-flex min-h-11 items-center text-lg font-semibold wrap-anywhere break-keep text-white underline underline-offset-4"
+                      >
+                        {team.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ) : null}
         </dl>
 
         <div className="border-t border-white/15 pt-6">

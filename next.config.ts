@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   // The e2e run with accounts switched on builds into its own folder (.next-auth), so it can sit
   // beside the default build without overwriting it.
   distDir: process.env.NEXT_DIST_DIR ?? '.next',
+  // Every visitor gets the page's metadata in its head. Otherwise Next.js streams it into the body
+  // for browsers it recognizes, and KakaoTalk's link preview, which is not on its list of bots,
+  // would not find the team's title and picture.
+  htmlLimitedBots: /.*/,
   // 75 for every photo; 90 for the opening one, which fills the window and is looked at first.
   images: { qualities: [75, 90] },
   // Vendored fonts live in versioned folders (public/fonts/<package>-<version>), so a file at a

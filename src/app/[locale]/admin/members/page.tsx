@@ -125,6 +125,9 @@ export default async function MembersPage({ params, searchParams }: Props) {
           the title and the table start where the logo does. */}
       <div className="w-full max-w-[75rem] flex-1">
         <h1 className={TITLE}>{t('title')}</h1>
+        <Link href="/admin/teams" className={`${LINK} mt-2 -ml-3`}>
+          {t('toTeams')}
+        </Link>
 
         <form
           method="get"

@@ -230,6 +230,44 @@ test('asking for a link shows the inbox state, and the emailed link signs the vi
   ).toHaveCount(0);
 });
 
+test('the waiting tab moves on by itself once the link was opened in another tab', async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  const email = 'member@example.test';
+  await clearMessagesFor(email);
+
+  await page.goto('/ko/login?next=%2Fko%2Fabout');
+  await page.getByLabel('이메일').fill(email);
+  await page.getByRole('button', { name: '로그인 링크 받기' }).click();
+  await expect(page.getByRole('heading', { name: '메일함을 확인해 주세요' })).toBeVisible();
+
+  const mailTab = await context.newPage();
+  await mailTab.goto(await latestLinkFor(email));
+  await expect(mailTab).toHaveURL(`${baseURL}/ko/about`);
+  await mailTab.close();
+
+  await expect(page).toHaveURL(`${baseURL}/ko/about`);
+});
+
+test('the waiting screen stays put for a session this browser already had', async ({
+  page,
+  baseURL,
+}) => {
+  const email = 'member@example.test';
+  await signIn(page, email, baseURL!);
+  await page.goto('/ko/login?error=link');
+  await clearMessagesFor(email);
+  await page.getByLabel('이메일').fill(email);
+  await page.getByRole('button', { name: '로그인 링크 받기' }).click();
+
+  const heading = page.getByRole('heading', { name: '메일함을 확인해 주세요' });
+  await expect(heading).toBeVisible();
+  await page.waitForTimeout(3_000);
+  await expect(heading).toBeVisible();
+});
+
 test('the English form sends the visitor back to the English page', async ({ page, baseURL }) => {
   // A different account than the test before it: Auth lets one account ask for a link once a second.
   const email = 'operator@example.test';
@@ -406,7 +444,8 @@ test.describe('a visitor who is already signed in', () => {
     const header = page.locator('header');
     await expect(header.getByRole('link', { name: '마이페이지' })).toBeVisible();
     // A member is not on the operator team.
-    await expect(header.getByRole('link', { name: '관리', exact: true })).toHaveCount(0);
+    await expect(header.getByRole('link', { name: '회원 관리', exact: true })).toHaveCount(0);
+    await expect(header.getByRole('link', { name: '팀 관리', exact: true })).toHaveCount(0);
 
     await header.getByRole('button', { name: '로그아웃' }).click();
     await expect(page).toHaveURL(`${baseURL}/ko`);
@@ -425,8 +464,13 @@ test.describe('a visitor who is already signed in', () => {
     const toggle = page.getByRole('button', { name: /계정 메뉴/ });
     if (await toggle.isVisible()) await toggle.click();
     await expect(
-      page.locator('header').getByRole('link', { name: '관리', exact: true }),
+      page.locator('header').getByRole('link', { name: '회원 관리', exact: true }),
     ).toBeVisible();
+    const teams = page.locator('header').getByRole('link', { name: '팀 관리', exact: true });
+    await expect(teams).toHaveAttribute('href', '/ko/admin/teams');
+    await teams.click();
+    await expect(page).toHaveURL(`${baseURL}/ko/admin/teams`);
+    await expect(page.getByRole('heading', { level: 1, name: '팀 관리' })).toBeVisible();
   });
 
   test('can close the desktop menu with Escape', async ({ page, baseURL }, testInfo) => {
