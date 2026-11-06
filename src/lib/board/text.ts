@@ -1,6 +1,7 @@
 import type { Localized, TimelineEvent } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { getSupabasePublicConfig } from '@/lib/supabase/env';
+import type { Attachment } from './forms';
 
 // English is optional. Where there is none, the English pages show the Korean.
 export function localized(ko: string, en: string, locale: Locale): string {
@@ -25,6 +26,22 @@ export function isUploadedPhoto(photo: string | null): photo is string {
 export function activityPhotoSrc(photo: string): string {
   if (!isUploadedPhoto(photo)) return photo;
   return `${getSupabasePublicConfig().url}/storage/v1/object/public/activity-photos/${photo}`;
+}
+
+function noticeFileUrl(path: string): string {
+  return `${getSupabasePublicConfig().url}/storage/v1/object/public/notice-files/${path}`;
+}
+
+export const noticePhotoSrc = noticeFileUrl;
+
+// Storage sends the file as a download under this name, rather than opening it in the site's place.
+export function noticeFileDownload(file: Attachment): string {
+  return `${noticeFileUrl(file.path)}?download=${encodeURIComponent(file.name)}`;
+}
+
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 type TimelineRow = {

@@ -777,7 +777,19 @@
       "bodyKo": "Body (Korean)",
       "bodyEn": "Body (English, optional)",
       "pinned": "Pin to the top",
-      "deleteQuestion": "Delete this notice? This cannot be undone."
+      "deleteQuestion": "Delete this notice? This cannot be undone.",
+      "photos": "Photos (optional, up to {count})",
+      "files": "Files (optional, up to {count})",
+      "filesHint": "PDF, Hangul, Word, Excel and PowerPoint files, up to 10MB each.",
+      "publicWarning": "Anyone can download the photos and files you attach. Never attach anything with personal details, such as a list of applicants or contacts.",
+      "remove": "Remove",
+      "removeLabel": "Remove {name}",
+      "removePhoto": "Remove photo {number}",
+      "photoAlt": "Attached photo {number}",
+      "tooManyPhotos": "You can attach up to {count} photos.",
+      "tooManyFiles": "You can attach up to {count} files.",
+      "fileTooLarge": "{name} is over 10MB.",
+      "fileBadType": "{name} isn't a type that can be attached."
     }
   },
   "Teams": {
@@ -916,6 +928,9 @@
       "lead": "Recruitment and event announcements.",
       "empty": "No notices yet.",
       "toList": "Back to notices"
-    }
+    },
+    "files": "Files",
+    "hasFiles": "Files",
+    "photoAlt": "{title}, photo {number}"
   }
 }

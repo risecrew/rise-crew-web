@@ -90,7 +90,7 @@ pnpm e2e:auth       # 로그인과 계정 화면 e2e (위 "검사" 참고)
 2. Vercel의 **Production** 환경변수에 `NEXT_PUBLIC_AUTH_ENABLED=true` **하나만** 더한다. `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`는 이 PR을 merge하기 **전에** 이미 운영용 Supabase 프로젝트의 값으로 Production에 넣어 두었어야 한다(아래 "7. Vercel 환경변수"). 스위치가 없으면 이 세 값이 있어도 계정 기능은 꺼진 채라서, merge해도 공개 사이트는 그대로다. 출시 때 새로 더하는 것은 스위치 하나뿐이다.
 3. 다시 배포한다.
 4. 실제 주소에서 구글 로그인, 인증번호 가입, 비밀번호 로그인이 끝까지 되는지 확인한다.
-5. 운영용 프로젝트에 운영진이 팀을 입력하고 공개를 켠다. 팀 공간, 활동, 공지의 테이블과 저장소는 마이그레이션으로 만들어진다. 스위치를 켜기 **전에** 운영 DB에 올린다(`/about`과 활동·공지 페이지가 빌드할 때 이 테이블을 읽는다).
+5. 운영용 프로젝트에 운영진이 팀을 입력하고 공개를 켠다. 팀 공간, 활동, 공지의 테이블과 저장소는 마이그레이션으로 만들어진다. 스위치를 켜기 **전에** 운영 DB에 올린다(스위치를 켜면 `/about`도 이 테이블을 읽는다).
 6. `/ko/activities`와 `/ko/about` 연혁에 활동 15건이 나오는지 확인한다. 이때부터 연혁은 DB를 읽는다. 홈은 계속 `src/content/data/stamps.ts`를 읽으므로, 새 활동을 홈에도 넣으려면 그 파일을 고친다.
 7. 검색엔진에 사이트를 열 때 `/startups`, `/activities`, `/notices`를 sitemap에 더한다.
 

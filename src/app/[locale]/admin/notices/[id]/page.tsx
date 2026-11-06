@@ -7,6 +7,7 @@ import { ROW, TITLE } from '@/components/teams/form-parts';
 import { asLocale } from '@/i18n/as-locale';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { requireRole } from '@/lib/auth/viewer';
+import { readAttachments } from '@/lib/board/forms';
 import { getNotice } from '@/lib/board/queries';
 import { AccountLayout, accountMetadata } from '../../../account-layout';
 import { deleteNotice } from '../actions';
@@ -34,7 +35,7 @@ export default async function EditNoticePage({ params }: Props) {
     <AccountLayout>
       <div className="w-full max-w-3xl flex-1">
         <h1 className={TITLE}>{t('edit')}</h1>
-        <NoticeForm notice={notice} />
+        <NoticeForm notice={{ ...notice, attachments: readAttachments(notice.attachments) }} />
         <div className={`${ROW} mt-10`}>
           <DeleteItem id={notice.id} question={t('deleteQuestion')} action={deleteNotice} />
         </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageCover } from '@/components/site/page-cover';
 import { SectionHeading } from '@/components/site/section-heading';
@@ -37,6 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AboutPage({ params }: Props) {
+  // With accounts on, the history comes from the database, as current as the activities page. With
+  // them off nothing here reads it, so the page stays static.
+  if (isAuthEnabled()) await connection();
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('About');

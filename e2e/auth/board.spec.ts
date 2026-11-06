@@ -3,7 +3,6 @@ import { collectConsoleErrors, expectAccessible, expectNoHorizontalScroll } from
 import { adminClient, createOnboardedAccount, deleteAccount, signIn } from './helpers';
 
 // What operators publish and everyone reads: activities and notices. Fake data on the local stack.
-// Rows are made through the screens because the public pages are cached until a save refreshes them.
 const OPERATOR = 'operator@example.test';
 const MEMBER = 'member@example.test';
 
@@ -231,17 +230,14 @@ test('a notice goes up, stays pinned on top, can be changed, and can be deleted'
   await addNotice(page, plain, '줄 하나\n줄 둘');
 
   const visitor = await (await browser.newContext()).newPage();
+  await visitor.goto('/ko/notices');
   const rows = visitor.locator('[data-notice]');
-  // Other tests save notices at the same moment, so the list may need a reload to catch up.
-  await expect(async () => {
-    await visitor.goto('/ko/notices');
-    const texts = await rows.allInnerTexts();
-    const [first, second] = [pinned, plain].map((title) =>
-      texts.findIndex((text) => text.includes(title)),
-    );
-    expect(first).toBeGreaterThanOrEqual(0);
-    expect(second).toBeGreaterThan(first);
-  }).toPass({ timeout: 15_000 });
+  const texts = await rows.allInnerTexts();
+  const [first, second] = [pinned, plain].map((title) =>
+    texts.findIndex((text) => text.includes(title)),
+  );
+  expect(first).toBeGreaterThanOrEqual(0);
+  expect(second).toBeGreaterThan(first);
   await expect(rows.filter({ hasText: pinned })).toContainText('고정');
   await expectAccessible(visitor);
 
@@ -336,4 +332,100 @@ test('someone demoted mid-form is refused, and the photo does not stay behind', 
   const { data } = await adminClient().from('notices').select('id').eq('title_ko', '강등 공지');
   expect(data).toEqual([]);
   await deleteAccount(email);
+});
+
+async function noticeFilesExist(paths: string[]): Promise<boolean[]> {
+  const { data, error } = await adminClient()
+    .storage.from('notice-files')
+    .list('', { limit: 1000 });
+  if (error) throw error;
+  const names = new Set(data.map((file) => file.name));
+  return paths.map((path) => names.has(path));
+}
+
+test('a notice carries photos and files, which download under their name and go when they are removed', async ({
+  page,
+  browser,
+  baseURL,
+}, testInfo) => {
+  const title = `첨부 공지 ${unique(testInfo)}`;
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/admin/notices/new');
+  await expect(page.getByText(/개인정보가 든 파일은 올리지 마세요/)).toBeVisible();
+  await page.getByLabel('제목', { exact: true }).fill(title);
+  await page.getByLabel('본문', { exact: true }).fill('본문입니다.');
+
+  // A page is refused where the file was picked, and nothing is added.
+  await page.getByLabel(/첨부 파일/).setInputFiles({
+    name: 'evil.html',
+    mimeType: 'text/html',
+    buffer: Buffer.from('<script>alert(1)</script>'),
+  });
+  await expect(page.getByText(/올릴 수 없는 형식/)).toBeVisible();
+
+  await page.getByLabel(/^사진/).setInputFiles({
+    name: 'photo.jpg',
+    mimeType: 'image/jpeg',
+    buffer: JPEG,
+  });
+  await page.getByLabel(/첨부 파일/).setInputFiles([
+    { name: '모집 안내.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 test') },
+    // Browsers often send a Hangul file with no type at all.
+    { name: '지원서.hwp', mimeType: '', buffer: Buffer.from('hwp test') },
+  ]);
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
+
+  const { data, error } = await adminClient()
+    .from('notices')
+    .select('id, photo_paths, attachments')
+    .eq('title_ko', title)
+    .single();
+  if (error) throw error;
+  const files = data.attachments as { path: string; name: string }[];
+  expect(files.map((file) => file.name)).toEqual(['모집 안내.pdf', '지원서.hwp']);
+  expect(data.photo_paths).toHaveLength(1);
+
+  const visitor = await (await browser.newContext()).newPage();
+  await visitor.goto(`/ko/notices/${data.id}`);
+  await expect(visitor.getByRole('img', { name: `${title} 사진 1` })).toBeVisible();
+  const link = visitor.getByRole('link', { name: /모집 안내\.pdf/ });
+  const response = await visitor.request.get((await link.getAttribute('href'))!);
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-disposition']).toContain('attachment');
+  await expectAccessible(visitor);
+  await expectNoHorizontalScroll(visitor);
+
+  // The list says there is something attached.
+  await visitor.goto('/ko/notices');
+  await expect(visitor.locator('[data-notice]', { hasText: title })).toContainText('첨부');
+
+  // Removing one file on the edit screen removes it from Storage, and keeps the rest.
+  await page.goto(`/ko/admin/notices/${data.id}`);
+  await page.getByRole('button', { name: '모집 안내.pdf 빼기' }).click();
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
+  expect(await noticeFilesExist([files[0].path, files[1].path, data.photo_paths[0]])).toEqual([
+    false,
+    true,
+    true,
+  ]);
+
+  // Deleting the notice takes the rest with it.
+  await page.goto(`/ko/admin/notices/${data.id}`);
+  await page.getByRole('button', { name: '지우기' }).click();
+  await page.getByRole('button', { name: '지우기' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
+  expect(await noticeFilesExist([files[1].path, data.photo_paths[0]])).toEqual([false, false]);
+  await visitor.context().close();
+});
+
+test('an activity without a photo shows the club mark instead of a word', async ({ page }) => {
+  await page.goto('/ko/activities');
+  const card = page.locator('[data-activity]', { hasText: '글로벌 IR과 pre-SEED 투자 유치' });
+  await expect(card.locator('[data-activity-mark] svg')).toBeVisible();
+  await expect(card.locator('[data-activity-mark]')).toHaveText('');
+  // The same shape as a photo, so a row of cards stays level.
+  const box = await card.locator('[data-activity-mark]').boundingBox();
+  expect(box!.width / box!.height).toBeCloseTo(1.5, 1);
 });

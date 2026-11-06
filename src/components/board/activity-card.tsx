@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { getTranslations } from 'next-intl/server';
 import type { Locale } from '@/i18n/locales';
 import { stampState } from '@/lib/content';
@@ -31,15 +32,13 @@ export async function ActivityCard({ activity, locale, today }: Props) {
           />
         </div>
       ) : (
-        // No photo: the city holds its place, so the row of cards stays level.
+        // No photo: the club's mark holds its place, the same for every activity, so the row of cards
+        // stays level.
         <div
-          aria-hidden
-          lang={lang(activity.city_en)}
-          className="flex aspect-[3/2] items-end overflow-hidden rounded-2xl bg-[radial-gradient(ellipse_90%_90%_at_50%_0%,rgb(0_62_145/0.55),transparent_75%)] p-5 ring-1 ring-white/10 ring-inset"
+          data-activity-mark
+          className="flex aspect-[3/2] items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 ring-inset"
         >
-          <span className="font-display text-[clamp(1.75rem,3vw,2.5rem)] leading-none font-[850] tracking-[-0.02em] break-keep text-white/90">
-            {localized(activity.city_ko, activity.city_en, locale)}
-          </span>
+          <RiseSymbol className="h-auto w-1/5 text-white/35" />
         </div>
       )}
       <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65">

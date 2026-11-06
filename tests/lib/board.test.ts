@@ -1,6 +1,22 @@
-import { describe, expect, it } from 'vitest';
-import { activitySchema, noticeSchema, BOARD_LIMITS, isActivityDate } from '@/lib/board/forms';
-import { activityTimeline, isUploadedPhoto, localized, showsFallback } from '@/lib/board/text';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  activitySchema,
+  BOARD_LIMITS,
+  cleanFileName,
+  isActivityDate,
+  noticeFileContentType,
+  noticeFileProblem,
+  noticeSchema,
+  readAttachments,
+} from '@/lib/board/forms';
+import {
+  activityTimeline,
+  formatFileSize,
+  isUploadedPhoto,
+  localized,
+  noticeFileDownload,
+  showsFallback,
+} from '@/lib/board/text';
 
 const activity = {
   date: '2026-11-06',
@@ -114,5 +130,53 @@ describe('activityTimeline', () => {
       evidence: [],
     });
     expect(events[0]).not.toHaveProperty('date', null);
+  });
+});
+
+describe('notice attachments', () => {
+  it('knows a file by its ending, whatever the browser calls it', () => {
+    expect(noticeFileProblem({ name: '모집 안내.HWP', size: 100 })).toBeNull();
+    expect(noticeFileProblem({ name: '지원서.docx', size: 100 })).toBeNull();
+    expect(noticeFileContentType('지원서.hwp')).toBe('application/x-hwp');
+  });
+  it('refuses a page, a program or an archive, even under a double ending', () => {
+    for (const name of ['a.html', 'a.svg', 'a.exe', 'a.zip', 'a.pdf.html', 'noending']) {
+      expect(noticeFileProblem({ name, size: 100 })).toBe('badType');
+    }
+  });
+  it('refuses a file over the limit', () => {
+    expect(noticeFileProblem({ name: 'a.pdf', size: BOARD_LIMITS.noticeFileBytes + 1 })).toBe(
+      'tooLarge',
+    );
+  });
+  it('reads attachments back, and an unreadable value as none', () => {
+    const file = { path: '7e5c0000-0000-4000-8000-00000000b001.pdf', name: '안내.pdf', size: 10 };
+    expect(readAttachments([file])).toEqual([file]);
+    expect(readAttachments('nonsense')).toEqual([]);
+    expect(readAttachments([{ path: 'https://example.test/a.pdf', name: 'a', size: 1 }])).toEqual(
+      [],
+    );
+  });
+  it('keeps a long file name to the limit with its ending, and without folders', () => {
+    const name = cleanFileName(`../${'가'.repeat(300)}.pdf`);
+    expect(name.length).toBeLessThanOrEqual(BOARD_LIMITS.noticeFileName);
+    expect(name.endsWith('.pdf')).toBe(true);
+    expect(name).not.toContain('/');
+  });
+  it('makes a download address that keeps a Korean file name', () => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.test');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'key');
+    const url = noticeFileDownload({
+      path: '7e5c0000-0000-4000-8000-00000000b001.pdf',
+      name: '모집 안내.pdf',
+      size: 1,
+    });
+    expect(url).toContain('/notice-files/7e5c0000-0000-4000-8000-00000000b001.pdf?download=');
+    expect(url).toContain(encodeURIComponent('모집 안내.pdf'));
+    vi.unstubAllEnvs();
+  });
+  it('says a size in the unit a person would', () => {
+    expect(formatFileSize(900)).toBe('1 KB');
+    expect(formatFileSize(2.5 * 1024 * 1024)).toBe('2.5 MB');
   });
 });

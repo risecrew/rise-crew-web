@@ -7,13 +7,15 @@ import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { getNotices } from '@/lib/board/queries';
+import { readAttachments } from '@/lib/board/forms';
 import { localized, showsFallback } from '@/lib/board/text';
 import { localizedAlternates } from '@/lib/metadata';
 import { postDate } from '@/lib/teams/text';
 
 type Props = { params: Promise<{ locale: string }> };
 
-export const revalidate = 86400;
+// Always the current rows, like the activities page.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isAuthEnabled()) return {};
@@ -57,6 +59,9 @@ export default async function NoticesPage({ params }: Props) {
                         <span className={`mr-2 align-middle ${CHIP}`}>{t('pinned')}</span>
                       ) : null}
                       {localized(notice.title_ko, notice.title_en, locale)}
+                      {readAttachments(notice.attachments).length > 0 ? (
+                        <span className={`ml-2 align-middle ${CHIP}`}>{t('hasFiles')}</span>
+                      ) : null}
                     </span>
                   </Link>
                 </li>

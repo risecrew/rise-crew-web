@@ -11,8 +11,9 @@ import { localizedAlternates } from '@/lib/metadata';
 
 type Props = { params: Promise<{ locale: string }> };
 
-// An operator's save refreshes this page at once; the day is for "upcoming" to turn over by itself.
-export const revalidate = 86400;
+// Always the current rows: what an operator saves shows at once, and a page cached mid-save could
+// otherwise hide it for as long as the cache lasts.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isAuthEnabled()) return {};

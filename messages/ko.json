@@ -777,7 +777,19 @@
       "bodyKo": "본문",
       "bodyEn": "본문 (영어, 선택)",
       "pinned": "맨 위에 고정",
-      "deleteQuestion": "이 공지를 지울까요? 되돌릴 수 없어요."
+      "deleteQuestion": "이 공지를 지울까요? 되돌릴 수 없어요.",
+      "photos": "사진 (선택, {count}장까지)",
+      "files": "첨부 파일 (선택, {count}개까지)",
+      "filesHint": "PDF, 한글, 워드, 엑셀, 파워포인트 파일을 개당 10MB까지 올릴 수 있어요.",
+      "publicWarning": "올린 사진과 파일은 누구나 내려받을 수 있어요. 합격자 명단이나 연락처처럼 개인정보가 든 파일은 올리지 마세요.",
+      "remove": "빼기",
+      "removeLabel": "{name} 빼기",
+      "removePhoto": "사진 {number} 빼기",
+      "photoAlt": "첨부 사진 {number}",
+      "tooManyPhotos": "사진은 {count}장까지 올릴 수 있어요.",
+      "tooManyFiles": "파일은 {count}개까지 올릴 수 있어요.",
+      "fileTooLarge": "{name}은(는) 10MB가 넘어요.",
+      "fileBadType": "{name}은(는) 올릴 수 없는 형식이에요."
     }
   },
   "Teams": {
@@ -916,6 +928,9 @@
       "lead": "모집 안내와 행사 소식을 알려 드립니다.",
       "empty": "아직 올라온 공지가 없어요.",
       "toList": "공지 목록으로"
-    }
+    },
+    "files": "첨부 파일",
+    "hasFiles": "첨부",
+    "photoAlt": "{title} 사진 {number}"
   }
 }

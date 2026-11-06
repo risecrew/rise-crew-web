@@ -1,8 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { locales } from '@/i18n/locales';
 import { DENIED, beginOperatorAction, invalid, text, writeRefusal } from '@/lib/board/actions';
 import { activitySchema, type BoardState } from '@/lib/board/forms';
 import { isUploadedPhoto } from '@/lib/board/text';
@@ -32,13 +30,6 @@ function photoOf(form: FormData): string | null | undefined {
   return PHOTO.test(photo) ? photo : undefined;
 }
 
-function refreshPublicPages() {
-  for (const locale of locales) {
-    revalidatePath(`/${locale}/activities`);
-    revalidatePath(`/${locale}/about`);
-  }
-}
-
 async function removeFile(supabase: Supabase, photo: string | null) {
   if (!isUploadedPhoto(photo)) return;
   // The row no longer points at it, so a file left behind is on no page.
@@ -55,7 +46,6 @@ export async function createActivity(_prev: BoardState, form: FormData): Promise
 
   const { error } = await context.supabase.from('activities').insert({ ...parsed.data, photo });
   if (error) return writeRefusal(error);
-  refreshPublicPages();
   redirect(`/${context.locale}/admin/activities`);
 }
 
@@ -88,7 +78,6 @@ export async function updateActivity(_prev: BoardState, form: FormData): Promise
   if (!data || data.length === 0) return DENIED;
 
   if (changed) await removeFile(context.supabase, before.photo);
-  refreshPublicPages();
   redirect(`/${context.locale}/admin/activities`);
 }
 
@@ -107,6 +96,5 @@ export async function deleteActivity(_prev: BoardState, form: FormData): Promise
   if (!data || data.length === 0) return DENIED;
 
   await removeFile(context.supabase, data[0].photo);
-  refreshPublicPages();
   redirect(`/${context.locale}/admin/activities`);
 }

@@ -105,32 +105,38 @@ export type Database = {
       };
       notices: {
         Row: {
+          attachments: NonNullable<Json>;
           body_en: string;
           body_ko: string;
           created_at: string;
           id: string;
           is_pinned: boolean;
+          photo_paths: string[];
           title_en: string;
           title_ko: string;
           updated_at: string;
         };
         ComputedFields: never;
         Insert: {
+          attachments?: NonNullable<Json>;
           body_en?: string;
           body_ko: string;
           created_at?: string;
           id?: string;
           is_pinned?: boolean;
+          photo_paths?: string[];
           title_en?: string;
           title_ko: string;
           updated_at?: string;
         };
         Update: {
+          attachments?: NonNullable<Json>;
           body_en?: string;
           body_ko?: string;
           created_at?: string;
           id?: string;
           is_pinned?: boolean;
+          photo_paths?: string[];
           title_en?: string;
           title_ko?: string;
           updated_at?: string;
