@@ -1,0 +1,42 @@
+import type { Metadata } from 'next';
+import { notFound, redirect } from 'next/navigation';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { asLocale } from '@/i18n/as-locale';
+import { isAuthEnabled } from '@/lib/auth/config';
+import { leaveLogin } from '@/lib/auth/login';
+import { getViewer } from '@/lib/auth/viewer';
+import { single } from '@/lib/search-params';
+import { AccountLayout, accountMetadata } from '../account-layout';
+import { ResetForm } from './reset-form';
+
+type Props = {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export async function generateMetadata({ params }: Pick<Props, 'params'>): Promise<Metadata> {
+  const locale = asLocale((await params).locale);
+  const t = await getTranslations({ locale, namespace: 'Auth.reset' });
+  return accountMetadata(t('metaTitle'));
+}
+
+// Only with a session, which the emailed link gives. Without one there is no account to change, and
+// the visitor is told the link did not work. An account that has not finished signing up may be
+// here too: it finishes afterwards.
+export default async function ResetPasswordPage({ params, searchParams }: Props) {
+  if (!isAuthEnabled()) notFound();
+
+  const locale = asLocale((await params).locale);
+  setRequestLocale(locale);
+  const next = leaveLogin(single((await searchParams).next), locale);
+
+  const viewer = await getViewer();
+  if (!viewer) redirect(`/${locale}/login?error=link`);
+  if (viewer.blocked) redirect(`/${locale}/login?error=blocked`);
+
+  return (
+    <AccountLayout>
+      <ResetForm locale={locale} next={next} />
+    </AccountLayout>
+  );
+}

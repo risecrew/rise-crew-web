@@ -10,8 +10,18 @@ for (const path of ['/ko/auth/callback?code=x', '/ko/auth/confirm?token_hash=x&t
   });
 }
 
-// The sign-up form is part of accounts too: no page, in either language.
-for (const path of ['/ko/welcome', '/en/welcome', '/ko/welcome?next=%2Fko%2Fabout']) {
+// The sign-up form and the password screens are part of accounts too: no page, in either language.
+for (const path of [
+  '/ko/welcome',
+  '/en/welcome',
+  '/ko/welcome?next=%2Fko%2Fabout',
+  '/ko/signup',
+  '/en/signup',
+  '/ko/forgot-password',
+  '/en/forgot-password',
+  '/ko/reset-password',
+  '/en/reset-password',
+]) {
   test(`${path} is a 404 while accounts are off`, async ({ request }) => {
     expect((await request.get(path, { maxRedirects: 0 })).status()).toBe(404);
   });

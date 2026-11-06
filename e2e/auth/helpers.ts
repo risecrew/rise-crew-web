@@ -320,3 +320,29 @@ export async function hidePost(id: string): Promise<void> {
     .eq('id', id);
   if (error) throw error;
 }
+
+// An account that signs in with a password: confirmed, with no sign-up form filled in yet. The
+// password is a throwaway for the local stack. Remove it afterwards with deleteAccount.
+export const TEST_PASSWORD = 'local-test-pass-1';
+
+export async function createPasswordAccount(email: string): Promise<string> {
+  const { data, error } = await adminClient().auth.admin.createUser({
+    email,
+    password: TEST_PASSWORD,
+    email_confirm: true,
+  });
+  if (error) throw error;
+  return data.user.id;
+}
+
+// Gives an account that already exists the throwaway password.
+export async function setTestPassword(email: string): Promise<string> {
+  const admin = adminClient();
+  const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 });
+  if (error) throw error;
+  const user = data.users.find((u) => u.email === email);
+  if (!user) throw new Error(`No account for ${email}.`);
+  const updated = await admin.auth.admin.updateUserById(user.id, { password: TEST_PASSWORD });
+  if (updated.error) throw updated.error;
+  return user.id;
+}

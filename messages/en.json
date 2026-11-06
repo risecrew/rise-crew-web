@@ -235,7 +235,7 @@
       "intro": "We ask for the information below when you sign up. We do not collect phone numbers or student IDs.",
       "email": {
         "label": "Email",
-        "body": "Required. Taken automatically from the account you sign in with (a Google account or an emailed link). You do not type it in."
+        "body": "Required. Taken from your Google account if you sign in with Google, or the address you enter if you sign up by email. Signing up by email also takes a password, stored only as a one-way hash that cannot be turned back into the password, so operators and admins cannot see it either."
       },
       "name": {
         "label": "Last name, first name",
@@ -271,8 +271,8 @@
     "retention": {
       "title": "How long we keep it, and how we destroy it",
       "keep": "We keep your information until you delete your account.",
-      "unfinished": "If you sign in but never finish the sign-up form, the account is deleted automatically 7 days after it was created, along with its sign-in details such as your email address and the basic profile Google shared.",
-      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of sign-in emails (your address and a link that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy.",
+      "unfinished": "If you never finish the sign-up form, the account is deleted automatically 7 days after it was created, along with its sign-in details such as your email address, password hash and the basic profile Google shared.",
+      "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of account emails (sign-up confirmation and password reset: your address and a link that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy.",
       "destroy": "When the retention period ends or there is a reason to delete information, we destroy it without delay. We handle personal information only in electronic form and destroy it by deleting it from the database. We do not keep it on paper or in separate files. Anything left in a company’s backups is gone when that backup’s retention period ends."
     },
     "processors": {
@@ -288,7 +288,7 @@
       },
       "google": {
         "label": "Google",
-        "body": "Google sign-in (confirming who you are through your Google account) and sign-in emails. For now, a RISE CREW Gmail account sends the sign-in emails. The recipient address and the one-time sign-in link pass through Google, and the sent copy is deleted automatically within 30 days."
+        "body": "Google sign-in (confirming who you are through your Google account) and account emails. For now, a RISE CREW Gmail account sends sign-up confirmation and password reset emails. The recipient address and the one-time link pass through Google, and the sent copy is deleted automatically within 30 days."
       }
     },
     "transfer": {
@@ -302,20 +302,20 @@
       "supabase": {
         "label": "Supabase Pte. Ltd. (privacy@supabase.com)",
         "country": "The database is in South Korea (Seoul). Running and supporting the service may involve processing in Singapore and other countries.",
-        "items": "Sign-up information, sign-in details, consent records, access logs",
+        "items": "Sign-up information, sign-in details (including the password hash), consent records, access logs",
         "purpose": "Running the database and sign-in. Kept until you delete your account; access logs follow the company’s own policy."
       },
       "vercel": {
         "label": "Vercel Inc. (privacy@vercel.com)",
-        "country": "United States (where the website’s server runs)",
+        "country": "South Korea (where the website’s server runs, Seoul); United States (where the company is based; access logs follow its own policy)",
         "items": "What passes through while you use the site (sign-in cookies, sign-up information you enter or edit) and access logs",
         "purpose": "Running the website. What passes through is used for processing and not stored; access logs follow the company’s own policy."
       },
       "google": {
         "label": "Google LLC (policies.google.com/privacy)",
         "country": "The United States and other countries where Google runs servers",
-        "items": "Account details used for Google sign-in; the recipient address and one-time link in sign-in emails",
-        "purpose": "Google sign-in and sending sign-in emails. Sent copies are deleted within 30 days; anything else follows the company’s own policy."
+        "items": "Account details used for Google sign-in; the recipient address and one-time link in account emails",
+        "purpose": "Google sign-in and sending account emails. Sent copies are deleted within 30 days; anything else follows the company’s own policy."
       },
       "refuse": "If you do not want this transfer, do not create an account, or delete yours on My page. You then cannot use features that need signing in, but public pages stay open without an account."
     },
@@ -350,11 +350,11 @@
       "intro": "We take the measures below to protect personal information.",
       "managerial": {
         "label": "Administrative",
-        "body": "Only operators, admins and the website administrator can see personal information. The Google account that sends sign-in emails uses two-step verification."
+        "body": "Only operators, admins and the website administrator can see personal information. The Google account that sends account emails uses two-step verification."
       },
       "technical": {
         "label": "Technical",
-        "body": "Database access rules limit what each role can see. Information travelling to and from the site uses encrypted connections (HTTPS), and Supabase stores the database encrypted. This site does not ask for passwords."
+        "body": "Database access rules limit what each role can see. Information travelling to and from the site uses encrypted connections (HTTPS), and Supabase stores the database encrypted. Passwords are stored only as hashes and are never emailed."
       },
       "physical": {
         "label": "Physical",
@@ -385,32 +385,83 @@
     },
     "login": {
       "title": "Sign in",
-      "lead": "New here? Signing in creates your account",
+      "lead": "Sign in with your email and password",
       "google": "Continue with Google",
-      "or": "or",
       "emailLabel": "Email",
       "emailPlaceholder": "name@example.com",
-      "submit": "Email me a sign-in link",
-      "sending": "Sending",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "signingIn": "Signing in",
       "emailInvalid": "Enter a valid email address.",
-      "sendFailed": "We couldn't send the link. Please try again in a moment.",
-      "tooMany": "Too many requests. Please try again in a moment.",
-      "storage": "Signing in stores your email address. If you don't finish signing up, it's deleted after 7 days.",
+      "passwordRequired": "Enter your password.",
+      "forgot": "Forgot your password?",
+      "signupPrompt": "New here?",
+      "signupLink": "Sign up",
+      "storage": "Signing up stores your email address. If you never finish the sign-up form, it is deleted after 7 days.",
       "policyLink": "Privacy policy",
-      "sent": {
-        "title": "Check your inbox",
-        "body": "We sent a sign-in link to this address.",
-        "spam": "If you don't see it, check your spam folder too.",
-        "resend": "Resend the link",
-        "resendIn": "Resend the link ({seconds}s)",
-        "resent": "We sent the link again.",
-        "change": "Use a different email"
-      },
+      "resendConfirm": "Send the confirmation email again",
       "errors": {
         "link": "That link has expired or was already used. Request a new one.",
         "blocked": "This account has been suspended.",
-        "oauth": "Google sign-in didn't finish. Please try again."
+        "oauth": "Google sign-in didn't finish. Please try again.",
+        "credentials": "That email or password is not right. If you never set a password, you can create one with Forgot your password.",
+        "notConfirmed": "You have not confirmed your email yet. Use the link in the email we sent.",
+        "failed": "We could not sign you in. Try again in a moment.",
+        "sendFailed": "We could not send the email. Try again in a moment.",
+        "tooMany": "Too many requests. Try again in a moment."
+      },
+      "or": "or"
+    },
+    "signup": {
+      "metaTitle": "Sign up",
+      "title": "Sign up",
+      "lead": "You confirm your email once, the first time",
+      "passwordHint": "At least 8 characters, with both letters and numbers.",
+      "submit": "Sign up",
+      "sending": "Sending",
+      "loginPrompt": "Already signed up?",
+      "loginLink": "Sign in"
+    },
+    "forgot": {
+      "metaTitle": "Reset your password",
+      "title": "Reset your password",
+      "lead": "We will email a link for choosing a new password",
+      "submit": "Email me a reset link",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "metaTitle": "New password",
+      "title": "New password",
+      "lead": "Choose the password you will sign in with from now on",
+      "passwordLabel": "New password",
+      "submit": "Save password",
+      "saving": "Saving",
+      "doneTitle": "Your password has changed",
+      "doneBody": "Use the new password next time you sign in. Other devices have been signed out.",
+      "doneNext": "Continue",
+      "errors": {
+        "same": "It has to differ from your current password.",
+        "stale": "You signed in too long ago to change it directly. Request an email under Forgot your password and try again.",
+        "failed": "We could not save it. Try again in a moment."
       }
+    },
+    "password": {
+      "show": "Show",
+      "hide": "Hide",
+      "invalid": "At least 8 characters, with both letters and numbers.",
+      "tooLong": "That password is too long."
+    },
+    "inbox": {
+      "title": "Check your inbox",
+      "signupBody": "We sent a confirmation link to this address.",
+      "resetBody": "We sent a password reset link to this address.",
+      "signupKnown": "If this email already has an account, no email comes. Sign in or use Forgot your password instead.",
+      "resetKnown": "If this email has no account, no email comes.",
+      "spam": "If you cannot see it, check your spam folder.",
+      "resend": "Resend the link",
+      "resendIn": "Resend the link ({seconds}s)",
+      "resent": "We sent the link again.",
+      "change": "Use a different email"
     },
     "welcome": {
       "metaTitle": "Finish sign-up",
@@ -488,7 +539,7 @@
       "delete": {
         "summary": "Delete account",
         "title": "Delete your account?",
-        "body": "Deleting removes your account and everything you told us when you signed up, right away. This can't be undone, and signing in again with the same email starts a new sign-up.",
+        "body": "Deleting removes your account and everything you told us when you signed up, right away. This can't be undone, and using the same email again means signing up anew.",
         "word": "delete",
         "prompt": "To continue, type <strong>{word}</strong> below.",
         "submit": "Delete my account",
@@ -499,7 +550,8 @@
           "lastAdmin": "You're the only admin, so you can't delete your account yet. Make someone else an admin before deleting your account."
         }
       },
-      "deleted": "Your account has been deleted. Thanks for being part of RISE CREW."
+      "deleted": "Your account has been deleted. Thanks for being part of RISE CREW.",
+      "changePassword": "Change password"
     }
   },
   "Admin": {
