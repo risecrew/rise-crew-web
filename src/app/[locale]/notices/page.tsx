@@ -37,7 +37,7 @@ export default async function NoticesPage({ params }: Props) {
     <main id="main" className="bg-stage">
       <PageCover title={t('notices.title')} lead={t('notices.lead')} />
       <section className="border-t border-white/10 bg-stage text-white">
-        <div className="mx-auto max-w-5xl px-5 py-14 md:px-10 md:py-20">
+        <div className="mx-auto max-w-7xl px-5 py-14 md:px-10 md:py-20">
           {notices.length > 0 ? (
             <ul className="border-b border-white/15">
               {notices.map((notice) => (

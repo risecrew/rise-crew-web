@@ -30,7 +30,18 @@ export async function ActivityCard({ activity, locale, today }: Props) {
             className="object-cover"
           />
         </div>
-      ) : null}
+      ) : (
+        // No photo: the city holds its place, so the row of cards stays level.
+        <div
+          aria-hidden
+          lang={lang(activity.city_en)}
+          className="flex aspect-[3/2] items-end overflow-hidden rounded-2xl bg-[radial-gradient(ellipse_90%_90%_at_50%_0%,rgb(0_62_145/0.55),transparent_75%)] p-5 ring-1 ring-white/10 ring-inset"
+        >
+          <span className="font-display text-[clamp(1.75rem,3vw,2.5rem)] leading-none font-[850] tracking-[-0.02em] break-keep text-white/90">
+            {localized(activity.city_ko, activity.city_en, locale)}
+          </span>
+        </div>
+      )}
       <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65">
         <time dateTime={activity.date ?? undefined} className="font-mono">
           {activity.date ? formatStampDate(activity.date, locale) : t('dateTbc')}
