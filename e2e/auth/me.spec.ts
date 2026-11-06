@@ -3,9 +3,13 @@ import { PRIVACY_POLICY_VERSION } from '@/lib/auth/profile';
 import { expectAccessible, expectNoHorizontalScroll } from '../helpers';
 import {
   accountRows,
+  addTeamMember,
   adminClient,
   authCookies,
   createBlockedAccount,
+  createOnboardedAccount,
+  createPost,
+  createTeam,
   deleteAccount,
   requestSignInLink,
   signIn,
@@ -853,4 +857,32 @@ test.describe('before the page has loaded its scripts', () => {
       await deleteAccount(email);
     }
   });
+});
+
+// A post belongs to the team, so it stays when the person who wrote it leaves. pgTAP pins that the
+// record of who wrote it is cleared.
+test('deleting an account keeps the posts on the team page', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const email = newAddress(testInfo);
+  const stamp = Date.now().toString(36);
+  const slug = `leaving-team-${stamp}`;
+  const title = `남는 글 ${stamp}`;
+  await createOnboardedAccount(email, { role: 'member' });
+  const teamId = await createTeam({ slug, name: `떠나는 팀 ${stamp}`, cohort: 4 });
+  await addTeamMember(teamId, email);
+  await createPost(email, teamId, { title });
+
+  await signIn(page, email, baseURL!);
+  await page.goto('/ko/me');
+  const t = COPY.ko.remove;
+  await page.getByText(t.summary).click();
+  await page.getByLabel(t.prompt).fill(t.word);
+  await page.getByRole('button', { name: t.submit }).click();
+  await expect(page.getByText(COPY.ko.notice)).toBeVisible();
+
+  await page.goto(`/ko/startups/${slug}`);
+  await expect(page.getByRole('heading', { level: 1, name: `떠나는 팀 ${stamp}` })).toBeVisible();
+  await expect(page.getByRole('link', { name: new RegExp(title) })).toBeVisible();
 });

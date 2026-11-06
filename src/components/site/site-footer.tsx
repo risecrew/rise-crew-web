@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
-import { NAV_ITEMS } from './site-header';
+import { getNavItems } from './site-header';
 
 export async function SiteFooter() {
   const t = await getTranslations('Footer');
@@ -19,7 +19,7 @@ export async function SiteFooter() {
         </div>
         <nav aria-label={nav('footer')}>
           <ul className="flex flex-col gap-2">
-            {[...NAV_ITEMS, { href: '/join', key: 'join' } as const].map((item) => (
+            {[...getNavItems(), { href: '/join', key: 'join' } as const].map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="underline-offset-4 hover:underline">
                   {nav(item.key)}

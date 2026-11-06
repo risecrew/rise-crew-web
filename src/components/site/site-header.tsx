@@ -8,12 +8,17 @@ import { AccountMenu } from './account-menu';
 import { LocaleSwitch } from './locale-switch';
 import { MobileNav } from './mobile-nav';
 
-export const NAV_ITEMS = [
-  { href: '/', key: 'home' },
-  { href: '/about', key: 'about' },
-  { href: '/network', key: 'network' },
-  { href: '/contact', key: 'contact' },
-] as const;
+// The menu, for the header, the phone menu and the footer. The team pages belong to accounts, so
+// with the switch off the menu is exactly what it was before they existed.
+export function getNavItems() {
+  return [
+    { href: '/', key: 'home' },
+    { href: '/about', key: 'about' },
+    ...(isAuthEnabled() ? [{ href: '/startups', key: 'startups' } as const] : []),
+    { href: '/network', key: 'network' },
+    { href: '/contact', key: 'contact' },
+  ] as const;
+}
 
 async function getAccountLabels() {
   const t = await getTranslations('Auth.menu');
@@ -21,7 +26,8 @@ async function getAccountLabels() {
     signIn: t('signIn'),
     account: t('account'),
     myPage: t('myPage'),
-    admin: t('admin'),
+    members: t('members'),
+    teams: t('teams'),
     signOut: t('signOut'),
   };
 }
@@ -29,7 +35,7 @@ async function getAccountLabels() {
 export async function SiteHeader() {
   const t = await getTranslations('Nav');
   const ctaT = await getTranslations('Cta');
-  const items = NAV_ITEMS.map((item) => ({ href: item.href, label: t(item.key) }));
+  const items = getNavItems().map((item) => ({ href: item.href, label: t(item.key) }));
   // The header action says what actually happens: apply while recruiting, read the notice
   // otherwise.
   const cta = applyCta(await getRecruitment());

@@ -71,3 +71,15 @@ for (const locale of LOCALES) {
     }
   });
 }
+
+// The team pages belong to accounts: no pages, and no item in the menu.
+for (const path of ['/ko/startups', '/en/startups/x', '/ko/startups/x/posts/y']) {
+  test(`${path} is a 404 while accounts are off`, async ({ request }) => {
+    expect((await request.get(path, { maxRedirects: 0 })).status()).toBe(404);
+  });
+}
+
+test('the menu has no startups item while accounts are off', async ({ page }) => {
+  await page.goto('/ko');
+  await expect(page.locator('a[href="/ko/startups"]')).toHaveCount(0);
+});

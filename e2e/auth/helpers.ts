@@ -9,7 +9,7 @@ function localEnv(name: string): string {
   return value;
 }
 
-function anonymousClient() {
+export function anonymousClient() {
   return createClient(localEnv('E2E_SUPABASE_URL'), localEnv('E2E_SUPABASE_PUBLISHABLE_KEY'), {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
@@ -98,6 +98,21 @@ export async function createBlockedAccount(email: string): Promise<void> {
   if (blockError) throw blockError;
 }
 
+// A client with an account's own session. The session comes from a link made by the Auth admin API,
+// so no email is sent. The team tables give the secret key nothing, so tests set them up the way the
+// site does: as an account that is allowed to.
+export async function clientSignedInAs(email: string) {
+  const link = await adminClient().auth.admin.generateLink({ type: 'magiclink', email });
+  if (link.error) throw link.error;
+  const client = anonymousClient();
+  const verified = await client.auth.verifyOtp({
+    token_hash: link.data.properties.hashed_token,
+    type: 'magiclink',
+  });
+  if (verified.error) throw verified.error;
+  return client;
+}
+
 // Creates an account with a finished sign-up (names, an occupation, the privacy and age14 consents
 // and optionally the recruit one) and, if asked, a role. It does the sign-up the way the form
 // does: as the account itself, with its own session, because the secret key may not write
@@ -128,14 +143,7 @@ export async function createOnboardedAccount(
   if (created.error) throw created.error;
   const id = created.data.user.id;
 
-  const link = await admin.auth.admin.generateLink({ type: 'magiclink', email });
-  if (link.error) throw link.error;
-  const own = anonymousClient();
-  const verified = await own.auth.verifyOtp({
-    token_hash: link.data.properties.hashed_token,
-    type: 'magiclink',
-  });
-  if (verified.error) throw verified.error;
+  const own = await clientSignedInAs(email);
 
   const consent = (kind: 'privacy' | 'age14' | 'recruit', granted: boolean) => ({
     user_id: id,
@@ -235,4 +243,80 @@ export async function expireSession(context: BrowserContext): Promise<void> {
   const base = chunks[0].name.replace(/\.\d+$/, '');
   await context.clearCookies({ name: /^sb-.+-auth-token(\.\d+)?$/ });
   await context.addCookies([{ ...chunks[0], name: base, value }]);
+}
+
+// Team spaces. Tests cannot delete a team (nobody can), so names and addresses are made unique by
+// the caller, and a test that needs to find its teams in the list filters by its own cohort.
+const TEAM_OPERATOR = 'operator@example.test';
+
+export async function createTeam(values: {
+  slug: string;
+  name: string;
+  cohort: number;
+  field?: string;
+  tagline?: string;
+  intro?: string;
+  links?: { kind: string; url: string }[];
+  is_published?: boolean;
+}): Promise<string> {
+  const operator = await clientSignedInAs(TEAM_OPERATOR);
+  const { data, error } = await operator
+    .from('teams')
+    .insert({ field: 'other', is_published: true, ...values })
+    .select('id')
+    .single();
+  if (error) throw error;
+  return data.id;
+}
+
+export async function addTeamMember(teamId: string, email: string): Promise<void> {
+  const operator = await clientSignedInAs(TEAM_OPERATOR);
+  const { error } = await operator
+    .from('team_members')
+    .insert({ team_id: teamId, user_id: await accountId(email) });
+  if (error) throw error;
+}
+
+export async function removeTeamMember(teamId: string, email: string): Promise<void> {
+  const operator = await clientSignedInAs(TEAM_OPERATOR);
+  const { error } = await operator
+    .from('team_members')
+    .delete()
+    .eq('team_id', teamId)
+    .eq('user_id', await accountId(email));
+  if (error) throw error;
+}
+
+export async function setRole(email: string, role: 'guest' | 'member' | 'operator'): Promise<void> {
+  const { error } = await adminClient()
+    .from('user_roles')
+    .update({ role })
+    .eq('user_id', await accountId(email));
+  if (error) throw error;
+}
+
+// A post written by a team member, as that member. Returns its id.
+export async function createPost(
+  email: string,
+  teamId: string,
+  values: { title: string; body?: string; visibility?: 'public' | 'signed_in' },
+): Promise<string> {
+  const member = await clientSignedInAs(email);
+  const { data, error } = await member
+    .from('team_posts')
+    .insert({ team_id: teamId, author_id: await accountId(email), ...values })
+    .select('id')
+    .single();
+  if (error) throw error;
+  return data.id;
+}
+
+// A post as whoever is asked (the operator by default), for checks and for hiding.
+export async function hidePost(id: string): Promise<void> {
+  const operator = await clientSignedInAs(TEAM_OPERATOR);
+  const { error } = await operator
+    .from('team_posts')
+    .update({ hidden_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw error;
 }

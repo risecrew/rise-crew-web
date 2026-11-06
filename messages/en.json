@@ -38,7 +38,8 @@
     "join": "Join",
     "menu": "Menu",
     "skip": "Skip to content",
-    "switchTo": "한국어"
+    "switchTo": "한국어",
+    "startups": "Startups"
   },
   "Footer": {
     "tagline": "From campus to the world.",
@@ -378,7 +379,8 @@
       "signIn": "Sign in",
       "account": "Account menu",
       "myPage": "My page",
-      "admin": "Admin",
+      "members": "Members",
+      "teams": "Teams",
       "signOut": "Sign out"
     },
     "login": {
@@ -480,7 +482,8 @@
         "affiliation": "Affiliation",
         "recruit": "Recruitment emails",
         "recruitOn": "Subscribed",
-        "recruitOff": "Not subscribed"
+        "recruitOff": "Not subscribed",
+        "teams": "My teams"
       },
       "delete": {
         "summary": "Delete account",
@@ -613,7 +616,171 @@
         "previous": "Previous",
         "next": "Next",
         "position": "Page {page} of {total}"
+      },
+      "toTeams": "Go to teams"
+    },
+    "teams": {
+      "title": "Teams",
+      "new": "Create a team",
+      "newLead": "A new team starts unpublished. Publish it once its intro is filled in.",
+      "toMembers": "Go to members",
+      "toList": "Back to teams",
+      "toPage": "View team page",
+      "empty": "No teams yet.",
+      "name": "Team name",
+      "field": "Field",
+      "cohort": "Cohort",
+      "published": "Published",
+      "publishedHint": "When on, the team appears on the startups list.",
+      "save": "Save",
+      "create": "Create",
+      "saved": "Saved.",
+      "people": "Team members",
+      "noPeople": "No team members yet.",
+      "memberEmail": "Email",
+      "addMember": "Add member",
+      "removeMember": "Remove",
+      "removeMemberLabel": "Remove {email}",
+      "hiddenPosts": "Hidden posts",
+      "noHidden": "No hidden posts.",
+      "hide": "Hide",
+      "unhide": "Restore",
+      "unhideLabel": "Restore {title}",
+      "fieldErrors": {
+        "required": "Please fill this in.",
+        "invalid": "This value cannot be used.",
+        "tooLong": "This is too long."
+      },
+      "errors": {
+        "denied": "You do not have permission to do this.",
+        "invalid": "Some fields need another look.",
+        "failed": "That did not save. Please try again in a moment.",
+        "needsMember": "This person is not a member yet. Make them a member first.",
+        "noAccount": "Nobody has signed up with this email.",
+        "alreadyInTeam": "This person is already on the team.",
+        "blocked": "A blocked account cannot join a team. Unblock it on the members screen first."
       }
     }
+  },
+  "Teams": {
+    "metaTitle": "Startups",
+    "metaDescription": "The startup teams of RISE CREW, and the updates they post themselves.",
+    "title": "Startups",
+    "lead": "The teams building something real at RISE CREW. They write their own pages and post their own updates.",
+    "filters": {
+      "label": "Filter",
+      "field": "Field",
+      "cohort": "Cohort",
+      "all": "All",
+      "clear": "Clear filters"
+    },
+    "cohort": "Cohort {cohort}",
+    "total": "{count, plural, one {# team} other {# teams}}",
+    "empty": "No teams to show yet.",
+    "emptyFiltered": "No teams match these filters.",
+    "fields": {
+      "ai-software": "AI & software",
+      "edutech": "Edtech",
+      "healthcare": "Healthcare",
+      "foodtech": "Food tech",
+      "lifestyle": "Lifestyle",
+      "commerce-marketing": "Commerce & marketing",
+      "mobility": "Mobility",
+      "other": "Other"
+    },
+    "facts": {
+      "field": "Field",
+      "cohort": "Cohort",
+      "links": "Links"
+    },
+    "linkKinds": {
+      "homepage": "Website",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "other": "Link"
+    },
+    "unpublished": "Not published",
+    "hidden": "Hidden",
+    "introEmpty": "This team has not written an intro yet.",
+    "posts": {
+      "title": "Posts",
+      "empty": "No posts yet.",
+      "edited": "Edited {date}",
+      "backToTeam": "Back to {team}",
+      "photoAlt": "{title}, photo {number}",
+      "emptyPage": "No posts on this page."
+    },
+    "locked": "{count, plural, one {# post is} other {# posts are}} for signed-in members. Sign in to read them.",
+    "signIn": "Sign in",
+    "lockedFinish": "{count, plural, one {# post is} other {# posts are}} for signed-in members. Finish signing up to read them.",
+    "finish": "Finish signing up",
+    "visibility": {
+      "public": "Public",
+      "signed_in": "Signed-in only"
+    },
+    "pager": {
+      "label": "Pages",
+      "previous": "Previous",
+      "next": "Next",
+      "status": "Page {page} of {pages}",
+      "first": "Back to the first page"
+    },
+    "form": {
+      "editIntro": "Edit intro",
+      "newPost": "New post",
+      "editPost": "Edit post",
+      "edit": "Edit",
+      "logo": "Logo",
+      "logoHint": "JPEG, PNG or WebP. Large files are made smaller automatically.",
+      "removeLogo": "Remove the current logo",
+      "tagline": "One-line intro",
+      "intro": "Intro",
+      "links": "Links",
+      "linkKind": "Type",
+      "linkUrl": "Address",
+      "addLink": "Add a link",
+      "removeLink": "Remove link {number}",
+      "postTitle": "Title",
+      "postBody": "Text",
+      "addPhotos": "Add photos",
+      "photoHint": "JPEG, PNG or WebP, up to 4 per post. Large photos are made smaller, and location data is removed.",
+      "photoNotice": "Please check the people in your photos and any personal details in your post before you share them.",
+      "removePhoto": "Remove photo {number}",
+      "visibility": "Who can read this",
+      "visibilityHint": {
+        "public": "Everyone who visits the site.",
+        "signed_in": "Only people who have finished signing up."
+      },
+      "save": "Save",
+      "publish": "Post",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleteQuestion": "Delete this post? Its photos go too.",
+      "deleteConfirm": "Delete it",
+      "errors": {
+        "denied": "You can no longer edit this team. You may have left the team or your role may have changed. Please ask an operator.",
+        "failed": "That did not save. Please try again in a moment.",
+        "summary": "Some fields need another look.",
+        "invalid": "This value cannot be used.",
+        "invalidUrl": "Enter an address that starts with http:// or https://.",
+        "tooLong": "This is too long.",
+        "titleRequired": "Please write a title.",
+        "tooLarge": "Each photo can be up to 30MB.",
+        "badType": "Only JPEG, PNG and WebP photos can be uploaded.",
+        "tooMany": "A post can have up to 4 photos.",
+        "uploadFailed": "The photos did not upload. What you wrote is still here, so please try again.",
+        "unreadable": "This photo could not be read. Please choose another file."
+      },
+      "cover": "Cover photo",
+      "coverHint": "Shown large at the top of the team page, to everyone. Large files are made smaller automatically. Without one, the photo from the latest public post appears.",
+      "removeCover": "Remove the current cover photo"
+    },
+    "emptyPage": "No teams on this page."
+  },
+  "Error": {
+    "title": "Something went wrong",
+    "body": "This page could not be loaded. Please try again in a moment.",
+    "retry": "Try again",
+    "home": "Go home"
   }
 }
