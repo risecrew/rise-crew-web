@@ -58,6 +58,22 @@ async function openAccountLinks(page: Page) {
     .click();
 }
 
+async function openPhoneMenu(page: Page) {
+  const summary = page.locator('header summary');
+  if (await summary.isVisible()) await summary.click();
+}
+
+// The account shows once the browser has read the session; only then does the menu say who sees what.
+async function expectSignedInHeader(page: Page) {
+  await expect(
+    page
+      .getByRole('button', { name: /계정 메뉴/ })
+      .or(page.locator('header a[href="/ko/me"]'))
+      .locator('visible=true')
+      .first(),
+  ).toBeVisible();
+}
+
 async function photoOf(title: string): Promise<string | null> {
   const { data, error } = await adminClient()
     .from('activities')
@@ -309,7 +325,10 @@ test('notices do not exist for anyone not approved, and are in the menu for thos
   const anonymous = await (await browser.newContext()).newPage();
   for (const path of paths) expect((await anonymous.request.get(path)).status()).toBe(404);
   await anonymous.goto('/ko');
-  await openAccountLinks(anonymous);
+  await openPhoneMenu(anonymous);
+  await expect(
+    anonymous.locator('header').getByRole('link', { name: '로그인' }).first(),
+  ).toBeVisible();
   await expect(anonymous.locator('a[href="/ko/notices"]')).toHaveCount(0);
 
   // Applied, not approved.
@@ -317,7 +336,8 @@ test('notices do not exist for anyone not approved, and are in the menu for thos
   await signIn(applying, email, baseURL!);
   for (const path of paths) expect((await applying.request.get(path)).status()).toBe(404);
   await applying.goto('/ko');
-  await openAccountLinks(applying);
+  await openPhoneMenu(applying);
+  await expectSignedInHeader(applying);
   await expect(applying.locator('a[href="/ko/notices"]')).toHaveCount(0);
   await applying.goto('/ko/me');
   await expect(applying.locator('[data-applying]')).toBeVisible();
@@ -326,7 +346,7 @@ test('notices do not exist for anyone not approved, and are in the menu for thos
   const approved = await (await browser.newContext()).newPage();
   await signIn(approved, APPROVED, baseURL!);
   await approved.goto('/ko');
-  await openAccountLinks(approved);
+  await openPhoneMenu(approved);
   await expect(
     approved.locator('a[href="/ko/notices"]').filter({ visible: true }).first(),
   ).toBeVisible();
@@ -404,10 +424,6 @@ test('an operator approves one applicant and declines another, who is then delet
     .getByRole('button', { name: /가입 거절/ })
     .first()
     .click();
-  await page
-    .getByRole('button', { name: '거절하고 삭제' })
-    .click()
-    .catch(() => {});
   await expect(page.getByText(/이미 승인된 계정/)).toBeVisible();
   const { data: stays } = await adminClient().from('profiles').select('id').eq('email', keep);
   expect(stays).toHaveLength(1);
