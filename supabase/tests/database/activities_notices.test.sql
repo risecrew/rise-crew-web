@@ -8,7 +8,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(30);
+select plan(31);
 
 create function public._t_rows(statement text)
 returns integer
@@ -56,8 +56,11 @@ select is(
   (select count(*)::integer from public.activities where is_planned), 2,
   'the two planned events stay planned');
 select is(
-  (select count(*)::integer from public.activities where date is null), 1,
-  'the one undated activity stays undated');
+  (select date from public.activities where title_ko = 'SKKU × FTU TECHFEST 전시'),
+  '2025-12-12', 'TECHFEST has its date');
+select is(
+  (select photo from public.activities where title_ko = '2025 세미나'),
+  '/images/activities/seminar-2025-11.jpg', 'the 2025 seminar is there with its photo');
 
 -- Anyone can read. Nobody but an operator writes.
 set local role anon;

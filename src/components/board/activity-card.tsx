@@ -36,9 +36,13 @@ export async function ActivityCard({ activity, locale, today }: Props) {
         // stays level.
         <div
           data-activity-mark
-          className="flex aspect-[3/2] items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10 ring-inset"
+          className="flex aspect-[3/2] items-center justify-center overflow-hidden rounded-2xl bg-white/5 ring-1 ring-white/10 ring-inset"
         >
-          <RiseSymbol className="h-auto w-1/5 text-white/35" />
+          {/* Sized inline: an SVG with no size of its own fills whatever it is in, so this must hold even
+              if a stylesheet arrives late or stale. */}
+          <div className="text-white" style={{ width: '20%', opacity: 0.35 }}>
+            <RiseSymbol className="block" />
+          </div>
         </div>
       )}
       <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65">

@@ -121,6 +121,7 @@ export const stamps: Stamp[] = [
   },
   {
     id: 'techfest-vietnam',
+    date: '2025-12-12',
     city: { ko: '베트남', en: 'Vietnam' },
     country: 'VN',
     title: { ko: 'SKKU × FTU TECHFEST 전시', en: 'SKKU × FTU TECHFEST exhibition' },
