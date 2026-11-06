@@ -11,28 +11,20 @@ import { formatStampDate } from '@/lib/format';
 
 // Room for the stage rail on wide screens.
 const GUTTER = 'px-5 md:px-10 lg:pr-14 lg:pl-60 xl:pl-72';
-const TITLE = 'font-display text-3xl font-[850] text-balance break-keep md:text-5xl';
+const TITLE = 'font-display text-headline text-balance break-keep';
 const RULE = 'border-t border-white/20 pt-4';
 
 type Stage = 'campus' | 'domestic' | 'global';
 
-// Width of each chapter word in em, measured in Wanted Sans at 900 with -0.03em tracking.
-// The title is sized so the word runs across the whole content width.
-const WORD_EM: Record<Stage, number> = { campus: 3.898, domestic: 4.388, global: 3.035 };
-
+// The three chapter names share one size (the display step, as the inner page titles), so
+// Campus, Domestic and Global read as equals whatever the length of the word.
 async function ChapterName({ stage }: { stage: Stage }) {
   const common = await getTranslations('Common');
   return (
-    <div className="[container-type:inline-size] overflow-x-clip">
-      <h2
-        id={`${stage}-title`}
-        className="font-display leading-[0.82] font-[900] tracking-[-0.03em] whitespace-nowrap text-white"
-        style={{ fontSize: `calc(100cqw / ${WORD_EM[stage]} * 0.98)` }}
-      >
-        <span lang="en">{common(`stage.${stage}.name`)}</span>
-        <span className="sr-only"> · {common(`stage.${stage}.sub`)}</span>
-      </h2>
-    </div>
+    <h2 id={`${stage}-title`} className="font-display text-display whitespace-nowrap text-white">
+      <span lang="en">{common(`stage.${stage}.name`)}</span>
+      <span className="sr-only"> · {common(`stage.${stage}.sub`)}</span>
+    </h2>
   );
 }
 
@@ -86,10 +78,7 @@ export async function CampusChapter({
         <div className="grid gap-10">
           {vcc ? (
             <div className={RULE}>
-              <CountUp
-                value={vcc.value}
-                className="font-display text-[clamp(5rem,13vw,11rem)] leading-[0.85] text-lime"
-              />
+              <CountUp value={vcc.value} className="font-display text-numeral text-lime" />
               <p className="mt-3 text-lg font-semibold">{pick(vcc.label, locale)}</p>
             </div>
           ) : null}
@@ -157,13 +146,13 @@ export async function DomesticChapter({
           <dl className="mt-10 grid gap-8">
             <div className={`${RULE} flex flex-col`}>
               <dt className="order-2 mt-2 text-white/75">{t('backing.mou')}</dt>
-              <dd className="order-1 font-display text-3xl font-[850] break-keep">
+              <dd className="order-1 font-display text-subhead break-keep">
                 {t('backing.mouDate')}
               </dd>
             </div>
             <div className={`${RULE} flex flex-col`}>
               <dt className="order-2 mt-2 text-white/75">{t('backing.seed')}</dt>
-              <dd className="order-1 font-display text-3xl font-[850] break-keep">
+              <dd className="order-1 font-display text-subhead break-keep">
                 {t('backing.seedValue')}
               </dd>
             </div>
@@ -234,7 +223,7 @@ export async function GlobalChapter({
             ),
             caption: (
               <>
-                <h4 className="font-display text-3xl font-[850] text-balance break-keep md:text-5xl">
+                <h4 className="font-display text-subhead text-balance break-keep">
                   {pick(stamp.title, locale)}
                 </h4>
                 <p className="mt-3 text-sm break-keep text-white/75 md:text-base">
@@ -259,10 +248,7 @@ export async function GlobalChapter({
             <div key={s.id} className="flex flex-col">
               <dt className="order-2 mt-2 text-white/80">{pick(s.label, locale)}</dt>
               <dd className="order-1">
-                <CountUp
-                  value={s.value}
-                  className="font-display text-[clamp(4.5rem,9vw,8rem)] leading-[0.85] text-lime"
-                />
+                <CountUp value={s.value} className="font-display text-display text-lime" />
               </dd>
             </div>
           ))}

@@ -5,19 +5,13 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { LocaleSwitch } from './locale-switch';
 
 type Item = { href: string; label: string };
-type Action = { href: string; label: string; external: boolean };
-
-const ACTION =
-  'rounded-full bg-lime px-4 py-2 font-semibold text-cobalt transition-transform duration-150 ease-out active:scale-[0.97]';
 
 export function MobileNav({
   items,
-  action,
   menuLabel,
   account,
 }: {
   items: Item[];
-  action: Action;
   menuLabel: string;
   // The sign-in link or the signed-in rows, when accounts are switched on.
   account?: ReactNode;
@@ -48,17 +42,8 @@ export function MobileNav({
           ))}
         </ul>
         {account}
-        <div className="mt-2 flex items-center justify-between border-t border-paper-edge px-3 pt-3">
+        <div className="mt-2 border-t border-paper-edge px-3 pt-3">
           <LocaleSwitch tone="ink" />
-          {action.external ? (
-            <a href={action.href} target="_blank" rel="noreferrer" className={ACTION}>
-              {action.label}
-            </a>
-          ) : (
-            <Link href={action.href} className={ACTION}>
-              {action.label}
-            </Link>
-          )}
         </div>
       </nav>
     </details>

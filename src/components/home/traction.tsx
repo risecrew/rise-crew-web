@@ -37,7 +37,7 @@ export async function Traction({
         className="absolute inset-0 bg-[linear-gradient(180deg,var(--color-stage),rgb(0_62_145/0.82)_35%,rgb(0_62_145/0.9)_70%,var(--color-stage))]"
       />
       <div className="relative mx-auto max-w-7xl px-5 py-28 md:px-10 md:py-40">
-        <h2 id="traction-title" className="font-display text-2xl font-[800] md:text-4xl">
+        <h2 id="traction-title" className="font-display text-headline">
           {t('traction.title')}
         </h2>
         <dl className="mt-10 grid gap-10 md:grid-cols-3">
@@ -50,10 +50,7 @@ export async function Traction({
                 </span>
               </dt>
               <dd className="order-1">
-                <CountUp
-                  value={s.value}
-                  className="font-display text-[clamp(5rem,13vw,11rem)] leading-[0.85]"
-                />
+                <CountUp value={s.value} className="font-display text-numeral" />
               </dd>
             </div>
           ))}

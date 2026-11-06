@@ -49,9 +49,7 @@ export default async function WelcomePage({ params, searchParams }: Props) {
   return (
     <AccountLayout>
       <div className="w-full max-w-lg">
-        <h1 className="font-display text-[clamp(3.25rem,9vw,6rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance break-keep">
-          {t('title')}
-        </h1>
+        <h1 className="font-display text-hero text-balance break-keep">{t('title')}</h1>
         <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
         <ProfileForm mode="welcome" email={viewer.email} next={next} />
       </div>

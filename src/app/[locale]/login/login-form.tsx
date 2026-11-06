@@ -254,7 +254,7 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
         <h1
           ref={headingRef}
           tabIndex={-1}
-          className="font-display text-[clamp(2rem,6vw,3.4rem)] leading-[1.04] font-[850] text-balance break-keep focus:outline-none"
+          className="font-display text-headline text-balance break-keep focus:outline-none"
         >
           {t('sent.title')}
         </h1>
@@ -289,9 +289,7 @@ export function LoginForm({ locale, next, notice: initialNotice, endSession }: P
 
   return (
     <div className="w-full max-w-md">
-      <h1 className="font-display text-[clamp(3.25rem,9vw,6rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance break-keep">
-        {t('title')}
-      </h1>
+      <h1 className="font-display text-hero text-balance break-keep">{t('title')}</h1>
       <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
       {alert}
 
