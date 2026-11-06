@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalScroll } from './helpers';
 
-const CITIES = ['싱가포르', '도쿄', '마카오', '베트남'];
+const CITIES = ['베트남', '싱가포르', '도쿄', '마카오'];
 
 function rail(page: Page) {
   return page.getByRole('navigation', { name: 'RISE CREW 3단계' });
