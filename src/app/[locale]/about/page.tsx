@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageCover } from '@/components/site/page-cover';
 import { SectionHeading } from '@/components/site/section-heading';
 import { Fact, FactList } from '@/components/stage/facts';
 import { FIELD } from '@/components/stage/labels';
 import { Timeline } from '@/components/stage/timeline';
+import { isAuthEnabled } from '@/lib/auth/config';
+import { getActivities } from '@/lib/board/queries';
+import { activityTimeline } from '@/lib/board/text';
 import { asLocale } from '@/i18n/as-locale';
 import {
   getGrowthSteps,
@@ -34,6 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AboutPage({ params }: Props) {
+  // With accounts on, the history comes from the database, as current as the activities page. With
+  // them off nothing here reads it, so the page stays static.
+  if (isAuthEnabled()) await connection();
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('About');
@@ -43,7 +50,8 @@ export default async function AboutPage({ params }: Props) {
     getPrograms(),
     getOfficers(),
     getMentors(),
-    getStamps(),
+    // With accounts off the database may not have these rows yet, and nobody can edit them.
+    isAuthEnabled() ? getActivities().then(activityTimeline) : getStamps(),
     getPhoto('smu-vibe-coding-2025-12'),
   ]);
   const advisor = mentors.find((m) => m.id === 'shin-dongwon');

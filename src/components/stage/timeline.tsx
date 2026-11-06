@@ -1,11 +1,11 @@
 import { getTranslations } from 'next-intl/server';
-import type { Stamp } from '@/content/schema';
+import type { TimelineEvent } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { pick, stampState } from '@/lib/content';
 import { formatStampDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
-type Props = { events: Stamp[]; locale: Locale; today: Date; className?: string };
+type Props = { events: TimelineEvent[]; locale: Locale; today: Date; className?: string };
 
 // The run of show: every event with its date and place. Events that have not happened read
 // as upcoming, and planned events whose date has passed read as unconfirmed.

@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { AccountMenu } from './account-menu';
 import { LocaleSwitch } from './locale-switch';
@@ -12,7 +13,13 @@ export function getNavItems() {
   return [
     { href: '/', key: 'home' },
     { href: '/about', key: 'about' },
-    ...(isAuthEnabled() ? [{ href: '/startups', key: 'startups' } as const] : []),
+    ...(isAuthEnabled()
+      ? ([
+          { href: '/startups', key: 'startups' },
+          { href: '/activities', key: 'activities' },
+          { href: '/notices', key: 'notices' },
+        ] as const)
+      : []),
     { href: '/network', key: 'network' },
     { href: '/contact', key: 'contact' },
   ] as const;
@@ -26,6 +33,8 @@ async function getAccountLabels() {
     myPage: t('myPage'),
     members: t('members'),
     teams: t('teams'),
+    activities: t('activities'),
+    notices: t('notices'),
     signOut: t('signOut'),
   };
 }
@@ -52,7 +61,14 @@ export async function SiteHeader() {
           <RiseSymbol className="h-8 w-auto" />
           <span className="font-display text-lg font-[800] tracking-wide">RISE CREW</span>
         </Link>
-        <nav aria-label={t('primary')} className="hidden items-center gap-7 text-white md:flex">
+        <nav
+          aria-label={t('primary')}
+          className={cn(
+            'hidden items-center gap-7 text-white',
+            // Two pages more in the menu with accounts on, so the full menu needs a wider window.
+            accountLabels ? 'lg:flex' : 'md:flex',
+          )}
+        >
           {items.map((item) => (
             <Link key={item.href} href={item.href} className="underline-offset-4 hover:underline">
               {item.label}
@@ -64,6 +80,7 @@ export async function SiteHeader() {
         <MobileNav
           items={items}
           menuLabel={t('menu')}
+          className={accountLabels ? 'lg:hidden' : 'md:hidden'}
           account={accountLabels ? <AccountMenu labels={accountLabels} variant="panel" /> : null}
         />
       </div>

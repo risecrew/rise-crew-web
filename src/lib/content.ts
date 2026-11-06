@@ -27,6 +27,7 @@ import {
   type Localized,
   type Recruitment,
   type Stamp,
+  type TimelineEvent,
 } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 
@@ -59,7 +60,7 @@ function periodEnd(date: string): Date {
   return new Date(Date.UTC(year, 11, 31, 23, 59, 59));
 }
 
-export function stampState(stamp: Stamp, today: Date): StampState {
+export function stampState(stamp: Stamp | TimelineEvent, today: Date): StampState {
   if (stamp.status === 'done') return 'done';
   if (!stamp.date) return 'upcoming';
   return periodEnd(stamp.date) < today ? 'unconfirmed' : 'upcoming';

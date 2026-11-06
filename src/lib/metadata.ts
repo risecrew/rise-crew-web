@@ -5,7 +5,13 @@ export const PAGE_PATHS: readonly PagePath[] = ['', '/about', '/network', '/cont
 
 // Pages that are not in the sitemap (yet). The privacy policy and the team pages open only once
 // accounts are switched on, and are listed with the other pages after that.
-export type UnlistedPath = '/privacy' | '/startups' | `/startups/${string}`;
+export type UnlistedPath =
+  | '/privacy'
+  | '/startups'
+  | '/activities'
+  | '/notices'
+  | `/notices/${string}`
+  | `/startups/${string}`;
 
 export function localizedAlternates(locale: Locale, path: PagePath | UnlistedPath) {
   return {

@@ -39,7 +39,9 @@
     "menu": "Menu",
     "skip": "Skip to content",
     "switchTo": "한국어",
-    "startups": "Startups"
+    "startups": "Startups",
+    "activities": "Activities",
+    "notices": "Notices"
   },
   "Footer": {
     "tagline": "From campus to the world.",
@@ -380,7 +382,9 @@
       "myPage": "My page",
       "members": "Members",
       "teams": "Teams",
-      "signOut": "Sign out"
+      "signOut": "Sign out",
+      "activities": "Manage activities",
+      "notices": "Manage notices"
     },
     "login": {
       "title": "Sign in",
@@ -714,7 +718,81 @@
         "noAccount": "Nobody has signed up with this email.",
         "alreadyInTeam": "This person is already on the team.",
         "blocked": "A blocked account cannot join a team. Unblock it on the members screen first."
-      }
+      },
+      "deleteTitle": "Delete this team",
+      "deleteLead": "To hide it for now, turn off publishing above. Deleting cannot be undone.",
+      "deleteQuestion": "Delete {name}? {posts, plural, one {# post} other {# posts}}, {members, plural, one {# membership} other {# memberships}} and uploaded photos go with it, and this cannot be undone. Members keep their accounts."
+    },
+    "board": {
+      "delete": "Delete",
+      "deleteConfirm": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…",
+      "errors": {
+        "denied": "You don't have permission to do this. Please check that you're signed in.",
+        "invalid": "Please check what you entered.",
+        "failed": "That didn't save. Please try again in a moment."
+      },
+      "fieldErrors": {
+        "required": "This is required.",
+        "tooLong": "This is too long.",
+        "invalidDate": "Use 2026, 2026-11 or 2026-11-06, with a date that exists."
+      },
+      "upload": {
+        "tooLarge": "That photo is too large. Pick one of 30MB or less.",
+        "badType": "Only JPG, PNG and WebP photos can be uploaded.",
+        "unreadable": "That photo couldn't be read. Please pick another.",
+        "denied": "You don't have permission to upload this.",
+        "failed": "The upload didn't work. Please try again."
+      },
+      "deleteFailed": "That didn't delete. Please try again in a moment."
+    },
+    "activities": {
+      "title": "Manage activities",
+      "new": "Add an activity",
+      "edit": "Edit activity",
+      "toPage": "View the activities page",
+      "empty": "No activities yet.",
+      "titleKo": "Title (Korean)",
+      "titleEn": "Title (English, optional)",
+      "date": "Date",
+      "dateHint": "A year (2026), a month (2026-11) or a day (2026-11-06). Leave it empty if unknown.",
+      "cityKo": "City (Korean)",
+      "cityEn": "City (English, optional)",
+      "photo": "Photo (optional, one)",
+      "currentPhoto": "Current photo",
+      "removePhoto": "Remove photo",
+      "summaryKo": "Short description (Korean, optional)",
+      "summaryEn": "Short description (English, optional)",
+      "planned": "Has not happened yet",
+      "plannedHint": "Shows as \"Upcoming\". Turn it off once the event is over.",
+      "deleteQuestion": "Delete this activity? This cannot be undone."
+    },
+    "notices": {
+      "title": "Manage notices",
+      "new": "Write a notice",
+      "edit": "Edit notice",
+      "toPage": "View the notices page",
+      "empty": "No notices yet.",
+      "titleKo": "Title (Korean)",
+      "titleEn": "Title (English, optional)",
+      "bodyKo": "Body (Korean)",
+      "bodyEn": "Body (English, optional)",
+      "pinned": "Pin to the top",
+      "deleteQuestion": "Delete this notice? This cannot be undone.",
+      "photos": "Photos (optional, up to {count})",
+      "files": "Files (optional, up to {count})",
+      "filesHint": "PDF, Hangul, Word, Excel and PowerPoint files, up to 10MB each.",
+      "publicWarning": "Anyone can download the photos and files you attach. Never attach anything with personal details, such as a list of applicants or contacts.",
+      "remove": "Remove",
+      "removeLabel": "Remove {name}",
+      "removePhoto": "Remove photo {number}",
+      "photoAlt": "Attached photo {number}",
+      "tooManyPhotos": "You can attach up to {count} photos.",
+      "tooManyFiles": "You can attach up to {count} files.",
+      "fileTooLarge": "{name} is over 10MB.",
+      "fileBadType": "{name} isn't a type that can be attached."
     }
   },
   "Teams": {
@@ -837,5 +915,25 @@
     "body": "This page could not be loaded. Please try again in a moment.",
     "retry": "Try again",
     "home": "Go home"
+  },
+  "Board": {
+    "pinned": "Pinned",
+    "edited": "Edited {date}",
+    "activities": {
+      "metaTitle": "Activities",
+      "title": "Activities",
+      "lead": "What RISE CREW has been doing, on campus and around the world.",
+      "empty": "No activities yet."
+    },
+    "notices": {
+      "metaTitle": "Notices",
+      "title": "Notices",
+      "lead": "Recruitment and event announcements.",
+      "empty": "No notices yet.",
+      "toList": "Back to notices"
+    },
+    "files": "Files",
+    "hasFiles": "Files",
+    "photoAlt": "{title}, photo {number}"
   }
 }

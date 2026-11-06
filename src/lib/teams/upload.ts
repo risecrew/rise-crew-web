@@ -6,17 +6,17 @@ export type UploadError = 'tooLarge' | 'badType' | 'unreadable' | 'denied' | 'fa
 
 // Storage says no with a 403 when the policies refuse: the person is no longer allowed, which is
 // not the same as a failed upload that trying again would fix.
-function uploadFailure(error: unknown): 'denied' | 'failed' {
+export function uploadFailure(error: unknown): 'denied' | 'failed' {
   const { status, statusCode } = error as { status?: unknown; statusCode?: unknown };
   return status === 403 || statusCode === '403' ? 'denied' : 'failed';
 }
 
-function extensionOf(blob: Blob): string {
+export function photoExtension(blob: Blob): string {
   return PHOTO_TYPES[blob.type as keyof typeof PHOTO_TYPES];
 }
 
 // Checks and shrinks one picture. Nothing has gone up yet at this point.
-async function prepare(
+export async function prepareImage(
   file: File,
   kind: ImageKind,
 ): Promise<{ blob: Blob } | { error: UploadError }> {
@@ -37,7 +37,7 @@ export async function uploadPhotos(
 ): Promise<{ paths: string[] } | { error: UploadError }> {
   const blobs: Blob[] = [];
   for (const file of files) {
-    const prepared = await prepare(file, 'photo');
+    const prepared = await prepareImage(file, 'photo');
     if ('error' in prepared) return prepared;
     blobs.push(prepared.blob);
   }
@@ -45,7 +45,7 @@ export async function uploadPhotos(
   const bucket = createSupabaseBrowserClient().storage.from('team-post-photos');
   const paths: string[] = [];
   for (const blob of blobs) {
-    const path = `${teamId}/${postId}/${crypto.randomUUID()}.${extensionOf(blob)}`;
+    const path = `${teamId}/${postId}/${crypto.randomUUID()}.${photoExtension(blob)}`;
     let failure: 'denied' | 'failed' | null = null;
     try {
       const { error } = await bucket.upload(path, blob, { contentType: blob.type, upsert: false });
@@ -80,10 +80,10 @@ export async function uploadTeamImage(
   teamId: string,
   file: File,
 ): Promise<{ path: string } | { error: UploadError }> {
-  const prepared = await prepare(file, bucket === 'team-logos' ? 'logo' : 'cover');
+  const prepared = await prepareImage(file, bucket === 'team-logos' ? 'logo' : 'cover');
   if ('error' in prepared) return prepared;
 
-  const path = `${teamId}/${crypto.randomUUID()}.${extensionOf(prepared.blob)}`;
+  const path = `${teamId}/${crypto.randomUUID()}.${photoExtension(prepared.blob)}`;
   try {
     const { error } = await createSupabaseBrowserClient()
       .storage.from(bucket)

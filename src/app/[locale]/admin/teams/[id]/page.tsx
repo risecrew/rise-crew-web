@@ -7,6 +7,7 @@ import {
   RemoveMemberButton,
   TeamSettingsForm,
 } from '@/components/teams/admin-forms';
+import { DeleteItem } from '@/components/board/delete-item';
 import { TEXT_BUTTON, TITLE } from '@/components/teams/form-parts';
 import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
@@ -16,6 +17,7 @@ import { requireRole } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { isUuid } from '@/lib/teams/query';
 import { AccountLayout, accountMetadata } from '../../../account-layout';
+import { deleteTeam } from '../actions';
 
 type Props = { params: Promise<{ locale: string; id: string }> };
 
@@ -46,7 +48,7 @@ export default async function AdminTeamPage({ params }: Props) {
   if (error) throw new Error(error.message);
   if (!team) notFound();
 
-  const [memberRows, hiddenPosts] = await Promise.all([
+  const [memberRows, hiddenPosts, postCount] = await Promise.all([
     supabase.from('team_members').select('user_id').eq('team_id', id),
     supabase
       .from('team_posts')
@@ -54,6 +56,7 @@ export default async function AdminTeamPage({ params }: Props) {
       .eq('team_id', id)
       .not('hidden_at', 'is', null)
       .order('hidden_at', { ascending: false }),
+    supabase.from('team_posts').select('id', { count: 'exact', head: true }).eq('team_id', id),
   ]);
   if (memberRows.error) throw new Error(memberRows.error.message);
   if (hiddenPosts.error) throw new Error(hiddenPosts.error.message);
@@ -151,6 +154,22 @@ export default async function AdminTeamPage({ params }: Props) {
           ) : (
             <p className="mt-4 border-t border-white/15 pt-4 text-white/85">{t('noHidden')}</p>
           )}
+        </section>
+
+        <section aria-labelledby="team-delete" className="mt-14 border-t border-white/15 pt-6">
+          <h2 id="team-delete" className={SECTION_TITLE}>
+            {t('deleteTitle')}
+          </h2>
+          <p className="mt-2 mb-4 text-base break-keep text-white/75">{t('deleteLead')}</p>
+          <DeleteItem
+            id={team.id}
+            action={deleteTeam}
+            question={t('deleteQuestion', {
+              name: team.name,
+              posts: postCount.count ?? 0,
+              members: memberRows.data?.length ?? 0,
+            })}
+          />
         </section>
       </div>
     </AccountLayout>
