@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
   // for browsers it recognizes, and KakaoTalk's link preview, which is not on its list of bots,
   // would not find the team's title and picture.
   htmlLimitedBots: /.*/,
+  // 75 for every photo; 90 for the opening one, which fills the window and is looked at first.
+  images: { qualities: [75, 90] },
   // Vendored fonts live in versioned folders (public/fonts/<package>-<version>), so a file at a
   // given URL never changes and can be cached for a year.
   async headers() {

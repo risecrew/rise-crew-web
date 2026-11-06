@@ -64,7 +64,7 @@ export default async function AboutPage({ params }: Props) {
             {rise.map((line) => (
               <li
                 key={line}
-                className="border-t border-white/15 py-5 font-display text-[clamp(1.6rem,3vw,2.6rem)] font-[850] break-keep"
+                className="border-t border-white/15 py-5 font-display text-subhead break-keep"
               >
                 <span className="text-lime">{line.slice(0, 1)}</span>
                 {line.slice(1)}

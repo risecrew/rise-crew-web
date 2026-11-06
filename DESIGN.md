@@ -18,41 +18,34 @@ colors:
   ink: "#13203a"
   ink-soft: "#46546d"
 typography:
-  chapter:
-    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "calc(100cqw / <word-em> * 0.98)"
-    fontWeight: 900
-    lineHeight: 0.82
-    letterSpacing: "-0.03em"
-  display:
-    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(3rem, 8.5vw, 8rem)"
-    fontWeight: 900
-    lineHeight: 0.92
-    letterSpacing: "-0.025em"
-  slogan:
-    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(2.6rem, 7.4vw, 6rem)"
-    fontWeight: 850
-    lineHeight: 0.95
-    letterSpacing: "-0.02em"
   numeral:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
     fontSize: "clamp(5rem, 13vw, 11rem)"
     fontWeight: 900
     lineHeight: 0.85
     fontFeature: "\"tnum\" 1"
-  account-title:
+  display:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(3.25rem, 9vw, 6rem)"
+    fontSize: "clamp(3rem, 8.5vw, 8rem)"
+    fontWeight: 900
+    lineHeight: 0.92
+    letterSpacing: "-0.025em"
+  hero:
+    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
+    fontSize: "clamp(2.6rem, 7vw, 6rem)"
     fontWeight: 900
     lineHeight: 0.95
     letterSpacing: "-0.025em"
   headline:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(1.9rem, 4vw, 3.4rem)"
+    fontSize: "clamp(2.125rem, 4vw, 3.4rem)"
     fontWeight: 850
     lineHeight: 1.04
+  subhead:
+    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
+    fontSize: "clamp(1.75rem, 2.6vw, 2.25rem)"
+    fontWeight: 850
+    lineHeight: 1.15
   title:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
     fontSize: "1.5rem"
@@ -174,11 +167,11 @@ components:
 
 사이트 전체가 불이 꺼진 객석에서 올려다보는 하나의 무대다. 바탕은 색이 거의 없는 무대 검정이고, 빛은 로고에서만 온다. 로고 코발트는 숫자 구간과 사진 없는 장면을 물들이는 조명이고, 라임은 무대 위에서 손을 드는 순간(행동 버튼, R·I·S·E 머리글자, 거대한 숫자)에만 켜진다. 실제 사람이 찍힌 사진이 화면 폭을 채우고, 그 위에 Wanted Sans의 매우 굵은 글자가 직접 올라간다.
 
-밀도는 낮고 크기 대비는 극단적이다. 장(章) 이름 Campus · Domestic · Global은 콘텐츠 폭을 끝에서 끝까지 가로지르고, 숫자는 최대 11rem까지 커진다. 그 사이의 정보는 카드가 아니라 얇은 흰 선(15~20% 불투명) 위에 라벨과 값을 쌓는 발표 자료 부록 같은 표로 정리된다. 상자, 그림자, 둥근 카드가 없는 평면이고, 깊이는 사진, 어둡게 까는 그라데이션, 코발트 빛 번짐으로만 만든다.
+밀도는 낮고 크기 대비는 극단적이다. 장(章) 이름 Campus · Domestic · Global은 안쪽 페이지 제목과 같은 최대 8rem으로 서고, 숫자는 최대 11rem까지 커진다. 그 사이의 정보는 카드가 아니라 얇은 흰 선(15~20% 불투명) 위에 라벨과 값을 쌓는 발표 자료 부록 같은 표로 정리된다. 상자, 그림자, 둥근 카드가 없는 평면이고, 깊이는 사진, 어둡게 까는 그라데이션, 코발트 빛 번짐으로만 만든다.
 
 움직임은 확실히 체감되되 항상 스크롤 방향을 따른다. 첫 화면 사진은 고정된 채 물러나며 어두워지고, 숫자는 같은 박자로 올라가며 굵어지고, Global은 화면을 고정한 채 도시 사진을 아래에서 위로 덮는다. JavaScript가 없거나 `prefers-reduced-motion`이면 모든 연출이 최종 상태로 멈춰 보인다. 16:9 슬라이드 틀, 슬라이드 번호, 단체 사진 히어로 아래 카드 격자는 이 세계가 거부한 형식이다.
 
-계정 화면(로그인, 가입 정보, 마이페이지, 회원 관리)은 같은 객석 안의 작은 방이다. 사진이 없으므로 코발트 조명이 위쪽 가장자리에서 내려오고(404는 아래에서 올라온다), 내용은 그 빛 아래 가운데 한 줄로 선다. 이 화면들은 소개가 아니라 입력과 확인이라서 큰 글자는 제목 하나뿐이고, 나머지는 알약형 입력칸과 가로선 목록이 맡는다. 화면 본문의 라임 알약은 하나를 넘지 않고, 그 화면이 하려는 일에만 켜진다. 헤더의 작은 "모집 안내 보기" 알약은 모든 화면에 있는 사이트 전체의 예외라서 이 수에 넣지 않는다.
+계정 화면(로그인, 가입 정보, 마이페이지, 회원 관리)은 같은 객석 안의 작은 방이다. 사진이 없으므로 코발트 조명이 위쪽 가장자리에서 내려오고(404는 아래에서 올라온다), 내용은 그 빛 아래 가운데 한 줄로 선다. 이 화면들은 소개가 아니라 입력과 확인이라서 큰 글자는 제목 하나뿐이고, 나머지는 알약형 입력칸과 가로선 목록이 맡는다. 화면의 라임 알약은 하나를 넘지 않고, 그 화면이 하려는 일에만 켜진다.
 
 **Key Characteristics:**
 - 거의 검은 무대 바탕(`stage`) 위의 흰 글자, 색은 로고에서만 가져온다.
@@ -187,7 +180,7 @@ components:
 - 콘텐츠 폭을 가로지르는 장 이름과 가변 굵기의 거대한 숫자.
 - 카드 대신 얇은 가로선으로 나눈 라벨·값 목록.
 - 스크롤에 묶인 고정 장면 전환, 움직임 축은 언제나 세로.
-- 계정 화면: 위에서 내려오는 코발트 조명, 알약 입력칸, 본문의 라임 알약은 많아야 하나(헤더의 작은 알약은 예외), 오류는 색이 아니라 문장으로.
+- 계정 화면: 위에서 내려오는 코발트 조명, 알약 입력칸, 라임 알약은 많아야 하나, 오류는 색이 아니라 문장으로.
 
 ## Colors
 
@@ -229,13 +222,14 @@ components:
 **Loading:** Wanted Sans Variable과 Pretendard Variable은 사이트가 직접 호스팅한다. 공식 npm 패키지(`pretendard`, `wanted-sans`)의 동적 부분집합(unicode-range로 나눈 작은 woff2) 파일을 `pnpm fonts:vendor`로 `public/fonts/<패키지>-<버전>/`에 복사하고, `src/lib/fonts.ts`의 CSS로 불러온다. 폴더 이름에 버전이 있어 1년 캐시(immutable)를 건다(`next.config.ts`). 외부 CDN은 쓰지 않는다. JetBrains Mono는 `next/font/google`로 빌드 때 내려받아 `--font-jetbrains` 변수로 연결한다.
 
 ### Hierarchy
-- **Chapter** (900, 콘텐츠 폭에 맞춘 `calc(100cqw / 단어폭 * 0.98)`, 0.82, -0.03em): Campus · Domestic · Global 장 이름. 컨테이너 쿼리로 단어가 콘텐츠 폭 전체를 가로지르도록 크기를 정하고, 줄바꿈하지 않는다. 단어폭(em)은 Wanted Sans 900, -0.03em에서 잰 값이다.
-- **Display** (900, `clamp(3rem, 8.5vw, 8rem)`, 0.92, -0.025em): 안쪽 페이지 표지 제목.
-- **Slogan** (850, `clamp(2.6rem, 7.4vw, 6rem)`, 0.95, -0.02em): 첫 화면 R·I·S·E 슬로건. 한 줄에 한 문장, 머리글자만 라임.
-- **Numeral** (스크롤에 따라 400 → 950, 정지 상태 900, `clamp(5rem, 13vw, 11rem)`, 0.85, 고정폭 숫자): 90+ · 22+ · 33, VCC 18. 대회 숫자는 한 단계 작은 `clamp(4.5rem, 9vw, 8rem)`. 라벨은 숫자 아래에 놓는다.
-- **Account Title** (900, `clamp(3.25rem, 9vw, 6rem)`, 0.95, -0.025em, `text-wrap: balance`): 로그인, 가입 정보("반가워요!"), 마이페이지 제목. 회원 관리는 표 폭을 위해 `clamp(2.5rem, 6vw, 4rem)`, 로그인 링크를 보낸 뒤의 "메일함을 확인해 주세요"는 `clamp(2rem, 6vw, 3.4rem)` 850, 1.04로 한 단계 낮춘다. 계정 화면 제목은 이 세 가지뿐이다.
-- **Headline** (850, `clamp(1.9rem, 4vw, 3.4rem)`, 1.04): 안쪽 페이지의 섹션 제목. 홈 장 안의 제목은 30px → 48px(md)로 같은 굵기를 쓴다. `text-wrap: balance`.
-- **Title** (800~850, 20~30px): 프로그램 이름, 멘토 이름, 사실 값(MOU 날짜, 팀당 500만 원).
+큰 글자는 아래 다섯 단계만 쓴다. 단계마다 넓은 화면에서 위 단계의 약 0.7배라 이웃한 두 단계가 같은 크기로 보이지 않는다. 값은 `globals.css`의 `--text-*` 토큰(`text-numeral`, `text-display`, `text-hero`, `text-headline`, `text-subhead`)에 있고, 화면 코드에 `text-[clamp(...)]` 같은 임의 크기를 새로 쓰지 않는다. subhead 아래는 Tailwind 기본 단계(2xl 이하)를 쓴다.
+
+- **Numeral** (`clamp(5rem, 13vw, 11rem)`, 0.85, 고정폭 숫자, 스크롤에 따라 400 → 950, 정지 상태 900): 90+ · 22+ · 33, VCC 18. 라벨은 숫자 아래에 놓는다.
+- **Display** (900, `clamp(3rem, 8.5vw, 8rem)`, 0.92, -0.025em): 안쪽 페이지 표지 제목, 홈의 장 이름 Campus · Domestic · Global, 대회 숫자(5개국 · 15팀). 장 이름 세 개는 단어 길이와 상관없이 같은 크기이고 줄바꿈하지 않는다.
+- **Hero** (900, `clamp(2.6rem, 7vw, 6rem)`, 0.95, -0.025em): 첫 화면 슬로건, 계정 화면 제목(가입 정보, 마이페이지). 슬로건은 머리글자 R·I·S·E를 따로 한 열에 세워 열 가운데에 맞추고(좁은 I도 가운데), 머리글자는 1000 굵기 라임, 나머지 글자는 0.8배 750 흰색이다. 머리글자가 세로로 RISE라는 단어로 읽힌다. R의 획은 글자 칸보다 0.05em 안쪽에서 시작하므로 슬로건 열을 그만큼 왼쪽으로 당겨, R이 헤더 로고와 아래 문장과 같은 세로선에 서게 한다.
+- **Headline** (850, `clamp(2.125rem, 4vw, 3.4rem)`, 1.04, `text-wrap: balance`): 섹션 제목. 안쪽 페이지 섹션, 홈 장 안의 제목, 홈 마지막 지원 권유 제목(한 줄, 가운데 정렬, 설명과 버튼도 가운데), "숫자로 보는 RISE CREW", 회원 관리 제목, "메일함을 확인해 주세요".
+- **Subhead** (850, `clamp(1.75rem, 2.6vw, 2.25rem)`, 1.15): 섹션 안의 제목. 해외 무대 각 도시의 행사 이름, 사실 값(MOU 날짜, 팀당 500만 원), 소개 페이지의 R·I·S·E 목록.
+- **Title** (800~850, 20~24px): 프로그램 이름, 멘토 이름.
 - **Body Lead** (400, 18px): 제목 아래 설명 문장. 최대 폭 42~48rem(`max-w-2xl`~`max-w-3xl`), 75% 흰색.
 - **Body** (400, 16px): 일반 문단과 목록. 계정 화면의 입력 문장, 오류·확인 메시지(흰색), 동의 문장(85%)도 16px이다. 로그인과 가입의 리드 문장은 18px 85%, `break-keep`.
 - **Label** (500, 14px): 사실 목록의 라벨(60% 흰색), 보도 출처 줄, 프로그램 요약. 계정 화면의 입력칸 라벨(75% 흰색), 회원 표의 머리글(60%), 역할 칩(600)도 이 크기다.
@@ -282,7 +276,7 @@ components:
 ### Buttons
 무대 위에서 유일하게 켜진 버튼. 자신 있고 손에 잡힌다.
 - **Shape:** 완전한 알약형(9999px).
-- **Primary:** 라임 바탕에 코발트 글자, 600 굵기, 12px 24px. 지원하기(모집 중) 또는 모집 안내 보기(모집 기간 아님) 한 가지 행동만 맡는다. 헤더와 휴대폰 메뉴에서는 8px 16px의 작은 판을 쓰고, 이 작은 판은 모든 화면에 있는 사이트 전체의 예외다. 화면 본문에는 라임 알약이 하나를 넘지 않는다.
+- **Primary:** 라임 바탕에 코발트 글자, 600 굵기, 12px 24px. 지원하기(모집 중) 또는 모집 안내 보기(모집 기간 아님) 한 가지 행동만 맡는다. 헤더와 휴대폰 메뉴에는 두지 않는다. 한 화면에 라임 알약이 하나를 넘지 않는다.
 - **Hover / Focus:** hover에서 2px 떠오르고, 누르면 0.97로 줄어든다(150ms, ease-out). 포커스는 2px 라임 외곽선, 3px 간격.
 - **Secondary:** 버튼 옆의 보조 행동(제휴 문의)은 버튼이 아니라 흰 글자 밑줄 링크다. 밑줄 간격 4px.
 - **Light (계정):** 흰 바탕에 무대 검정 글자, 알약, 12px 24px, 600. 로그인 화면의 "구글로 계속하기" 하나에만 쓴다. 글자 앞에 구글의 "G" 표식을 단다(장식이라 버튼 이름은 글자가 맡는다). 라임이 아닌 면이라서 같은 화면의 라임 알약(로그인 링크 받기)을 가리지 않는다.
@@ -330,16 +324,21 @@ components:
 - **Timeline variant:** 날짜(Mono, 60%) · 장소(600) · 행사명의 세 열. 아직 일어나지 않았거나 확인되지 않은 일정은 줄 전체를 60%로 낮추고 상태 칩을 단다.
 
 ### Navigation
-- **Site header:** 사진 위에 투명하게 겹친다. 흰 심볼과 RISE CREW 워드마크(Wanted Sans 800), 오른쪽에 흰 글자 링크(hover 밑줄), 대문자 언어 전환, 작은 라임 버튼.
+- **Site header:** 사진 위에 투명하게 겹친다. 흰 심볼과 RISE CREW 워드마크(Wanted Sans 800), 오른쪽에 흰 글자 링크(hover 밑줄), 대문자 언어 전환, 로그인. 모집 버튼은 헤더에 두지 않는다(첫 화면과 마지막 부름에 있다). 모든 페이지와 같은 콘텐츠 폭(최대 80rem, 좌우 여백 20px, md 이상 40px) 안에 있고, 첫 화면의 슬로건과 버튼도 같은 폭 안에 놓여서 로고는 슬로건의 R과, 마지막 항목은 첫 화면의 모집 버튼 오른쪽 끝과 같은 세로선에 선다.
 - **Account entry:** 로그인하기 전에는 오른쪽의 흰 글자 링크 "로그인"(hover 밑줄)이다. 로그인한 뒤에는 36px 원(50% 흰 테두리, 이름 첫 글자 Wanted Sans 800 16px)으로 바뀌고, 누르면 256px 계정 패널(Elevation 참고)이 열린다. 패널에는 이름과 이메일, 마이페이지, 운영진과 관리자에게만 보이는 회원 관리와 팀 관리, 로그아웃이 줄로 있다. 바깥을 누르거나 Esc나 Tab으로 나가면 닫히고 Esc는 원으로 포커스를 돌려준다. 어느 쪽인지는 브라우저가 세션을 읽어 정하므로 주변 페이지는 정적으로 남는다. 차단된 계정은 로그인하지 않은 것으로 보인다.
-- **Mobile:** md 미만에서는 "MENU"(한국어는 "메뉴") 테두리 버튼(4px, 50% 흰 테두리, Control 글자)이 종이 바탕 패널을 연다. 패널은 잉크 글자, 항목 hover는 종이 가장자리, 아래에 코발트 언어 전환과 라임 버튼. 로그인한 뒤에는 라임 버튼 위에 계정 줄이 든다.
-- **Footer:** 코발트 면 전체. 심볼, 워드마크, 슬로건 한 줄, 지원 기관 표기, 링크 목록, 공용 연락처.
+- **Mobile:** md 미만에서는 "MENU"(한국어는 "메뉴") 테두리 버튼(4px, 50% 흰 테두리, Control 글자)이 종이 바탕 패널을 연다. 패널은 잉크 글자, 항목 hover는 종이 가장자리, 아래에 코발트 언어 전환. 로그인한 뒤에는 언어 전환 위에 계정 줄이 든다.
+- **Footer:** 코발트 면 전체. 심볼, 워드마크, 슬로건 한 줄, 지원 기관 표기, 링크 목록, 공용 연락처. 맨 아래 줄에 저작권 표기와 작은 제작자 표기(`made by sjhbread, jwc`, 12px)를 둔다.
 
 ### Stage Photo
 사진이 주인공이다.
 - **Style:** `object-cover`로 틀을 채우고, 아래로 갈수록 무대 검정으로 어두워지는 막(15% → 25% → 88%)을 깐 뒤 그 위에 흰 글자를 놓는다.
 - **Temporary badge:** 원본이 오기 전의 임시 사진에는 오른쪽 위에 "임시 사진" 알약(55% 검정, 배경 흐림, 11px 600)을 단다. 화면 폭 사진에서는 헤더 아래로 내려 겹치지 않게 한다.
 - **No photo:** 사진이 없는 장면(Campus, 404)은 사진을 흉내 내지 않고 코발트 방사형 조명을 아래나 위에서 비춘다.
+- **Opening photo (첫 화면 대표 사진):** 고를 때 네 가지를 모두 지킨다.
+  1. RISE CREW가 사진 안에서 드러난다: 멤버가 주인공이고, 저지·점퍼·현수막의 RISE CREW 표기나 로고가 데스크톱과 휴대폰 잘림 모두에서 보인다. 무대나 행사장만 보이는 사진은 쓰지 않는다.
+  2. 위쪽 띠(헤더 자리)가 어둡다: 흰 헤더 글자가 밝은 천장, 현수막, 화면 위에 오지 않는다. 추가로 첫 화면 사진만 위 128px에 55% → 0 무대 검정 막을 한 겹 더 깐다.
+  3. 고화질이다: 원본 긴 변 4000px 안팎 이상이고 흔들림 없이 선명하다. 웹용은 긴 변 3200px, 메타데이터 제거, 화질 90으로 내보내고, 세로 화면에서 옆이 잘려 넓게 그려지는 폭만큼 받아 오게 `sizes`를 잡는다.
+  4. 사이트의 다른 곳에 쓰지 않은 사진이다.
 
 ### Count-Up Numeral
 - 화면의 60%에 들어오면 0에서 목표값까지 1.4초, 지수 감속(easeOutExpo)으로 올라간다. 모든 숫자가 같은 시간을 써서 함께 멈춘다. 동시에 스크롤 위치에 따라 굵기가 400 → 950으로 변한다. 서버 렌더와 움직임 꺼짐 상태에서는 최종값이 900 굵기로 보이고, 화면 낭독기는 항상 최종값을 읽는다.
@@ -371,7 +370,7 @@ components:
 - **Do** 스크롤 연출은 세로 방향으로만 움직이고, 움직임 꺼짐과 JavaScript 없음에서는 최종 상태를 보여준다.
 - **Do** 날짜와 번호는 JetBrains Mono와 고정폭 숫자로 쓴다.
 - **Do** 계정 화면은 코발트 조명을 위에서 비추고, 내용을 가운데 한 줄로 세운다.
-- **Do** 계정 화면의 본문에는 라임 알약을 많아야 하나만 두고, 그 화면이 하려는 일(로그인 링크 받기, 가입 완료, 정보 수정, 회원으로)에만 쓴다. 나머지는 흰 테두리 알약이나 밑줄 글자 버튼이다. 헤더의 작은 "모집 안내 보기" 알약은 사이트 전체의 예외로 따로 센다.
+- **Do** 계정 화면의 본문에는 라임 알약을 많아야 하나만 두고, 그 화면이 하려는 일(로그인 링크 받기, 가입 완료, 정보 수정, 회원으로)에만 쓴다. 나머지는 흰 테두리 알약이나 밑줄 글자 버튼이다.
 - **Do** 오류는 칸 테두리를 100% 흰색으로 올리고 칸 아래에 흰 문장으로 이유를 쓴다. 위험한 행동(탈퇴, 차단)도 라임이 아니라 Outline 알약이다.
 - **Do** 밑줄 글자 버튼도 누르는 영역을 44px 이상으로 잡는다.
 

@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { ChapterRail } from '@/components/stage/chapter-rail';
 import type { Mentor, Partner, Photo, Press, Program, Stamp, Stat } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
-import { stampState, type ApplyCta } from '@/lib/content';
+import type { ApplyCta } from '@/lib/content';
 import { Ask } from './ask';
 import { CampusChapter, DomesticChapter, GlobalChapter, RouteIntro } from './chapters';
 import { Hero } from './hero';
@@ -20,7 +20,6 @@ type Props = {
   partners: Partner[];
   press: Press[];
   cta: ApplyCta;
-  today: Date;
 };
 
 // The home follows RISE CREW's own three stages, Campus → Domestic → Global, with a rail that
@@ -36,7 +35,6 @@ export async function Home({
   partners,
   press,
   cta,
-  today,
 }: Props) {
   const t = await getTranslations('Home');
   const common = await getTranslations('Common');
@@ -44,6 +42,9 @@ export async function Home({
   const photo = (id: string) => photos.find((p) => p.id === id);
   const pickStats = (ids: string[]) => ids.map(stat).filter((s): s is Stat => !!s);
   const workshop = photo('workshop-2026-01');
+  // The opening: the crew itself, holding up its own jersey, a photo used nowhere else. The expo
+  // hall above them is dark, so the white header reads over it.
+  const opening = photo('beyond-expo-crew-jersey-2026');
 
   // Global stops in the order they happened; undated ones last.
   const stops = stamps
@@ -59,7 +60,7 @@ export async function Home({
 
   return (
     <>
-      <Hero locale={locale} photo={workshop} cta={cta} />
+      <Hero locale={locale} photo={opening} cta={cta} />
       <Traction
         locale={locale}
         stats={pickStats(['members', 'teams', 'mentors'])}
@@ -84,11 +85,7 @@ export async function Home({
           press={press.find((p) => p.id === 'eduplus-aix')}
         />
       </ChapterRail>
-      <Ask
-        locale={locale}
-        cta={cta}
-        upcoming={stamps.filter((s) => stampState(s, today) === 'upcoming')}
-      />
+      <Ask cta={cta} />
     </>
   );
 }
