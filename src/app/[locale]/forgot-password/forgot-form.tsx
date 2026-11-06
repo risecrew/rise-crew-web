@@ -98,7 +98,7 @@ export function ForgotForm({ locale, next, email: known }: Props) {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-sm">
       <h1 className={SCREEN_TITLE}>{t('title')}</h1>
       <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
       {notice ? <Alert>{login(`errors.${notice}`)}</Alert> : null}

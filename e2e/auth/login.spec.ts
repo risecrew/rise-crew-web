@@ -47,7 +47,9 @@ function anonymousSignIn(email: string, password: string) {
 const COPY = {
   ko: {
     title: '로그인',
-    lead: '이메일과 비밀번호로 로그인해요',
+    signupTab: '회원가입',
+    switchLabel: '로그인 또는 회원가입',
+    signupHint: '이메일을 확인한 뒤 비밀번호를 정해요',
     google: '구글로 계속하기',
     or: '또는',
     emailLabel: '이메일',
@@ -60,14 +62,14 @@ const COPY = {
       blocked: '이용이 제한된 계정이에요.',
       oauth: '구글 로그인을 마치지 못했어요. 다시 시도해 주세요.',
     },
-    // The quiet line under the sign-in options, and its link.
-    storage: '가입하면 이메일 주소가 저장돼요. 가입 정보를 입력하지 않으면 7일 뒤 삭제돼요.',
     policyLink: '개인정보 처리방침',
     policyTitle: '개인정보 처리방침',
   },
   en: {
     title: 'Sign in',
-    lead: 'Sign in with your email and password',
+    signupTab: 'Sign up',
+    switchLabel: 'Sign in or sign up',
+    signupHint: 'Confirm your email, then choose a password',
     google: 'Continue with Google',
     or: 'or',
     emailLabel: 'Email',
@@ -80,8 +82,6 @@ const COPY = {
       blocked: 'This account has been suspended.',
       oauth: "Google sign-in didn't finish. Please try again.",
     },
-    storage:
-      'Signing up stores your email address. If you never finish the sign-up form, it is deleted after 7 days.',
     policyLink: 'Privacy policy',
     policyTitle: 'Privacy policy',
   },
@@ -114,8 +114,17 @@ for (const locale of ['ko', 'en'] as const) {
     test('has the Google button and the email form', async ({ page }) => {
       const response = await page.goto(`/${locale}/login`);
       expect(response?.status()).toBe(200);
-      await expect(page.getByRole('heading', { level: 1, name: t.title })).toBeVisible();
-      await expect(page.getByText(t.lead)).toBeVisible();
+      // The title is for screen readers and the tab; the screen opens on the switch instead.
+      await expect(page.getByRole('heading', { level: 1, name: t.title })).toHaveClass(/sr-only/);
+      const tabs = page.getByRole('navigation', { name: t.switchLabel });
+      await expect(tabs.getByRole('link', { name: t.title })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+      await expect(tabs.getByRole('link', { name: t.signupTab })).toHaveAttribute(
+        'href',
+        `/${locale}/signup`,
+      );
       const google = page.getByRole('button', { name: t.google });
       await expect(google).toBeVisible();
       // Google's own mark sits before the label; it is decoration, so the name stays the label.
@@ -130,7 +139,7 @@ for (const locale of ['ko', 'en'] as const) {
     test('is accessible and does not scroll sideways', async ({ page }) => {
       const response = await page.goto(`/${locale}/login`);
       expect(response?.status()).toBe(200);
-      await expect(page.getByRole('heading', { level: 1, name: t.title })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: t.title })).toBeAttached();
       await expectNoHorizontalScroll(page);
       await expectAccessible(page);
     });
@@ -168,22 +177,35 @@ for (const locale of ['ko', 'en'] as const) {
       await expect(notice(page)).toHaveText(t.invalid);
     });
 
-    test('says under the sign-in options what signing in stores, with the policy a tap away', async ({
+    test('keeps quiet: no lead or storage line, and nothing larger than the subhead', async ({
       page,
-      baseURL,
     }) => {
       await page.goto(`/${locale}/login`);
       const main = page.locator('main');
-      const line = main.getByText(t.storage, { exact: true });
-      await expect(line).toBeVisible();
-      // Quiet: small, in the soft white of the account screens.
-      await expect(line).toHaveCSS('font-size', '14px');
-      await expect(line).toHaveCSS('color', /\/ 0\.75\)$|, 0\.75\)$/);
-      // Under the sign-in options: below the button that sends the link.
-      const submit = (await page
-        .getByRole('button', { name: t.submit, exact: true })
-        .boundingBox())!;
-      expect((await line.boundingBox())!.y).toBeGreaterThan(submit.y + submit.height);
+      await expect(main.getByRole('link', { name: t.policyLink, exact: true })).toHaveCount(0);
+      const largest = await main.evaluate((el) =>
+        Math.max(
+          ...[...el.querySelectorAll('*')]
+            .filter((n) => n.getBoundingClientRect().width > 1)
+            .map((n) => parseFloat(getComputedStyle(n).fontSize)),
+        ),
+      );
+      // The subhead step tops out at 36px.
+      expect(largest).toBeLessThanOrEqual(36);
+    });
+
+    test('the sign-up side has the same switch, a hint and the policy a tap away', async ({
+      page,
+      baseURL,
+    }) => {
+      await page.goto(`/${locale}/signup`);
+      const main = page.locator('main');
+      const tabs = page.getByRole('navigation', { name: t.switchLabel });
+      await expect(tabs.getByRole('link', { name: t.signupTab })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+      await expect(page.getByLabel(t.emailLabel)).toHaveAccessibleDescription(t.signupHint);
 
       // The policy is one tap away: an underlined link, as tall as a finger.
       const link = main.getByRole('link', { name: t.policyLink, exact: true });
@@ -191,7 +213,16 @@ for (const locale of ['ko', 'en'] as const) {
       await expect(link).toHaveCSS('text-decoration-line', 'underline');
       expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
       await expectNoHorizontalScroll(page);
+      await expectAccessible(page);
 
+      // The switch keeps its place between the two screens.
+      const at = async () => (await tabs.boundingBox())!.y;
+      const here = await at();
+      await tabs.getByRole('link', { name: t.title }).click();
+      await expect(page).toHaveURL(`${baseURL}/${locale}/login`);
+      expect(Math.abs((await at()) - here)).toBeLessThanOrEqual(1);
+
+      await page.goto(`/${locale}/signup`);
       await link.click();
       await expect(page).toHaveURL(`${baseURL}/${locale}/privacy`);
       await expect(page.getByRole('heading', { level: 1, name: t.policyTitle })).toBeVisible();
@@ -211,7 +242,7 @@ for (const locale of ['ko', 'en'] as const) {
 
 test('an error code the page does not know shows no message', async ({ page }) => {
   await page.goto('/ko/login?error=whatever');
-  await expect(page.getByRole('heading', { level: 1, name: '로그인' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: '로그인' })).toBeAttached();
   await expect(notice(page)).toHaveCount(0);
 });
 

@@ -7,10 +7,16 @@ export const INPUT =
   'w-full rounded-full border border-white/50 bg-white/5 px-5 py-3.5 text-base text-white placeholder:text-white/55 aria-invalid:border-white';
 export const FIELD_LABEL = 'block text-sm font-medium text-white/75';
 export const FIELD_ERROR = 'mt-2 px-2 text-base break-keep text-white';
-export const SCREEN_TITLE =
-  'font-display text-[clamp(3.25rem,9vw,6rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance break-keep';
+// The account screens are for typing, not for reading: their titles stop at the subhead step.
+export const SCREEN_TITLE = 'font-display text-subhead text-balance break-keep';
+// The sign-in and sign-up column. Both hold the height of the taller one (sign-in, 498px), so the
+// switch at the top stays put when the visitor moves between them.
+export const AUTH_COLUMN = 'w-full max-w-sm min-h-[31.125rem]';
 export const INLINE_LINK =
   'inline-flex min-h-11 items-center text-base text-white underline underline-offset-4';
+// A small link beside a form (forgotten password, the policy) with a finger-sized target.
+export const QUIET_LINK =
+  'inline-flex min-h-11 items-center text-sm text-white/75 underline underline-offset-4 hover:text-white';
 
 // Where to go once a browser holds a session. The welcome page sends a finished account straight on
 // to `next`, a new one to the form, and a blocked one to the reason, so every way in ends the same.
