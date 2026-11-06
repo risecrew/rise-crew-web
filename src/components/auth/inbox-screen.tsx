@@ -106,11 +106,11 @@ export function InboxScreen({ locale, next, email, kind, resend, onChangeAddress
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-sm">
       <h1
         ref={heading}
         tabIndex={-1}
-        className="font-display text-[clamp(2rem,6vw,3.4rem)] leading-[1.04] font-[850] text-balance break-keep focus:outline-none"
+        className="font-display text-subhead text-balance break-keep focus:outline-none"
       >
         {t('title')}
       </h1>

@@ -71,11 +71,11 @@ export function ResetForm({ locale, next, first }: Props) {
 
   if (done) {
     return (
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         <h1
           ref={doneHeading}
           tabIndex={-1}
-          className="font-display text-[clamp(2rem,6vw,3.4rem)] leading-[1.04] font-[850] text-balance break-keep focus:outline-none"
+          className="font-display text-subhead text-balance break-keep focus:outline-none"
         >
           {t('doneTitle')}
         </h1>
@@ -89,7 +89,7 @@ export function ResetForm({ locale, next, first }: Props) {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-sm">
       <h1 className={SCREEN_TITLE}>{t(first ? 'firstTitle' : 'title')}</h1>
       <p className="mt-5 text-lg break-keep text-white/85">{t(first ? 'firstLead' : 'lead')}</p>
       {problem ? <Alert>{t(`errors.${problem}`)}</Alert> : null}

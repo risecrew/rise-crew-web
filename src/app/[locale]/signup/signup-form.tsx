@@ -3,15 +3,15 @@
 import { useTranslations } from 'next-intl';
 import { useRef, useState, type FormEvent } from 'react';
 import {
+  AUTH_COLUMN,
   Alert,
   FIELD_ERROR,
   FIELD_LABEL,
-  INLINE_LINK,
   INPUT,
   PILL,
-  SCREEN_TITLE,
-  withNext,
+  QUIET_LINK,
 } from '@/components/auth/form-parts';
+import { AuthSwitch } from '@/components/auth/auth-switch';
 import { GoogleButton } from '@/components/auth/google-button';
 import { InboxScreen } from '@/components/auth/inbox-screen';
 import type { Locale } from '@/i18n/locales';
@@ -99,9 +99,9 @@ export function SignupForm({ locale, next }: Props) {
   }
 
   return (
-    <div className="w-full max-w-md">
-      <h1 className={SCREEN_TITLE}>{t('title')}</h1>
-      <p className="mt-5 text-lg break-keep text-white/85">{t('lead')}</p>
+    <div className={AUTH_COLUMN}>
+      <h1 className="sr-only">{t('title')}</h1>
+      <AuthSwitch locale={locale} next={next} current="signup" />
       {notice ? <Alert>{login(`errors.${notice}`)}</Alert> : null}
 
       <GoogleButton
@@ -144,7 +144,9 @@ export function SignupForm({ locale, next }: Props) {
           spellCheck={false}
           placeholder={login('emailPlaceholder')}
           aria-invalid={emailErrors > 0}
-          aria-describedby={emailErrors > 0 ? 'signup-email-error' : undefined}
+          aria-describedby={
+            emailErrors > 0 ? 'signup-email-error signup-email-hint' : 'signup-email-hint'
+          }
           className={cn('mt-2', INPUT)}
         />
         {emailErrors > 0 ? (
@@ -152,6 +154,10 @@ export function SignupForm({ locale, next }: Props) {
             {login('emailInvalid')}
           </p>
         ) : null}
+        {/* What happens next, said once and quietly: the password comes after the mail. */}
+        <p id="signup-email-hint" className="mt-2 px-2 text-sm break-keep text-white/75">
+          {t('lead')}
+        </p>
         <button
           type="submit"
           disabled={busy || googleBusy}
@@ -161,24 +167,9 @@ export function SignupForm({ locale, next }: Props) {
         </button>
       </form>
 
-      <p className="mt-4 flex items-center gap-2 text-base text-white/75">
-        {t('loginPrompt')}
-        <Link
-          href={{ pathname: '/login', query: withNext(locale, next) }}
-          prefetch={false}
-          className={INLINE_LINK}
-        >
-          {t('loginLink')}
-        </Link>
-      </p>
-
-      <p className="mt-6 flex flex-wrap items-center gap-x-2 text-sm text-pretty break-keep text-white/75">
-        <span>{login('storage')}</span>
-        <Link
-          href="/privacy"
-          prefetch={false}
-          className="inline-flex min-h-11 items-center underline underline-offset-4 hover:text-white"
-        >
+      {/* Only the policy, small: the sign-up form itself asks for consent later. */}
+      <p className="mt-6 text-center">
+        <Link href="/privacy" prefetch={false} className={QUIET_LINK}>
           {login('policyLink')}
         </Link>
       </p>
