@@ -23,6 +23,58 @@ export type Database = {
   };
   public: {
     Tables: {
+      activities: {
+        Row: {
+          city_en: string;
+          city_ko: string;
+          created_at: string;
+          date: string | null;
+          id: string;
+          is_planned: boolean;
+          photo: string | null;
+          photo_alt_en: string;
+          photo_alt_ko: string;
+          summary_en: string;
+          summary_ko: string;
+          title_en: string;
+          title_ko: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_en?: string;
+          city_ko: string;
+          created_at?: string;
+          date?: string | null;
+          id?: string;
+          is_planned?: boolean;
+          photo?: string | null;
+          photo_alt_en?: string;
+          photo_alt_ko?: string;
+          summary_en?: string;
+          summary_ko?: string;
+          title_en?: string;
+          title_ko: string;
+          updated_at?: string;
+        };
+        Update: {
+          city_en?: string;
+          city_ko?: string;
+          created_at?: string;
+          date?: string | null;
+          id?: string;
+          is_planned?: boolean;
+          photo?: string | null;
+          photo_alt_en?: string;
+          photo_alt_ko?: string;
+          summary_en?: string;
+          summary_ko?: string;
+          title_en?: string;
+          title_ko?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       consents: {
         Row: {
           created_at: string;
@@ -48,6 +100,40 @@ export type Database = {
           kind?: string;
           policy_version?: string;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      notices: {
+        Row: {
+          body_en: string;
+          body_ko: string;
+          created_at: string;
+          id: string;
+          is_pinned: boolean;
+          title_en: string;
+          title_ko: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body_en?: string;
+          body_ko: string;
+          created_at?: string;
+          id?: string;
+          is_pinned?: boolean;
+          title_en?: string;
+          title_ko: string;
+          updated_at?: string;
+        };
+        Update: {
+          body_en?: string;
+          body_ko?: string;
+          created_at?: string;
+          id?: string;
+          is_pinned?: boolean;
+          title_en?: string;
+          title_ko?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
