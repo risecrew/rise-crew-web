@@ -93,3 +93,30 @@ test('the menu has no startups item while accounts are off', async ({ page }) =>
   await page.goto('/ko');
   await expect(page.locator('a[href="/ko/startups"]')).toHaveCount(0);
 });
+
+// Activities and notices are written by operators, who need accounts, so they go public with them.
+for (const path of [
+  '/ko/activities',
+  '/en/activities',
+  '/ko/notices',
+  '/en/notices/x',
+  '/ko/admin/activities',
+  '/ko/admin/activities/new',
+  '/ko/admin/notices',
+  '/ko/admin/notices/new',
+]) {
+  test(`${path} is a 404 while accounts are off`, async ({ request }) => {
+    expect((await request.get(path, { maxRedirects: 0 })).status()).toBe(404);
+  });
+}
+
+test('the menu has no activities or notices item while accounts are off', async ({ page }) => {
+  await page.goto('/ko');
+  await expect(page.locator('a[href="/ko/activities"]')).toHaveCount(0);
+  await expect(page.locator('a[href="/ko/notices"]')).toHaveCount(0);
+});
+
+test('the about page reads its history from the code while accounts are off', async ({ page }) => {
+  await page.goto('/ko/about');
+  await expect(page.locator('[data-event]')).toHaveCount(15);
+});

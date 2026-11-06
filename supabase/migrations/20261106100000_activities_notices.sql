@@ -100,6 +100,8 @@ revoke all on table public.activities, public.notices
   from public, anon, authenticated, service_role;
 
 grant select on table public.activities, public.notices to anon, authenticated;
+-- For tests and scripts that set rows up with the secret key. The site never writes with it.
+grant select, insert, update, delete on table public.activities, public.notices to service_role;
 grant insert (date, title_ko, title_en, city_ko, city_en, summary_ko, summary_en, photo,
               photo_alt_ko, photo_alt_en, is_planned),
       update (date, title_ko, title_en, city_ko, city_en, summary_ko, summary_en, photo,

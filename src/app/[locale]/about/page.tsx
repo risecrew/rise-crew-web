@@ -5,6 +5,9 @@ import { SectionHeading } from '@/components/site/section-heading';
 import { Fact, FactList } from '@/components/stage/facts';
 import { FIELD } from '@/components/stage/labels';
 import { Timeline } from '@/components/stage/timeline';
+import { isAuthEnabled } from '@/lib/auth/config';
+import { getActivities } from '@/lib/board/queries';
+import { activityTimeline } from '@/lib/board/text';
 import { asLocale } from '@/i18n/as-locale';
 import {
   getGrowthSteps,
@@ -43,7 +46,8 @@ export default async function AboutPage({ params }: Props) {
     getPrograms(),
     getOfficers(),
     getMentors(),
-    getStamps(),
+    // With accounts off the database may not have these rows yet, and nobody can edit them.
+    isAuthEnabled() ? getActivities().then(activityTimeline) : getStamps(),
     getPhoto('smu-vibe-coding-2025-12'),
   ]);
   const advisor = mentors.find((m) => m.id === 'shin-dongwon');

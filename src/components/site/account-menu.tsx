@@ -14,6 +14,8 @@ export type AccountLabels = {
   myPage: string;
   members: string;
   teams: string;
+  activities: string;
+  notices: string;
   signOut: string;
 };
 
@@ -151,6 +153,16 @@ function AccountLinks({
           <li>
             <Link href="/admin/teams" prefetch={false} className={row}>
               {labels.teams}
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/activities" prefetch={false} className={row}>
+              {labels.activities}
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/notices" prefetch={false} className={row}>
+              {labels.notices}
             </Link>
           </li>
         </>

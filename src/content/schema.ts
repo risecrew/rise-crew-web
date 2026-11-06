@@ -45,6 +45,7 @@ export const stampSchema = z
     }
   });
 export type Stamp = z.infer<typeof stampSchema>;
+export type TimelineEvent = Pick<Stamp, 'id' | 'date' | 'city' | 'title' | 'status' | 'evidence'>;
 
 export const growthStepSchema = z.object({
   id,

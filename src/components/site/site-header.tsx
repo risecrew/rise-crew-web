@@ -12,7 +12,13 @@ export function getNavItems() {
   return [
     { href: '/', key: 'home' },
     { href: '/about', key: 'about' },
-    ...(isAuthEnabled() ? [{ href: '/startups', key: 'startups' } as const] : []),
+    ...(isAuthEnabled()
+      ? ([
+          { href: '/startups', key: 'startups' },
+          { href: '/activities', key: 'activities' },
+          { href: '/notices', key: 'notices' },
+        ] as const)
+      : []),
     { href: '/network', key: 'network' },
     { href: '/contact', key: 'contact' },
   ] as const;
@@ -26,6 +32,8 @@ async function getAccountLabels() {
     myPage: t('myPage'),
     members: t('members'),
     teams: t('teams'),
+    activities: t('activities'),
+    notices: t('notices'),
     signOut: t('signOut'),
   };
 }
