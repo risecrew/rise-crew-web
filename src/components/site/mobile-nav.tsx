@@ -3,9 +3,10 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { ApprovedOnly } from './approved-only';
 import { LocaleSwitch } from './locale-switch';
 
-type Item = { href: string; label: string };
+type Item = { href: string; label: string; approvedOnly: boolean };
 
 export function MobileNav({
   items,
@@ -37,13 +38,16 @@ export function MobileNav({
         className="absolute right-0 mt-3 w-64 rounded-lg bg-paper p-3 text-ink shadow-xl"
       >
         <ul className="flex flex-col">
-          {items.map((item) => (
-            <li key={item.href}>
-              <Link href={item.href} className="block rounded px-3 py-3 hover:bg-paper-edge">
-                {item.label}
-              </Link>
-            </li>
-          ))}
+          {items.map((item) => {
+            const row = (
+              <li key={item.href}>
+                <Link href={item.href} className="block rounded px-3 py-3 hover:bg-paper-edge">
+                  {item.label}
+                </Link>
+              </li>
+            );
+            return item.approvedOnly ? <ApprovedOnly key={item.href}>{row}</ApprovedOnly> : row;
+          })}
         </ul>
         {account}
         <div className="mt-2 border-t border-paper-edge px-3 pt-3">

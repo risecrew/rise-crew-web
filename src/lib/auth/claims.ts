@@ -26,5 +26,5 @@ export function readTokenClaims(token: string): TokenClaims | null {
   if (typeof claims !== 'object' || claims === null || Array.isArray(claims)) return null;
 
   const { app_role: role, blocked } = claims as Record<string, unknown>;
-  return { role: isRole(role) ? role : 'guest', blocked: blocked === true };
+  return { role: isRole(role) ? role : 'applicant', blocked: blocked === true };
 }

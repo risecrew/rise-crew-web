@@ -14,6 +14,7 @@ import {
   pageRange,
   parseMembersQuery,
   planBlock,
+  planReject,
   planRoleChange,
   readMemberForm,
   refusalReason,
@@ -237,11 +238,22 @@ describe('planRoleChange', () => {
     });
   });
 
-  it('lets an admin set any role', () => {
-    for (const to of ROLE_ORDER) {
+  it('lets an admin set any role but applicant', () => {
+    for (const to of ROLE_ORDER.filter((role) => role !== 'applicant')) {
       const from = to === 'guest' ? 'member' : 'guest';
       expect(planRoleChange(admin, [target(C, from)], to, [B])).toEqual({ ok: true });
     }
+  });
+
+  it('sends nobody back to applying, whoever asks', () => {
+    for (const actor of [admin, { ...admin, role: 'operator' as const }]) {
+      expect(planRoleChange(actor, [target(C, 'guest')], 'applicant', [B]).ok).toBe(false);
+    }
+  });
+
+  it('lets an operator approve an applicant', () => {
+    const operator = { ...admin, role: 'operator' as const };
+    expect(planRoleChange(operator, [target(C, 'applicant')], 'guest', [B])).toEqual({ ok: true });
   });
 
   it('refuses to demote the last admin, whoever asks and however', () => {
@@ -684,5 +696,38 @@ describe('readMemberForm', () => {
 
   it('gives an empty language when there is none', () => {
     expect(readMemberForm(form([['id', A]])).locale).toBe('');
+  });
+});
+
+describe('planReject and declining', () => {
+  it('only touches applicants, and names anyone else', () => {
+    expect(planReject([target('a', 'applicant'), target('b', 'applicant')])).toEqual({ ok: true });
+    expect(planReject([target('a', 'applicant'), target('b', 'guest')])).toEqual({
+      ok: false,
+      error: 'refused',
+      refused: ['b'],
+    });
+  });
+
+  it('always asks first', () => {
+    expect(needsConfirmation({ kind: 'reject' }, [target('a', 'applicant')])).toBe(true);
+  });
+
+  it('reads the button, and nothing mixed with it', () => {
+    const form = (entries: [string, string][]) => {
+      const data = new FormData();
+      for (const [key, value] of entries) data.append(key, value);
+      return data;
+    };
+    expect(readMemberForm(form([['reject', 'true']])).change).toEqual({ kind: 'reject' });
+    expect(readMemberForm(form([['reject', 'x']])).change).toBeNull();
+    expect(
+      readMemberForm(
+        form([
+          ['reject', 'true'],
+          ['to', 'guest'],
+        ]),
+      ).change,
+    ).toBeNull();
   });
 });

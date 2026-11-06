@@ -5,6 +5,7 @@ import { adminClient, createOnboardedAccount, deleteAccount, signIn } from './he
 // What operators publish and everyone reads: activities and notices. Fake data on the local stack.
 const OPERATOR = 'operator@example.test';
 const MEMBER = 'member@example.test';
+const APPROVED = 'guest@example.test';
 
 // The smallest JPEG a browser will decode, so the upload and shrink path runs for real.
 const JPEG = Buffer.from(
@@ -230,6 +231,7 @@ test('a notice goes up, stays pinned on top, can be changed, and can be deleted'
   await addNotice(page, plain, '줄 하나\n줄 둘');
 
   const visitor = await (await browser.newContext()).newPage();
+  await signIn(visitor, APPROVED, baseURL!);
   await visitor.goto('/ko/notices');
   const rows = visitor.locator('[data-notice]');
   const texts = await rows.allInnerTexts();
@@ -281,10 +283,137 @@ test('a notice over the length limit is refused with what was typed left in plac
   await expect(page.getByLabel('제목', { exact: true })).toHaveValue('긴 공지');
 });
 
-test('a notice address that does not exist is a 404', async ({ request }) => {
+test('a notice address that does not exist is a 404', async ({ browser, baseURL }) => {
+  const page = await (await browser.newContext()).newPage();
+  await signIn(page, APPROVED, baseURL!);
   for (const id of ['00000000-0000-4000-8000-000000000000', 'not-a-uuid']) {
-    expect((await request.get(`/ko/notices/${id}`)).status()).toBe(404);
+    expect((await page.request.get(`/ko/notices/${id}`)).status()).toBe(404);
   }
+  await page.context().close();
+});
+
+test('notices do not exist for anyone not approved, and are in the menu for those who are', async ({
+  browser,
+  baseURL,
+}, testInfo) => {
+  const title = `회원 공지 ${unique(testInfo)}`;
+  const email = `applying-${unique(testInfo)}@example.test`;
+  await createOnboardedAccount(email, { role: 'applicant' });
+  const operator = await (await browser.newContext()).newPage();
+  await signIn(operator, OPERATOR, baseURL!);
+  await addNotice(operator, title);
+  const { data } = await adminClient().from('notices').select('id').eq('title_ko', title).single();
+  const paths = ['/ko/notices', '/en/notices', `/ko/notices/${data!.id}`];
+
+  // Signed out.
+  const anonymous = await (await browser.newContext()).newPage();
+  for (const path of paths) expect((await anonymous.request.get(path)).status()).toBe(404);
+  await anonymous.goto('/ko');
+  await openAccountLinks(anonymous);
+  await expect(anonymous.locator('a[href="/ko/notices"]')).toHaveCount(0);
+
+  // Applied, not approved.
+  const applying = await (await browser.newContext()).newPage();
+  await signIn(applying, email, baseURL!);
+  for (const path of paths) expect((await applying.request.get(path)).status()).toBe(404);
+  await applying.goto('/ko');
+  await openAccountLinks(applying);
+  await expect(applying.locator('a[href="/ko/notices"]')).toHaveCount(0);
+  await applying.goto('/ko/me');
+  await expect(applying.locator('[data-applying]')).toBeVisible();
+
+  // Approved.
+  const approved = await (await browser.newContext()).newPage();
+  await signIn(approved, APPROVED, baseURL!);
+  await approved.goto('/ko');
+  await openAccountLinks(approved);
+  await expect(
+    approved.locator('a[href="/ko/notices"]').filter({ visible: true }).first(),
+  ).toBeVisible();
+  await approved.goto('/ko/notices');
+  await expect(approved.locator('[data-notice]', { hasText: title })).toBeVisible();
+  await approved.goto(`/ko/notices/${data!.id}`);
+  await expect(approved.getByRole('heading', { name: title })).toBeVisible();
+
+  // Activities stay open to everyone.
+  expect((await anonymous.request.get('/ko/activities')).status()).toBe(200);
+
+  await deleteAccount(email);
+  await adminClient().from('notices').delete().eq('title_ko', title);
+  for (const page of [operator, anonymous, applying, approved]) await page.context().close();
+});
+
+test('an operator approves one applicant and declines another, who is then deleted', async ({
+  browser,
+  baseURL,
+}, testInfo) => {
+  const id = unique(testInfo);
+  const keep = `approve-${id}@example.test`;
+  const drop = `decline-${id}@example.test`;
+  const keepId = await createOnboardedAccount(keep, { role: 'applicant', names: ['승인', id] });
+  await createOnboardedAccount(drop, { role: 'applicant', names: ['거절', id] });
+
+  const page = await (await browser.newContext()).newPage();
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/admin/members');
+  await page.locator('[data-applicants]').click();
+  await expect(page).toHaveURL(/role=applicant/);
+
+  const row = (name: string) =>
+    page
+      .locator('tr, li')
+      .filter({ hasText: `${name}${id}` })
+      .filter({ hasText: '가입 신청 중' })
+      .first();
+  await row('승인').getByRole('checkbox').check();
+  await page
+    .getByRole('button', { name: /가입자로/ })
+    .first()
+    .click();
+  await expect(page.getByText(/1명을 가입자로 바꿨어요/)).toBeVisible();
+  const { data: role } = await adminClient()
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', keepId)
+    .single();
+  expect(role!.role).toBe('guest');
+
+  await page.goto('/ko/admin/members?role=applicant');
+  await row('거절').getByRole('checkbox').check();
+  await page
+    .getByRole('button', { name: /가입 거절/ })
+    .first()
+    .click();
+  await expect(page.getByText(/가입 신청을 거절할까요/)).toBeVisible();
+  await page.getByRole('button', { name: '거절하고 삭제' }).click();
+  await expect(page.getByText(/거절하고 삭제했어요/)).toBeVisible();
+  const { data: gone } = await adminClient().from('profiles').select('id').eq('email', drop);
+  expect(gone).toEqual([]);
+
+  // Someone already approved cannot be declined.
+  await page.goto('/ko/admin/members');
+  await page.getByRole('searchbox').fill(keep);
+  await page.getByRole('searchbox').press('Enter');
+  await page
+    .locator('tr, li')
+    .filter({ hasText: `승인${id}` })
+    .first()
+    .getByRole('checkbox')
+    .check();
+  await page
+    .getByRole('button', { name: /가입 거절/ })
+    .first()
+    .click();
+  await page
+    .getByRole('button', { name: '거절하고 삭제' })
+    .click()
+    .catch(() => {});
+  await expect(page.getByText(/이미 승인된 계정/)).toBeVisible();
+  const { data: stays } = await adminClient().from('profiles').select('id').eq('email', keep);
+  expect(stays).toHaveLength(1);
+
+  await deleteAccount(keep);
+  await page.context().close();
 });
 
 test('the account menu leads operators to both screens', async ({ page, baseURL }) => {
@@ -387,12 +516,19 @@ test('a notice carries photos and files, which download under their name and go 
   expect(data.photo_paths).toHaveLength(1);
 
   const visitor = await (await browser.newContext()).newPage();
+  await signIn(visitor, APPROVED, baseURL!);
   await visitor.goto(`/ko/notices/${data.id}`);
   await expect(visitor.getByRole('img', { name: `${title} 사진 1` })).toBeVisible();
   const link = visitor.getByRole('link', { name: /모집 안내\.pdf/ });
   const response = await visitor.request.get((await link.getAttribute('href'))!);
   expect(response.status()).toBe(200);
   expect(response.headers()['content-disposition']).toContain('attachment');
+
+  // Without the short-lived address the file does not open, and the bucket does not list it.
+  const { data: publicUrl } = adminClient()
+    .storage.from('notice-files')
+    .getPublicUrl(files[0].path);
+  expect((await visitor.request.get(publicUrl.publicUrl)).status()).toBeGreaterThanOrEqual(400);
   await expectAccessible(visitor);
   await expectNoHorizontalScroll(visitor);
 

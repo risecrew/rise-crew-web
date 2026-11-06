@@ -67,7 +67,7 @@ set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
 select ok((select count(*) from public.activities) >= 15, 'anon reads activities');
-select is((select count(*)::integer from public.notices), 1, 'anon reads notices');
+select throws_ok('select * from public.notices', '42501', null, 'anon cannot read notices');
 select throws_ok(
   $$insert into public.notices (title_ko, body_ko) values ('x', 'x')$$,
   '42501', null, 'anon cannot write a notice');

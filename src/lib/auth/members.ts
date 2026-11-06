@@ -148,12 +148,20 @@ export function planBlock(
   return { ok: true };
 }
 
+// Turning applications down deletes the accounts, so it only ever touches applicants. Any operator
+// may do it: approving and refusing are the same job.
+export function planReject(targets: readonly MemberTarget[]): Plan {
+  const refused = targets.filter((t) => t.role !== 'applicant').map((t) => t.id);
+  return refused.length > 0 ? { ok: false, error: 'refused', refused } : { ok: true };
+}
+
 // ---------------------------------------------------------------------------
 // The form and what comes back from it
 // ---------------------------------------------------------------------------
 
 // One change for the whole batch: everyone becomes `to`, or everyone is blocked / unblocked.
-export type MemberChange = { kind: 'role'; to: AppRole } | { kind: 'block'; blocked: boolean };
+export type MemberChange =
+  { kind: 'role'; to: AppRole } | { kind: 'block'; blocked: boolean } | { kind: 'reject' };
 
 // The people in `targets` that a role change takes from operator or above to below it: operators
 // and admins who would lose the members screen and everything else that comes with the role
@@ -174,6 +182,7 @@ export function staffLosingRole(
 // to make. This is for the person's sake, not a security check: the server's rules below do not
 // depend on it.
 export function needsConfirmation(change: MemberChange, targets: readonly MemberTarget[]): boolean {
+  if (change.kind === 'reject') return true;
   if (change.kind === 'block') return change.blocked;
   if (atLeast(change.to, 'operator')) return true;
   return staffLosingRole(change, targets).length > 0;
@@ -185,7 +194,7 @@ export function needsConfirmation(change: MemberChange, targets: readonly Member
 //  - `self`: blocking or unblocking your own account;
 //  - `authority`: more than this actor may do (an operator touching staff or an admin, or giving
 //    a role above member, or blocking staff or an admin).
-export type RefusalReason = 'same' | 'self' | 'authority';
+export type RefusalReason = 'same' | 'self' | 'authority' | 'notApplicant';
 
 // The reason `target` is in a refused batch. Only meant for people planRoleChange or planBlock
 // refused: it names the first rule they fail, and answers `authority` for anyone else.
@@ -194,6 +203,7 @@ export function refusalReason(
   target: MemberTarget,
   change: MemberChange,
 ): RefusalReason {
+  if (change.kind === 'reject') return 'notApplicant';
   if (change.kind === 'block') return target.id === actor.id ? 'self' : 'authority';
   return target.role === change.to ? 'same' : 'authority';
 }
@@ -202,7 +212,7 @@ export type RefusalGroup = { reason: RefusalReason; names: string[]; more: numbe
 
 // The most serious reason first: what this person may not do at all, then what they cannot do to
 // themselves, then what only needs a different click.
-const REASON_ORDER: readonly RefusalReason[] = ['authority', 'self', 'same'];
+const REASON_ORDER: readonly RefusalReason[] = ['authority', 'notApplicant', 'self', 'same'];
 
 // People in a refused batch, grouped by why, in the order above and the order they were chosen
 // in. A group names at most REFUSED_NAMES_SHOWN people and counts the rest.
@@ -252,9 +262,12 @@ export function readMemberForm(form: FormData): MemberForm {
   const locale = form.get('locale');
   const to = form.get('to');
   const blocked = form.get('blocked');
+  const reject = form.get('reject');
 
   let change: MemberChange | null = null;
-  if (to !== null && blocked === null) {
+  if (reject !== null) {
+    if (reject === 'true' && to === null && blocked === null) change = { kind: 'reject' };
+  } else if (to !== null && blocked === null) {
     if (isRole(to)) change = { kind: 'role', to };
   } else if (blocked !== null && to === null) {
     if (blocked === 'true' || blocked === 'false') {

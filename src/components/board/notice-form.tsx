@@ -22,7 +22,7 @@ import {
   type Attachment,
   type BoardState,
 } from '@/lib/board/forms';
-import { formatFileSize, noticePhotoSrc } from '@/lib/board/text';
+import { formatFileSize } from '@/lib/board/text';
 import { removeNoticeFiles, uploadNoticeFiles } from '@/lib/board/upload';
 import { TEAM_LIMITS, checkPhoto } from '@/lib/teams/forms';
 import { BoardField } from './fields';
@@ -45,7 +45,14 @@ const ATTACHED = 'flex min-h-11 flex-wrap items-center justify-between gap-x-3 p
 // To write a notice, or change one. Photos and files go up first, straight to Storage, and the row
 // names them afterwards. React empties a form once its action has run, so everything is kept here and
 // a refusal leaves what was typed and picked in place.
-export function NoticeForm({ notice }: { notice?: Notice }) {
+export function NoticeForm({
+  notice,
+  photoUrls = {},
+}: {
+  notice?: Notice;
+  // Short-lived addresses to the photos it already has: the bucket is private.
+  photoUrls?: Record<string, string>;
+}) {
   const t = useTranslations('Admin.notices');
   const board = useTranslations('Admin.board');
   const locale = useCurrentLocale();
@@ -180,7 +187,7 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
             {keptPhotos.map((path, index) => (
               <li key={path} className="flex items-center gap-1">
                 <Image
-                  src={noticePhotoSrc(path)}
+                  src={photoUrls[path] ?? ''}
                   alt={t('photoAlt', { number: index + 1 })}
                   width={120}
                   height={80}

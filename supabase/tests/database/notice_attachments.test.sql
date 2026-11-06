@@ -19,8 +19,8 @@ update public.user_roles set role = 'operator'
 
 select results_eq(
   $$select public, file_size_limit from storage.buckets where id = 'notice-files'$$,
-  $$values (true, 10485760::bigint)$$,
-  'the bucket is public and holds files up to 10MB');
+  $$values (false, 10485760::bigint)$$,
+  'the bucket is private and holds files up to 10MB');
 select is(
   (select count(*)::integer from storage.buckets, unnest(allowed_mime_types) as mime
     where id = 'notice-files' and mime ~ '(html|svg|zip$|javascript)' and mime <> 'application/hwp+zip'),
@@ -29,7 +29,8 @@ select is(
 set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
-select lives_ok('select photo_paths, attachments from public.notices', 'anon reads attachments');
+select throws_ok(
+  'select photo_paths, attachments from public.notices', '42501', null, 'anon cannot read attachments');
 select throws_ok(
   $$insert into storage.objects (bucket_id, name) values
     ('notice-files', '7e5d0000-0000-4000-8000-00000000c001.pdf')$$,

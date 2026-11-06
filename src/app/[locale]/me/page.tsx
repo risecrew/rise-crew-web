@@ -126,6 +126,15 @@ export default async function MyPage({ params, searchParams }: Props) {
           </div>
         </div>
 
+        {viewer.role === 'applicant' ? (
+          <p
+            data-applying
+            className="mt-6 rounded-2xl border border-white/25 px-5 py-4 text-base break-keep text-white"
+          >
+            {t('applying')}
+          </p>
+        ) : null}
+
         <dl className="mt-8">
           {rows.map((row) => (
             <div key={row.label} className="border-t border-white/15 py-4">

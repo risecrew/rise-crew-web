@@ -140,8 +140,8 @@ select results_eq(
 );
 select results_eq(
   $$select role::text from public.user_roles where user_id = '7e570000-0000-4000-8000-000000000001'$$,
-  $$values ('guest'::text)$$,
-  'a new auth user gets one user_roles row with role guest'
+  $$values ('applicant'::text)$$,
+  'a new auth user gets one user_roles row with role applicant'
 );
 
 -- Roles for the rest of the file.

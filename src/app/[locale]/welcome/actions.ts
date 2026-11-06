@@ -108,7 +108,8 @@ export async function saveProfile(
     if (consentError) return saveFailed(parsed.values, consentError);
   }
 
-  redirect(target);
+  // Someone who has just applied is told so on My page, which is what they need to know next.
+  redirect(mode === 'welcome' ? `/${locale}/me` : target);
 }
 
 // Whatever went wrong, the visitor sees one message and can send the form again. Sending again

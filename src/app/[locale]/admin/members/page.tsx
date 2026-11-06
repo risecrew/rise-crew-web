@@ -71,6 +71,10 @@ export default async function MembersPage({ params, searchParams }: Props) {
   const occupations = await getTranslations('Auth.profile.occupation');
 
   const supabase = await createSupabaseServerClient();
+  const { count: waiting } = await supabase
+    .from('member_list')
+    .select('id', { count: 'exact', head: true })
+    .eq('role', 'applicant');
   const read = (from: number, to: number) => {
     let request = supabase.from('member_list').select(COLUMNS, { count: 'exact' });
     if (query.q) request = request.ilike('search_text', searchPattern(query.q));
@@ -128,6 +132,15 @@ export default async function MembersPage({ params, searchParams }: Props) {
         <Link href="/admin/teams" className={`${LINK} mt-2 -ml-3`}>
           {t('toTeams')}
         </Link>
+        {waiting ? (
+          <Link
+            data-applicants
+            href={{ pathname: '/admin/members', query: { role: 'applicant' } }}
+            className={`${LINK} mt-2 -ml-3 block font-semibold`}
+          >
+            {t('waiting', { count: waiting })}
+          </Link>
+        ) : null}
 
         <form
           method="get"
