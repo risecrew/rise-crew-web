@@ -1,8 +1,10 @@
 import { expect, test, type TestInfo } from '@playwright/test';
 import { collectConsoleErrors, expectAccessible, expectNoHorizontalScroll } from '../helpers';
 import {
+  accountRows,
   addTeamMember,
   adminClient,
+  clientSignedInAs,
   createOnboardedAccount,
   createPost,
   createTeam,
@@ -285,4 +287,77 @@ test('the team admin screens are noindex, clean on a phone and accessible', asyn
     await expectAccessible(page);
   }
   expect(errors).toEqual([]);
+});
+
+test('an operator deletes a team, with its posts and files, and its members keep their accounts', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const id = unique(testInfo);
+  const name = `지울 팀 ${id}`;
+  const email = `teamdel-${id}@example.test`;
+  created.push(email);
+  const memberId = await createOnboardedAccount(email, { role: 'member' });
+  const teamId = await createTeam({ slug: `del-${id}`, name, cohort: 1 });
+  await addTeamMember(teamId, email);
+  const postId = await createPost(email, teamId, { title: `글 ${id}` });
+
+  // A member of the team cannot do this, from the screen or around it.
+  const member = await clientSignedInAs(email);
+  const refused = await member.from('teams').delete().eq('id', teamId).select('id');
+  expect(refused.data).toEqual([]);
+
+  // Files in each of a team's three places.
+  const storage = adminClient().storage;
+  const body = { contentType: 'image/jpeg' };
+  const file = Buffer.from('test');
+  const logo = `${teamId}/${crypto.randomUUID()}.jpg`;
+  const cover = `${teamId}/${crypto.randomUUID()}.jpg`;
+  const photo = `${teamId}/${postId}/${crypto.randomUUID()}.jpg`;
+  for (const [bucket, path] of [
+    ['team-logos', logo],
+    ['team-covers', cover],
+    ['team-post-photos', photo],
+  ] as const) {
+    const { error } = await storage.from(bucket).upload(path, file, body);
+    if (error) throw error;
+  }
+  const { error: photoError } = await member
+    .from('team_posts')
+    .update({ photo_paths: [photo] })
+    .eq('id', postId);
+  if (photoError) throw photoError;
+
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto(`/ko/admin/teams/${teamId}`);
+  await page.getByRole('button', { name: '지우기', exact: true }).click();
+  // It says what goes with the team before anything happens, and backing out changes nothing.
+  await expect(page.getByText(/글 1개와 팀원 연결 1건/)).toBeVisible();
+  await page.getByRole('button', { name: '취소' }).click();
+  await expect(page.getByLabel('팀 이름')).toHaveValue(name);
+
+  await page.getByRole('button', { name: '지우기', exact: true }).click();
+  await page.getByRole('button', { name: '지우기', exact: true }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/teams$/);
+  await expect(page.getByRole('link', { name: new RegExp(name) })).toHaveCount(0);
+
+  expect((await page.request.get(`/ko/startups/del-${id}`)).status()).toBe(404);
+  expect((await page.request.get(`/ko/admin/teams/${teamId}`)).status()).toBe(404);
+  for (const [bucket, folder] of [
+    ['team-logos', teamId],
+    ['team-covers', teamId],
+    ['team-post-photos', `${teamId}/${postId}`],
+  ] as const) {
+    const { data, error } = await storage.from(bucket).list(folder);
+    if (error) throw error;
+    expect(data).toEqual([]);
+  }
+
+  // Their account is untouched, and they are simply in no team.
+  expect((await accountRows(email)).profile.id).toBe(memberId);
+  const { data: memberships } = await member
+    .from('team_members')
+    .select('team_id')
+    .eq('user_id', memberId);
+  expect(memberships).toEqual([]);
 });

@@ -9,6 +9,7 @@ import { isAuthEnabled } from '@/lib/auth/config';
 import { atLeast } from '@/lib/auth/roles';
 import { getViewer } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import type { BoardState } from '@/lib/board/forms';
 import { makeTeamSlug, teamCreateSchema, teamSettingsSchema } from '@/lib/teams/forms';
 import { isUuid } from '@/lib/teams/query';
 
@@ -184,4 +185,39 @@ export async function setPostHidden(
   revalidatePath(`/${context.locale}/admin/teams/${data[0].team_id}`);
   revalidatePath(`/${context.locale}/startups`, 'layout');
   return { ok: true };
+}
+
+// Deletes a team, its memberships and its posts. Files have no reference for the database to cascade
+// through, so they go here. What they were is read first, while the rows still say. Files that cannot
+// be removed are left behind: they are on no page, and the team is what the operator asked to delete.
+export async function deleteTeam(_prev: BoardState, form: FormData): Promise<BoardState> {
+  const context = await begin(form);
+  if (!context) return { ok: false, error: 'denied' };
+  const id = text(form, 'id');
+  if (!isUuid(id)) return { ok: false, error: 'denied' };
+  const { supabase } = context;
+
+  const [posts, logos, covers] = await Promise.all([
+    supabase.from('team_posts').select('photo_paths').eq('team_id', id),
+    supabase.storage.from('team-logos').list(id),
+    supabase.storage.from('team-covers').list(id),
+  ]);
+  if (posts.error || logos.error || covers.error) return { ok: false, error: 'failed' };
+
+  const { data, error } = await supabase.from('teams').delete().eq('id', id).select('id');
+  if (error) return { ok: false, error: error.code === '42501' ? 'denied' : 'failed' };
+  if (!data || data.length === 0) return { ok: false, error: 'denied' };
+
+  const inFolder = (files: { name: string }[]) => files.map((file) => `${id}/${file.name}`);
+  const photos = posts.data.flatMap((post) => post.photo_paths);
+  await Promise.all([
+    logos.data.length > 0 ? supabase.storage.from('team-logos').remove(inFolder(logos.data)) : null,
+    covers.data.length > 0
+      ? supabase.storage.from('team-covers').remove(inFolder(covers.data))
+      : null,
+    photos.length > 0 ? supabase.storage.from('team-post-photos').remove(photos) : null,
+  ]);
+
+  revalidatePath(`/${context.locale}/startups`, 'layout');
+  redirect(`/${context.locale}/admin/teams`);
 }

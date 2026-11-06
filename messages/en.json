@@ -718,7 +718,10 @@
         "noAccount": "Nobody has signed up with this email.",
         "alreadyInTeam": "This person is already on the team.",
         "blocked": "A blocked account cannot join a team. Unblock it on the members screen first."
-      }
+      },
+      "deleteTitle": "Delete this team",
+      "deleteLead": "To hide it for now, turn off publishing above. Deleting cannot be undone.",
+      "deleteQuestion": "Delete {name}? Its {posts} posts, {members} memberships and uploaded photos go with it, and this cannot be undone. Members keep their accounts."
     },
     "board": {
       "delete": "Delete",
