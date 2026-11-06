@@ -38,9 +38,7 @@ export function PageCover({ title, lead, photo, children }: Props) {
       )}
       <div className="relative w-full px-5 pt-32 pb-14 md:px-10 md:pb-20">
         <div className="mx-auto max-w-7xl">
-          <h1 className="max-w-5xl font-display text-[clamp(3rem,8.5vw,8rem)] leading-[0.92] font-[900] tracking-[-0.025em] text-balance break-keep">
-            {title}
-          </h1>
+          <h1 className="max-w-5xl font-display text-display text-balance break-keep">{title}</h1>
           {lead ? (
             <p className="mt-6 max-w-2xl text-lg break-keep text-white/85 md:text-xl">{lead}</p>
           ) : null}

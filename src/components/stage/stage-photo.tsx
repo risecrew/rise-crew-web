@@ -17,6 +17,12 @@ type Props = {
    * the caller places the badge itself (e.g. outside a layer that scales).
    */
   badge?: 'corner' | 'under-header' | 'none';
+  /**
+   * The opening photo fills the whole window at a finer quality. On a window narrower than the
+   * photo (a phone held upright) it is cropped at the sides, so it is drawn as wide as the
+   * window is tall times the photo's own ratio, and the browser has to fetch that width.
+   */
+  hero?: boolean;
 };
 
 type BadgePlacement = 'corner' | 'under-header';
@@ -44,6 +50,7 @@ export function StagePhoto({
   className,
   scrim = 'bottom',
   badge = 'corner',
+  hero = false,
 }: Props) {
   return (
     <>
@@ -52,7 +59,12 @@ export function StagePhoto({
         alt={pick(photo.alt, locale)}
         fill
         priority={priority}
-        sizes="(min-width: 768px) 92vw, 100vw"
+        sizes={
+          hero
+            ? `(max-aspect-ratio: ${photo.width}/${photo.height}) ${Math.ceil((100 * photo.width) / photo.height)}vh, 100vw`
+            : '(min-width: 768px) 92vw, 100vw'
+        }
+        quality={hero ? 90 : 75}
         className={cn('object-cover', className)}
       />
       <div
@@ -64,6 +76,14 @@ export function StagePhoto({
             : 'bg-[linear-gradient(180deg,rgb(7_9_15/0.15)_0%,rgb(7_9_15/0.25)_45%,rgb(7_9_15/0.88)_100%)]',
         )}
       />
+      {/* The header's white type sits on the opening photo, so its top edge is shaded a little
+          more, whatever the photo holds up there. */}
+      {hero ? (
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(180deg,rgb(7_9_15/0.55),transparent)]"
+        />
+      ) : null}
       {photo.temporary && badge !== 'none' ? (
         <TemporaryBadge label={temporaryLabel} placement={badge} />
       ) : null}

@@ -1,9 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { RiseSymbol } from '@/components/brand/rise-symbol';
-import { AskButton } from '@/components/stage/ask-button';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
-import { applyCta, getRecruitment } from '@/lib/content';
 import { AccountMenu } from './account-menu';
 import { LocaleSwitch } from './locale-switch';
 import { MobileNav } from './mobile-nav';
@@ -34,15 +32,7 @@ async function getAccountLabels() {
 
 export async function SiteHeader() {
   const t = await getTranslations('Nav');
-  const ctaT = await getTranslations('Cta');
   const items = getNavItems().map((item) => ({ href: item.href, label: t(item.key) }));
-  // The header action says what actually happens: apply while recruiting, read the notice
-  // otherwise.
-  const cta = applyCta(await getRecruitment());
-  const action =
-    cta.kind === 'apply'
-      ? { href: cta.href, label: ctaT('apply'), external: true }
-      : { href: '/join', label: ctaT('notice'), external: false };
 
   // With accounts switched off the header is exactly what it was before they existed.
   const accountLabels = isAuthEnabled() ? await getAccountLabels() : null;
@@ -55,6 +45,8 @@ export async function SiteHeader() {
       >
         {t('skip')}
       </a>
+      {/* The content width every page uses; the home's opening sets its slogan in the same width,
+          so the logo stands over the R and the last item over the hero's button. */}
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-5 md:px-10">
         <Link href="/" className="flex items-center gap-2 text-white">
           <RiseSymbol className="h-8 w-auto" />
@@ -67,12 +59,10 @@ export async function SiteHeader() {
             </Link>
           ))}
           <LocaleSwitch />
-          <AskButton cta={cta} className="px-4 py-2" />
           {accountLabels ? <AccountMenu labels={accountLabels} /> : null}
         </nav>
         <MobileNav
           items={items}
-          action={action}
           menuLabel={t('menu')}
           account={accountLabels ? <AccountMenu labels={accountLabels} variant="panel" /> : null}
         />

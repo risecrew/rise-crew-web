@@ -18,6 +18,26 @@
   --font-display: 'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
+  /* The display type scale, largest first. Each step is roughly 0.7 of the one above at full
+     width, so two neighbours never look like the same size. Every large heading uses one of
+     these; below `subhead` the plain Tailwind steps (2xl and down) take over. */
+  --text-numeral: clamp(5rem, 13vw, 11rem); /* the counted numbers: 90+, 22+, 33, VCC 18 */
+  --text-numeral--line-height: 0.85;
+  --text-display: clamp(3rem, 8.5vw, 8rem); /* page and chapter names, the contest numbers */
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: -0.025em;
+  --text-display--font-weight: 900;
+  --text-hero: clamp(2.6rem, 7vw, 6rem); /* the home slogan, the closing ask, account titles */
+  --text-hero--line-height: 0.95;
+  --text-hero--letter-spacing: -0.025em;
+  --text-hero--font-weight: 900;
+  --text-headline: clamp(2.125rem, 4vw, 3.4rem); /* section titles */
+  --text-headline--line-height: 1.04;
+  --text-headline--font-weight: 850;
+  --text-subhead: clamp(1.75rem, 2.6vw, 2.25rem); /* titles inside a section */
+  --text-subhead--line-height: 1.15;
+  --text-subhead--font-weight: 850;
+
   /* The account menu opens from its button: a short, strong ease-out from just above and a touch
      smaller (never from nothing). */
   --animate-menu-in: menu-in 150ms cubic-bezier(0.23, 1, 0.32, 1);
