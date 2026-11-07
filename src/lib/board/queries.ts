@@ -1,6 +1,11 @@
 import 'server-only';
+import { notFound } from 'next/navigation';
 import { cache } from 'react';
+import { atLeast } from '@/lib/auth/roles';
+import { getViewer } from '@/lib/auth/viewer';
 import { createSupabasePublicClient } from '@/lib/supabase/public';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { readAttachments, type Attachment } from './forms';
 import type { Database } from '@/lib/supabase/database.types';
 import { isUuid } from '@/lib/teams/query';
 
@@ -40,8 +45,10 @@ export async function getActivity(id: string): Promise<Activity | null> {
   return data;
 }
 
+// Notices are read with the visitor's own session, so the database decides who sees them.
 export async function getNotices(): Promise<Notice[]> {
-  const { data, error } = await createSupabasePublicClient()
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
     .from('notices')
     .select('*')
     .order('is_pinned', { ascending: false })
@@ -53,11 +60,48 @@ export async function getNotices(): Promise<Notice[]> {
 // Shared within one request, so the metadata and the page do not query twice.
 export const getNotice = cache(async (id: string): Promise<Notice | null> => {
   if (!isUuid(id)) return null;
-  const { data, error } = await createSupabasePublicClient()
-    .from('notices')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from('notices').select('*').eq('id', id).maybeSingle();
   if (error) throw new Error(error.message);
   return data;
 });
+
+// How long an address to a notice's photo or file works. Storage issues one only to someone allowed
+// to read the file; someone who could read it may have kept a copy anyway, so a short life is about
+// addresses being passed on.
+const SIGNED_SECONDS = 600;
+
+export type SignedAttachment = Attachment & { url: string };
+
+// Addresses to what a notice carries. A file that cannot be signed is left out rather than breaking
+// the page. Files download under their own name.
+export async function signNoticeFiles(
+  notice: Pick<Notice, 'photo_paths' | 'attachments'>,
+): Promise<{ photos: { path: string; url: string }[]; files: SignedAttachment[] }> {
+  const bucket = (await createSupabaseServerClient()).storage.from('notice-files');
+  const [photos, files] = await Promise.all([
+    notice.photo_paths.length > 0
+      ? bucket.createSignedUrls(notice.photo_paths, SIGNED_SECONDS)
+      : Promise.resolve({ data: [] }),
+    Promise.all(
+      readAttachments(notice.attachments).map(async (file) => {
+        const { data } = await bucket.createSignedUrl(file.path, SIGNED_SECONDS, {
+          download: file.name,
+        });
+        return data ? { ...file, url: data.signedUrl } : null;
+      }),
+    ),
+  ]);
+  return {
+    photos: (photos.data ?? []).flatMap((photo) =>
+      photo.path && photo.signedUrl ? [{ path: photo.path, url: photo.signedUrl }] : [],
+    ),
+    files: files.filter((file) => file !== null),
+  };
+}
+
+// For the notice pages: anyone not approved gets a 404, as if notices did not exist.
+export async function requireNoticeReader(): Promise<void> {
+  const viewer = await getViewer();
+  if (!viewer || viewer.blocked || !viewer.onboarded || !atLeast(viewer.role, 'guest')) notFound();
+}

@@ -369,7 +369,7 @@ export type Database = {
       team_signed_in_post_count: { Args: { team: string }; Returns: number };
     };
     Enums: {
-      app_role: 'guest' | 'member' | 'operator' | 'admin';
+      app_role: 'applicant' | 'guest' | 'member' | 'operator' | 'admin';
       occupation: 'undergrad' | 'grad' | 'alumni' | 'founder' | 'other';
       team_post_visibility: 'public' | 'signed_in';
     };
@@ -486,7 +486,7 @@ export const Constants = {
   },
   public: {
     Enums: {
-      app_role: ['guest', 'member', 'operator', 'admin'],
+      app_role: ['applicant', 'guest', 'member', 'operator', 'admin'],
       occupation: ['undergrad', 'grad', 'alumni', 'founder', 'other'],
       team_post_visibility: ['public', 'signed_in'],
     },

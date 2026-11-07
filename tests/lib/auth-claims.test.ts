@@ -18,10 +18,10 @@ describe('readTokenClaims', () => {
     });
   });
 
-  it('treats a missing or unknown role as a guest', () => {
-    expect(readTokenClaims(token({ sub: 'u' }))).toEqual({ role: 'guest', blocked: false });
-    expect(readTokenClaims(token({ app_role: 'superuser' }))?.role).toBe('guest');
-    expect(readTokenClaims(token({ app_role: 7 }))?.role).toBe('guest');
+  it('treats a missing or unknown role as the lowest role', () => {
+    expect(readTokenClaims(token({ sub: 'u' }))).toEqual({ role: 'applicant', blocked: false });
+    expect(readTokenClaims(token({ app_role: 'superuser' }))?.role).toBe('applicant');
+    expect(readTokenClaims(token({ app_role: 7 }))?.role).toBe('applicant');
   });
 
   it('counts only a real true as blocked', () => {

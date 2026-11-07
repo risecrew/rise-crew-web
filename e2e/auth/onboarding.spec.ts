@@ -314,7 +314,7 @@ test('asks for what is missing, keeps what was typed, and finishes once it is al
 
     // Done: back to the home page, the header's circle shows the new initial, no page reload.
     await page.getByRole('button', { name: t.submit }).click();
-    await expect(page).toHaveURL(`${baseURL}/ko`);
+    await expect(page).toHaveURL(`${baseURL}/ko/me`);
     expect(await page.evaluate(() => (window as unknown as { softNav?: boolean }).softNav)).toBe(
       true,
     );
@@ -374,7 +374,7 @@ test('an alumnus signs up in English, with an affiliation and the recruitment ma
     await page.getByRole('button', { name: t.submit }).click();
 
     // Back to the page the visitor was heading for.
-    await expect(page).toHaveURL(`${baseURL}/en/about`);
+    await expect(page).toHaveURL(`${baseURL}/en/me`);
     await openMenu(page);
     await expect(initialCircle(page)).toHaveText('R');
 
@@ -414,7 +414,7 @@ test('a school typed before choosing another occupation is not saved', async ({
     await page.getByRole('checkbox', { name: t.age14 }).check();
     await page.getByRole('checkbox', { name: t.privacy }).check();
     await page.getByRole('button', { name: t.submit }).click();
-    await expect(page).toHaveURL(`${baseURL}/ko`);
+    await expect(page).toHaveURL(`${baseURL}/ko/me`);
 
     const { profile } = await accountRows(email);
     expect(profile).toMatchObject({ occupation: 'founder', school: null, major: null });
@@ -444,7 +444,7 @@ test.describe('before the page has loaded its scripts', () => {
       await page.getByRole('checkbox', { name: t.privacy }).check();
       await page.getByRole('button', { name: t.submit }).click();
 
-      await expect(page).toHaveURL(`${baseURL}/ko`);
+      await expect(page).toHaveURL(`${baseURL}/ko/me`);
       const { profile, consents } = await accountRows(email);
       expect(profile).toMatchObject({
         last_name: '정',

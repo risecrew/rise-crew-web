@@ -32,6 +32,9 @@ insert into auth.users (id, email) values
   ('7e5b0000-0000-4000-8000-000000000003', 'pgtap-cover-a@example.test'),
   ('7e5b0000-0000-4000-8000-000000000005', 'pgtap-cover-operator@example.test');
 
+-- Approved, like everyone these tests sign in as; applying is tested in applicant_approval.
+update public.user_roles set role = 'guest'
+ where user_id in (select id from auth.users where email like 'pgtap-%');
 update public.user_roles set role = 'member'
  where user_id = '7e5b0000-0000-4000-8000-000000000003';
 update public.user_roles set role = 'operator'

@@ -48,6 +48,7 @@
     "supportedBy": "Official startup club of the SKKU ANCHOR Division",
     "address": "Room 50322, Hoam Hall, 25-2 Sungkyunkwan-ro, Jongno-gu, Seoul",
     "rights": "© {year} RISE CREW",
+    "madeBy": "Made by the RISE CREW dev team",
     "privacy": "Privacy policy"
   },
   "Common": {
@@ -328,7 +329,7 @@
       },
       "staff": {
         "label": "Operators and admins",
-        "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) of people who finished signing up, on the member management screen. They do not see accounts that never finished the sign-up form. They look at it only to manage members and, for people who agreed, to send recruitment notices."
+        "body": "They see all sign-up information (name, email, what you do now, school, major and affiliation, and whether you agreed to recruitment emails) of people who finished signing up, on the member management screen. They do not see accounts that never finished the sign-up form. They look at it only to manage members and, for people who agreed, to send recruitment notices. They also review each application and approve or decline it. Declining deletes the account and what it entered right away."
       },
       "admin": {
         "label": "Website administrator",
@@ -526,6 +527,7 @@
       "edit": "Edit",
       "cancel": "Cancel",
       "roles": {
+        "applicant": "Application pending",
         "guest": "Guest",
         "member": "Member",
         "operator": "Operator",
@@ -553,7 +555,8 @@
         }
       },
       "deleted": "Your account has been deleted. Thanks for being part of RISE CREW.",
-      "changePassword": "Change password"
+      "changePassword": "Change password",
+      "applying": "We've received your application. Once an operator approves it, you can read notices and posts for members."
     },
     "switch": {
       "label": "Sign in or sign up",
@@ -614,8 +617,10 @@
           "operator": "{count, plural, one {Make # operator} other {Make # operators}}",
           "admin": "{count, plural, one {Make # admin} other {Make # admins}}",
           "block": "{count, plural, one {Block # person} other {Block # people}}",
-          "unblock": "{count, plural, one {Unblock # person} other {Unblock # people}}"
-        }
+          "unblock": "{count, plural, one {Unblock # person} other {Unblock # people}}",
+          "reject": "Decline {count}"
+        },
+        "reject": "Decline"
       },
       "confirm": {
         "block": {
@@ -640,7 +645,11 @@
         },
         "staffLoss": "{staff, plural, one {# operator or admin will lose that role.} other {# operators or admins will lose those roles.}}",
         "selfLoss": "Your own account is one of them, so you will lose access to this screen.",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "reject": {
+          "question": "Decline {count, plural, one {# application} other {# applications}}? Their accounts and what they entered are deleted, and this cannot be undone.",
+          "yes": "Decline and delete"
+        }
       },
       "result": {
         "done": {
@@ -649,7 +658,8 @@
           "operator": "{count, plural, one {# person is now an operator.} other {# people are now operators.}}",
           "admin": "{count, plural, one {# person is now an admin.} other {# people are now admins.}}",
           "block": "{count, plural, one {# person was blocked.} other {# people were blocked.}}",
-          "unblock": "{count, plural, one {# person was unblocked.} other {# people were unblocked.}}"
+          "unblock": "{count, plural, one {# person was unblocked.} other {# people were unblocked.}}",
+          "reject": "Declined and deleted {count, plural, one {# application} other {# applications}}."
         },
         "errors": {
           "none": "Choose who to change first.",
@@ -659,7 +669,8 @@
           "lastAdmin": "That would leave the site without an admin. Make someone else an admin first.",
           "missing": "Some of these people are no longer on the list. Reload the page and try again.",
           "stale": "Someone changed in the meantime, so only part of this may have gone through. Check the list.",
-          "failed": "That didn't work. Please try again in a moment."
+          "failed": "That didn't work. Please try again in a moment.",
+          "refusedReject": "Nobody was declined."
         },
         "who": "{more, plural, =0 {{names}} other {{names} and # more}}",
         "reasons": {
@@ -667,7 +678,8 @@
           "authorityRole": "{who} can't be changed with your access. Operators can only move people between Guest and Member; ask an admin for anything else.",
           "authorityBlock": "{who} can't be blocked with your access, because they're an operator or an admin. Ask an admin to do it.",
           "authorityUnblock": "{who} can't be unblocked with your access, because they're an operator or an admin. Ask an admin to do it.",
-          "self": "{who} is your own account, so you can't block or unblock it. Take yourself off the selection and try again."
+          "self": "{who} is your own account, so you can't block or unblock it. Take yourself off the selection and try again.",
+          "notApplicant": "{who}: already approved, so cannot be declined. Use block instead."
         }
       },
       "pages": {
@@ -676,7 +688,8 @@
         "next": "Next",
         "position": "Page {page} of {total}"
       },
-      "toTeams": "Go to teams"
+      "toTeams": "Go to teams",
+      "waiting": "View {count, plural, one {# application} other {# applications}}"
     },
     "teams": {
       "title": "Teams",
@@ -784,7 +797,7 @@
       "photos": "Photos (optional, up to {count})",
       "files": "Files (optional, up to {count})",
       "filesHint": "PDF, Hangul, Word, Excel and PowerPoint files, up to 10MB each.",
-      "publicWarning": "Anyone can download the photos and files you attach. Never attach anything with personal details, such as a list of applicants or contacts.",
+      "publicWarning": "Only approved accounts can see the photos and files you attach. Even so, never attach anything with personal details, such as a list of applicants or contacts.",
       "remove": "Remove",
       "removeLabel": "Remove {name}",
       "removePhoto": "Remove photo {number}",
@@ -908,7 +921,8 @@
       "coverHint": "Shown large at the top of the team page, to everyone. Large files are made smaller automatically. Without one, the photo from the latest public post appears.",
       "removeCover": "Remove the current cover photo"
     },
-    "emptyPage": "No teams on this page."
+    "emptyPage": "No teams on this page.",
+    "lockedApplying": "{count, plural, one {# post is} other {# posts are}} for members. You can read them once your application is approved."
   },
   "Error": {
     "title": "Something went wrong",

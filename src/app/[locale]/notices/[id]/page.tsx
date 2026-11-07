@@ -7,17 +7,11 @@ import { TEXT_BUTTON, TITLE } from '@/components/teams/form-parts';
 import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
-import { getNotice } from '@/lib/board/queries';
-import { readAttachments } from '@/lib/board/forms';
-import {
-  formatFileSize,
-  localized,
-  noticeFileDownload,
-  noticePhotoSrc,
-  showsFallback,
-} from '@/lib/board/text';
-import { localizedAlternates } from '@/lib/metadata';
+import { getNotice, requireNoticeReader, signNoticeFiles } from '@/lib/board/queries';
+import { formatFileSize, localized, showsFallback } from '@/lib/board/text';
 import { postDate } from '@/lib/teams/text';
+
+import { accountMetadata } from '../../account-layout';
 
 type Props = { params: Promise<{ locale: string; id: string }> };
 
@@ -26,13 +20,9 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isAuthEnabled()) return {};
   const { locale: rawLocale, id } = await params;
-  const locale = asLocale(rawLocale);
   const notice = await getNotice(id);
   if (!notice) return {};
-  return {
-    title: localized(notice.title_ko, notice.title_en, locale),
-    alternates: localizedAlternates(locale, `/notices/${id}`),
-  };
+  return accountMetadata(localized(notice.title_ko, notice.title_en, asLocale(rawLocale)));
 }
 
 export default async function NoticePage({ params }: Props) {
@@ -40,11 +30,12 @@ export default async function NoticePage({ params }: Props) {
   const { locale: rawLocale, id } = await params;
   const locale = asLocale(rawLocale);
   setRequestLocale(locale);
+  await requireNoticeReader();
   const notice = await getNotice(id);
   if (!notice) notFound();
   const t = await getTranslations('Board');
   const title = localized(notice.title_ko, notice.title_en, locale);
-  const files = readAttachments(notice.attachments);
+  const { photos, files } = await signNoticeFiles(notice);
   // Saving twice within a minute is one edit as far as a reader is concerned.
   const edited =
     new Date(notice.updated_at).getTime() - new Date(notice.created_at).getTime() > 60_000;
@@ -62,12 +53,12 @@ export default async function NoticePage({ params }: Props) {
         <div lang={showsFallback(notice.body_en, locale) ? 'ko' : undefined} className="mt-8">
           <PostBody text={localized(notice.body_ko, notice.body_en, locale)} />
         </div>
-        {notice.photo_paths.length > 0 ? (
+        {photos.length > 0 ? (
           <div className="mt-10 flex flex-col gap-4">
-            {notice.photo_paths.map((path, index) => (
+            {photos.map((photo, index) => (
               <Image
-                key={path}
-                src={noticePhotoSrc(path)}
+                key={photo.path}
+                src={photo.url}
                 alt={t('photoAlt', { title, number: index + 1 })}
                 width={1200}
                 height={900}
@@ -84,7 +75,7 @@ export default async function NoticePage({ params }: Props) {
               {files.map((file) => (
                 <li key={file.path}>
                   <a
-                    href={noticeFileDownload(file)}
+                    href={file.url}
                     className="flex min-h-11 flex-wrap items-center gap-x-3 py-2 text-base text-white underline underline-offset-4"
                   >
                     <span className="wrap-anywhere">{file.name}</span>

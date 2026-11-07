@@ -67,13 +67,15 @@ export default async function TeamPage({ params, searchParams }: Props) {
   const t = await getTranslations('Teams');
   const { page } = parseTeamsQuery(await searchParams);
   const viewer = await getViewer();
-  const canReadSignedIn = viewer !== null && viewer.onboarded && !viewer.blocked;
+  const canReadSignedIn =
+    viewer !== null && viewer.onboarded && !viewer.blocked && viewer.role !== 'applicant';
   const [access, cover, { posts, total, lockedCount }] = await Promise.all([
     getTeamAccess(team, viewer),
     getTeamCover(team),
     listPosts(team.id, page, !canReadSignedIn && !viewer?.blocked),
   ]);
   const signedIn = viewer !== null;
+  const applying = viewer?.onboarded === true && viewer.role === 'applicant';
   const path = `/${locale}/startups/${team.slug}`;
 
   return (
@@ -147,18 +149,22 @@ export default async function TeamPage({ params, searchParams }: Props) {
           {lockedCount > 0 ? (
             <div className="mt-8 flex max-w-2xl flex-wrap items-center justify-between gap-x-4 rounded-lg border border-white/25 px-4 py-3">
               <p className="break-keep">
-                {t(signedIn ? 'lockedFinish' : 'locked', { count: lockedCount })}
+                {t(applying ? 'lockedApplying' : signedIn ? 'lockedFinish' : 'locked', {
+                  count: lockedCount,
+                })}
               </p>
-              <Link
-                href={
-                  signedIn
-                    ? `/welcome?next=${encodeURIComponent(path)}`
-                    : `/login?next=${encodeURIComponent(path)}`
-                }
-                className="inline-flex min-h-11 items-center underline underline-offset-4"
-              >
-                {t(signedIn ? 'finish' : 'signIn')}
-              </Link>
+              {applying ? null : (
+                <Link
+                  href={
+                    signedIn
+                      ? `/welcome?next=${encodeURIComponent(path)}`
+                      : `/login?next=${encodeURIComponent(path)}`
+                  }
+                  className="inline-flex min-h-11 items-center underline underline-offset-4"
+                >
+                  {t(signedIn ? 'finish' : 'signIn')}
+                </Link>
+              )}
             </div>
           ) : null}
 
