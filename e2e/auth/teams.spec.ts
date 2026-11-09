@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import {
   LOCALES,
   collectConsoleErrors,
@@ -234,3 +234,36 @@ for (const locale of LOCALES) {
     expect(errors).toEqual([]);
   });
 }
+
+test('the account menu leads a member straight to their team; others get no such row', async ({
+  page,
+  browser,
+  baseURL,
+}) => {
+  const open = async (page: Page) => {
+    await page
+      .locator('header summary')
+      .or(page.getByRole('button', { name: /계정 메뉴/ }))
+      .locator('visible=true')
+      .first()
+      .click();
+  };
+  await signIn(page, memberEmail, baseURL!);
+  await page.goto('/ko');
+  await open(page);
+  const header = page.locator('header');
+  const row = header.getByRole('link', { name: '소속팀', exact: true }).locator('visible=true');
+  await expect(row).toHaveAttribute('href', `/ko/startups/${SLUG}`);
+  await row.click();
+  await expect(page).toHaveURL(`${baseURL}/ko/startups/${SLUG}`);
+
+  // Someone in no team.
+  const other = await (await browser.newContext()).newPage();
+  await signIn(other, guestEmail, baseURL!);
+  await open(other);
+  const otherHeader = other.locator('header');
+  await expect(
+    otherHeader.getByRole('link', { name: '마이페이지' }).locator('visible=true'),
+  ).toBeVisible();
+  await expect(otherHeader.getByRole('link', { name: /소속팀/ })).toHaveCount(0);
+});

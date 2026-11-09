@@ -13,8 +13,12 @@ type Client = ReturnType<typeof createSupabaseBrowserClient>;
 
 type NameParts = { last_name: string | null; first_name: string | null };
 
+// The teams the visitor belongs to, for the menu's way into them.
+export type MyTeam = { slug: string; name: string };
+
 export type Account =
-  { status: 'out' } | { status: 'in'; role: AppRole; email: string; names: NameParts };
+  | { status: 'out' }
+  | { status: 'in'; role: AppRole; email: string; names: NameParts; teams: MyTeam[] };
 
 const SIGNED_OUT: Account = { status: 'out' };
 
@@ -23,15 +27,15 @@ let started = false;
 // Each report from Supabase takes a moment to finish (the profile is read from the database); only
 // the newest one may publish, or a slow sign-in could overwrite a sign-out that came after it.
 let latest = 0;
-// The names of the last profile read, so a refreshed token does not read the row again.
-let known: { id: string; names: NameParts } | null = null;
+// The names and teams last read, so a refreshed token does not read them again.
+let known: { id: string; names: NameParts; teams: MyTeam[] } | null = null;
 // The Supabase client, once the store has started (there is a session to look up).
 let client: Client | null = null;
 const listeners = new Set<() => void>();
 
 function sameAccount(a: Account, b: Account): boolean {
   if (a.status === 'out' || b.status === 'out') return a.status === b.status;
-  return a.role === b.role && a.email === b.email && a.names === b.names;
+  return a.role === b.role && a.email === b.email && a.names === b.names && a.teams === b.teams;
 }
 
 function publish(next: Account) {
@@ -57,19 +61,36 @@ async function apply(supabase: Client, session: Session | null) {
     return;
   }
 
-  let names = known?.id === session.user.id ? known.names : null;
-  if (!names) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('last_name, first_name')
-      .eq('id', session.user.id)
-      .maybeSingle();
-    names = data ?? { last_name: null, first_name: null };
+  let found = known?.id === session.user.id ? known : null;
+  if (!found) {
+    // The database answers only with the visitor's own team rows, and only teams they can see.
+    const [profile, membership] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('last_name, first_name')
+        .eq('id', session.user.id)
+        .maybeSingle(),
+      supabase.from('team_members').select('teams(slug, name)').eq('user_id', session.user.id),
+    ]);
+    const teams = (membership.data ?? [])
+      .flatMap((row) => (row.teams ? [row.teams] : []))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    found = {
+      id: session.user.id,
+      names: profile.data ?? { last_name: null, first_name: null },
+      teams,
+    };
     // A failed read is not remembered, so the next report tries again.
-    if (!error) known = { id: session.user.id, names };
+    if (!profile.error && !membership.error) known = found;
   }
   if (mine !== latest) return;
-  publish({ status: 'in', role: claims.role, email: session.user.email ?? '', names });
+  publish({
+    status: 'in',
+    role: claims.role,
+    email: session.user.email ?? '',
+    names: found.names,
+    teams: found.teams,
+  });
 }
 
 async function start() {

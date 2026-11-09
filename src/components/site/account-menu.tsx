@@ -6,12 +6,19 @@ import type { Locale } from '@/i18n/locales';
 import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { atLeast } from '@/lib/auth/roles';
 import { cn } from '@/lib/utils';
-import { accountLabel, getServerSnapshot, getSnapshot, subscribe } from './account-store';
+import {
+  accountLabel,
+  getServerSnapshot,
+  getSnapshot,
+  subscribe,
+  type MyTeam,
+} from './account-store';
 
 export type AccountLabels = {
   signIn: string;
   account: string;
   myPage: string;
+  myTeam: string;
   members: string;
   teams: string;
   activities: string;
@@ -49,6 +56,7 @@ export function AccountMenu({
       initial={initial}
       email={account.email}
       staff={staff}
+      teams={account.teams}
       locale={locale}
     />
   ) : (
@@ -57,7 +65,13 @@ export function AccountMenu({
         <Circle letter={initial} tone="paper" />
         <Who name={name} email={account.email} tone="paper" />
       </div>
-      <AccountLinks labels={labels} staff={staff} locale={locale} tone="paper" />
+      <AccountLinks
+        labels={labels}
+        staff={staff}
+        teams={account.teams}
+        locale={locale}
+        tone="paper"
+      />
     </div>
   );
 }
@@ -124,11 +138,13 @@ function Who({ name, email, tone }: { name: string; email: string; tone: Tone })
 function AccountLinks({
   labels,
   staff,
+  teams,
   locale,
   tone,
 }: {
   labels: AccountLabels;
   staff: boolean;
+  teams: MyTeam[];
   locale: Locale;
   tone: Tone;
 }) {
@@ -143,6 +159,15 @@ function AccountLinks({
           {labels.myPage}
         </Link>
       </li>
+      {/* Straight to the visitor's own team page. With more than one team, each row names its
+          team; with none, there is no row. */}
+      {teams.map((team) => (
+        <li key={team.slug}>
+          <Link href={`/startups/${team.slug}`} prefetch={false} className={row}>
+            {teams.length > 1 ? `${labels.myTeam} · ${team.name}` : labels.myTeam}
+          </Link>
+        </li>
+      ))}
       {staff ? (
         <>
           <li>
@@ -186,6 +211,7 @@ function Dropdown({
   initial,
   email,
   staff,
+  teams,
   locale,
 }: {
   labels: AccountLabels;
@@ -193,6 +219,7 @@ function Dropdown({
   initial: string;
   email: string;
   staff: boolean;
+  teams: MyTeam[];
   locale: Locale;
 }) {
   const pathname = usePathname();
@@ -247,7 +274,13 @@ function Dropdown({
             <Who name={name} email={email} tone="stage" />
           </div>
           <div className="border-t border-white/15 pt-2">
-            <AccountLinks labels={labels} staff={staff} locale={locale} tone="stage" />
+            <AccountLinks
+              labels={labels}
+              staff={staff}
+              teams={teams}
+              locale={locale}
+              tone="stage"
+            />
           </div>
         </div>
       ) : null}
