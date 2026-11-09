@@ -12,5 +12,4 @@ export const OUTLINE =
   'inline-flex min-h-12 cursor-pointer items-center justify-center rounded-full border border-white/50 px-6 py-3 font-semibold text-white transition-[background-color,scale] duration-150 ease-out hover:bg-white/10 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60';
 export const TEXT_BUTTON =
   'inline-flex min-h-11 cursor-pointer items-center px-3 text-base text-white underline underline-offset-4';
-export const TITLE =
-  'font-display text-[clamp(2.5rem,6vw,4rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance break-keep';
+export const TITLE = 'font-display text-hero text-balance break-keep';

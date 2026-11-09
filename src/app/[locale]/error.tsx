@@ -17,9 +17,7 @@ export default function ErrorPage({ retry }: { retry: () => void }) {
         className="absolute inset-x-0 top-0 -z-10 h-[80svh] bg-[radial-gradient(ellipse_75%_65%_at_50%_0%,rgb(0_62_145/0.6),transparent_70%)]"
       />
       <div className="w-full max-w-lg">
-        <h1 className="font-display text-[clamp(2rem,6vw,3.4rem)] leading-[1.04] font-[850] text-balance break-keep">
-          {t('title')}
-        </h1>
+        <h1 className="font-display text-headline text-balance break-keep">{t('title')}</h1>
         <p className="mt-4 text-lg break-keep text-white/85">{t('body')}</p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <button

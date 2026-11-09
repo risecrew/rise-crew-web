@@ -52,7 +52,7 @@ export function TeamCover({ name, tagline, facts, logo, photo, badge, actions }:
                 {facts}
                 {badge}
               </p>
-              <h1 className="mt-2 font-display text-[clamp(2.75rem,7vw,6rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance wrap-anywhere break-keep">
+              <h1 className="mt-2 font-display text-hero text-balance wrap-anywhere break-keep">
                 {name}
               </h1>
             </div>
