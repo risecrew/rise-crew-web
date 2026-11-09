@@ -13,7 +13,7 @@ describe('localizedAlternates', () => {
     expect(localizedAlternates('ko', '').canonical).toBe('/ko');
   });
   it('lists the five public pages', () => {
-    expect(PAGE_PATHS).toEqual(['', '/about', '/network', '/contact', '/join']);
+    expect(PAGE_PATHS).toEqual(['', '/about', '/network', '/join']);
   });
 });
 

@@ -4,7 +4,6 @@ import { HeroStage } from '@/components/stage/hero-stage';
 import { StagePhoto, TemporaryBadge } from '@/components/stage/stage-photo';
 import type { Photo } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
-import { Link } from '@/i18n/navigation';
 import type { ApplyCta } from '@/lib/content';
 
 const SLOGAN = [
@@ -80,9 +79,9 @@ export async function Hero({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-6">
-          <Link href="/contact" className="font-semibold text-white underline underline-offset-4">
+          <a href="#contact" className="font-semibold text-white underline underline-offset-4">
             {ctaT('partner')}
-          </Link>
+          </a>
           <AskButton cta={cta} />
         </div>
       </div>

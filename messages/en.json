@@ -12,10 +12,6 @@
       "title": "Network | RISE CREW",
       "description": "Mentors and partners who work with RISE CREW."
     },
-    "contact": {
-      "title": "Contact | RISE CREW",
-      "description": "Contact RISE CREW and send partnership inquiries."
-    },
     "join": {
       "title": "Join | RISE CREW",
       "description": "RISE CREW recruitment, eligibility, benefits and FAQ."
@@ -34,7 +30,6 @@
     "home": "Home",
     "about": "About",
     "network": "Network",
-    "contact": "Contact",
     "join": "Join",
     "menu": "Menu",
     "skip": "Skip to content",
@@ -183,10 +178,8 @@
   "Contact": {
     "title": "Let's work together",
     "lead": "Companies, institutions, mentors and press: please reach us by email.",
-    "partnerTitle": "Partnership inquiry",
-    "partnerBody": "The subject line starts with [Partnership]. Please include your organization, contact person and proposal.",
-    "partnerSubject": "[Partnership] ",
-    "room": "Room 50322, Hoam Hall (club room)"
+    "subject": "[Inquiry] ",
+    "button": "Email us"
   },
   "Join": {
     "title": "Board RISE CREW",

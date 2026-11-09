@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page } from '@playwright/test';
 
 export const LOCALES = ['ko', 'en'] as const;
-export const PAGES = ['', '/about', '/network', '/contact', '/join'] as const;
+export const PAGES = ['', '/about', '/network', '/join'] as const;
 
 export function collectConsoleErrors(page: Page): string[] {
   const errors: string[] = [];

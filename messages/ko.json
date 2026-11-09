@@ -12,10 +12,6 @@
       "title": "네트워크 | RISE CREW",
       "description": "RISE CREW와 함께하는 멘토와 협력 기관."
     },
-    "contact": {
-      "title": "문의 | RISE CREW",
-      "description": "RISE CREW 연락처와 제휴 문의."
-    },
     "join": {
       "title": "지원하기 | RISE CREW",
       "description": "RISE CREW 모집 안내, 지원 자격, 혜택, 자주 묻는 질문."
@@ -34,7 +30,6 @@
     "home": "홈",
     "about": "소개",
     "network": "네트워크",
-    "contact": "문의",
     "join": "지원하기",
     "menu": "메뉴",
     "skip": "본문으로 건너뛰기",
@@ -183,10 +178,8 @@
   "Contact": {
     "title": "제휴와 협업을 기다립니다",
     "lead": "기업, 기관, 멘토, 언론 문의는 이메일로 보내주세요.",
-    "partnerTitle": "제휴 문의",
-    "partnerBody": "메일 제목에 [제휴 문의]가 미리 들어갑니다. 소속, 담당자, 제안 내용을 적어주세요.",
-    "partnerSubject": "[제휴 문의] ",
-    "room": "호암관 50322호 (동아리방)"
+    "subject": "[문의] ",
+    "button": "이메일로 문의하기"
   },
   "Join": {
     "title": "RISE CREW에 탑승하세요",

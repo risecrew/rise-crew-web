@@ -1,7 +1,7 @@
 import type { Locale } from '@/i18n/locales';
 
-export type PagePath = '' | '/about' | '/network' | '/contact' | '/join';
-export const PAGE_PATHS: readonly PagePath[] = ['', '/about', '/network', '/contact', '/join'];
+export type PagePath = '' | '/about' | '/network' | '/join';
+export const PAGE_PATHS: readonly PagePath[] = ['', '/about', '/network', '/join'];
 
 // Pages that are not in the sitemap (yet). The privacy policy and the team pages open only once
 // accounts are switched on, and are listed with the other pages after that.

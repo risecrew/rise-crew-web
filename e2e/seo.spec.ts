@@ -17,7 +17,7 @@ test('sitemap lists every page in both languages and robots points to it', async
   const sitemap = await (await request.get('/sitemap.xml')).text();
   for (const path of ['/ko', '/en', '/ko/about', '/en/join'])
     expect(sitemap).toContain(`${path}</loc>`);
-  expect(sitemap.match(/<url>/g)).toHaveLength(10);
+  expect(sitemap.match(/<url>/g)).toHaveLength(8);
   // The privacy policy is not listed: it opens only when the accounts are launched.
   expect(sitemap).not.toContain('/privacy');
   const robots = await (await request.get('/robots.txt')).text();

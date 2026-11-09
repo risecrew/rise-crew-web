@@ -24,7 +24,7 @@ for (const locale of LOCALES) {
 
 // Inner pages open the way the home's chapters do: a photo from edge to edge with the title
 // on it, not a framed screen beside the title.
-for (const path of ['/about', '/network', '/contact', '/join'] as const) {
+for (const path of ['/about', '/network', '/join'] as const) {
   test(`${path} opens on an edge-to-edge photo with the title on it`, async ({ page }) => {
     await page.goto(`/ko${path}`);
     const cover = page.locator('[data-page-cover]');

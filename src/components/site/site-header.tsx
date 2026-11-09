@@ -23,7 +23,6 @@ export function getNavItems() {
         ] as const)
       : []),
     { href: '/network', key: 'network' },
-    { href: '/contact', key: 'contact' },
   ] as const;
 }
 

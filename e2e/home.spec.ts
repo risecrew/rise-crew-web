@@ -141,7 +141,12 @@ test('the ask leads to the join page while recruitment is closed', async ({ page
     'href',
     '/ko/join',
   );
-  await expect(ask.getByRole('link', { name: '제휴 문의' })).toHaveAttribute('href', '/ko/contact');
+  await expect(
+    ask.locator('#contact').getByRole('link', { name: '이메일로 문의하기' }),
+  ).toBeVisible();
+  await expect(
+    page.locator('[data-hero]').getByRole('link', { name: '제휴 문의' }),
+  ).toHaveAttribute('href', '#contact');
 });
 
 async function expectFinalState(page: Page) {
