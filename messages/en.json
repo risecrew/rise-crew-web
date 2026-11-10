@@ -291,8 +291,8 @@
         "body": "Confirming who has signed up, signing you in, managing roles (guest, member, operator, admin), and limiting the use of accounts that cause problems."
       },
       "community": {
-        "label": "Community use",
-        "body": "Showing content that only signed-in people can see, and giving members features such as posting and replying."
+        "label": "Team spaces",
+        "body": "Letting team members post their team’s introduction, posts and photos on its startup page, and showing posts that only signed-in people can see."
       },
       "recruit": {
         "label": "Recruitment notices",
@@ -335,14 +335,19 @@
         "body": "Optional. Whether you agreed is recorded with the time and the version of this policy."
       },
       "passive": "If you sign in with Google, Supabase also stores the basic profile Google shares (display name, profile picture URL, account identifier and the like) with your sign-in details. Supabase and Vercel keep access logs automatically (IP address, browser, and times), and Supabase’s sign-in logs also include your account email and account identifier. These logs are held under each company’s own policy.",
-      "cookies": "This site stores cookies in your browser. While you are signed in, a cookie keeps you signed in. When the language you view the site in differs from your browser’s (for example after you switch language), a cookie remembers that language, whether or not you are signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in and your language choice is not remembered."
+      "cookies": "This site stores cookies in your browser. While you are signed in, a cookie keeps you signed in. When the language you view the site in differs from your browser’s (for example after you switch language), a cookie remembers that language, whether or not you are signed in. We do not use cookies for advertising or for tracking visits. You can block cookies in your browser settings, but then you cannot stay signed in and your language choice is not remembered.",
+      "posts": {
+        "label": "Team posts and photos",
+        "body": "When a team member posts text or photos on a team page, we store them with the account that posted them (the author record). The author record is not shown on the page. The team member who posts is responsible for checking the people in the photos and any personal information in the text."
+      }
     },
     "retention": {
       "title": "How long we keep it, and how we destroy it",
       "keep": "We keep your information until you delete your account.",
       "unfinished": "If you never finish the sign-up form, the account is deleted automatically 7 days after it was created, along with its sign-in details such as your email address, password hash and the basic profile Google shared.",
       "delete": "When you delete your account on My page, your account and sign-up information are deleted right away, along with the record of your consents. Copies of account emails (sign-up confirmation and password reset: your address and a code that has already expired) in the Gmail account that sent them are deleted automatically within 30 days. Access logs that the companies keep automatically are held under each company’s own policy.",
-      "destroy": "When the retention period ends or there is a reason to delete information, we destroy it without delay. We handle personal information only in electronic form and destroy it by deleting it from the database. We do not keep it on paper or in separate files. Anything left in a company’s backups is gone when that backup’s retention period ends."
+      "destroy": "When the retention period ends or there is a reason to delete information, we destroy it without delay. We handle personal information only in electronic form and destroy it by deleting it from the database. We do not keep it on paper or in separate files. Anything left in a company’s backups is gone when that backup’s retention period ends.",
+      "posts": "If you delete your account, the posts and photos you put on a team page stay as the team’s record, and only the author record is removed. To remove a post or photo, delete it yourself before leaving or ask an operator."
     },
     "processors": {
       "title": "Who processes it for us",

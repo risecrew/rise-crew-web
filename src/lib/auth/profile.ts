@@ -17,7 +17,7 @@ export { NAME_MAX, OCCUPATIONS, TEXT_MAX, isStudent };
 export type { Occupation } from './occupation';
 
 // Bumped whenever the privacy policy text changes. Stored with every consent record.
-export const PRIVACY_POLICY_VERSION = '2026-11-06';
+export const PRIVACY_POLICY_VERSION = '2026-11-11';
 
 // Messages are codes, not sentences, so the form can show them in either language:
 //   required          the field is empty (or, for an occupation, not one of the options)

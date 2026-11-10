@@ -121,6 +121,7 @@ export default async function PrivacyPage({ params }: Props) {
                   'age14',
                   'privacy',
                   'recruit',
+                  'posts',
                 ] as const
               ).map((key) => (
                 <Row key={key} label={t(`items.${key}.label`)}>
@@ -136,6 +137,7 @@ export default async function PrivacyPage({ params }: Props) {
             <p>{t('retention.keep')}</p>
             <p>{t('retention.unfinished')}</p>
             <p>{t('retention.delete')}</p>
+            <p>{t('retention.posts')}</p>
             <p>{t('retention.destroy')}</p>
           </Section>
 
