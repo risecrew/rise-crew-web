@@ -15,6 +15,7 @@ import { PrimaryNav } from './primary-nav';
 export function getNavItems() {
   return [
     { href: '/about', key: 'about' },
+    { href: '/program', key: 'program' },
     ...(isAuthEnabled()
       ? ([
           { href: '/startups', key: 'startups' },
@@ -32,6 +33,12 @@ export function getNavItems() {
 export async function getApplyLabel() {
   const t = await getTranslations('Nav');
   return (await getRecruitment()).status === 'open' ? t('apply') : t('applyInfo');
+}
+
+// The same, on a page's own button, where there is room to say "see how to apply".
+export async function getApplyButtonLabel() {
+  const t = await getTranslations('Nav');
+  return (await getRecruitment()).status === 'open' ? t('apply') : t('applyInfoLong');
 }
 
 const APPLY =

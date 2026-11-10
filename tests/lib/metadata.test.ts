@@ -12,8 +12,8 @@ describe('localizedAlternates', () => {
   it('handles the home path', () => {
     expect(localizedAlternates('ko', '').canonical).toBe('/ko');
   });
-  it('lists the five public pages', () => {
-    expect(PAGE_PATHS).toEqual(['', '/about', '/network', '/join']);
+  it('lists the public pages', () => {
+    expect(PAGE_PATHS).toEqual(['', '/about', '/program', '/network', '/join']);
   });
 });
 

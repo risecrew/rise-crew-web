@@ -5,7 +5,7 @@ import type { Partner } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { pick } from '@/lib/content';
 
-export type HomeNumber = { id: string; value: string; unit: string; label: string };
+export type HomeNumber = { id: string; shown: React.ReactNode; label: string };
 
 // S2 (wireframe v1.1, §8): four numbers, one date for all of them, and the partners' logos. The
 // numbers are plain text, never counted up, so a screen reader reads each once.
@@ -34,10 +34,7 @@ export async function Numbers({
           {numbers.map((n) => (
             <div key={n.id} className="flex flex-col">
               <dt className="order-2 mt-2 text-[15px] text-white/80">{n.label}</dt>
-              <dd className="order-1 font-display text-numeral">
-                {n.value}
-                <span className="ml-1 text-xl font-semibold">{n.unit}</span>
-              </dd>
+              <dd className="order-1 font-display text-numeral">{n.shown}</dd>
             </div>
           ))}
         </dl>

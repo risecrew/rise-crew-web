@@ -25,7 +25,6 @@ import {
   stampSchema,
   statSchema,
   type Localized,
-  type Recruitment,
   type Stamp,
   type TimelineEvent,
 } from '@/content/schema';
@@ -64,14 +63,6 @@ export function stampState(stamp: Stamp | TimelineEvent, today: Date): StampStat
   if (stamp.status === 'done') return 'done';
   if (!stamp.date) return 'upcoming';
   return periodEnd(stamp.date) < today ? 'unconfirmed' : 'upcoming';
-}
-
-export type ApplyCta = { kind: 'apply'; href: string } | { kind: 'notice'; message: Localized };
-
-export function applyCta(r: Recruitment): ApplyCta {
-  return r.status === 'open'
-    ? { kind: 'apply', href: r.applyUrl }
-    : { kind: 'notice', message: r.nextNotice };
 }
 
 function compareStamps(a: Stamp, b: Stamp): number {

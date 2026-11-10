@@ -13,7 +13,7 @@
       "description": "Mentors and partners who work with RISE CREW."
     },
     "join": {
-      "title": "Join | RISE CREW",
+      "title": "How to apply | RISE CREW",
       "description": "RISE CREW recruitment, eligibility, benefits and FAQ."
     },
     "notFound": {
@@ -22,6 +22,10 @@
     "privacy": {
       "title": "Privacy policy | RISE CREW",
       "description": "What RISE CREW collects when you create an account on this website, why, how long we keep it, and your rights."
+    },
+    "program": {
+      "title": "Program | RISE CREW",
+      "description": "From campus to the world: the three stages of the RISE CREW program."
     }
   },
   "Nav": {
@@ -39,7 +43,9 @@
     "applyInfo": "How to apply",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "switchLabel": "한국어로 보기"
+    "switchLabel": "한국어로 보기",
+    "applyInfoLong": "See how to apply",
+    "program": "Program"
   },
   "Footer": {
     "supportedBy": "Global startup club under the SKKU ANCHOR Division",
@@ -80,7 +86,6 @@
       "eyebrow": "A global startup club under the SKKU ANCHOR Division",
       "title": "From campus to the world,\nwe grow founders who execute",
       "body": "Education and mentoring, commercialization support, overseas expos and IR. {teams} startup teams are growing with us.",
-      "applyInfo": "How to apply",
       "partner": "Partner with us"
     },
     "numbers": {
@@ -90,9 +95,9 @@
       "mentors": "Mentors",
       "partners": "Partners",
       "unit": {
-        "people": "",
-        "teams": "",
-        "places": ""
+        "people": "{value}",
+        "teams": "{value}",
+        "places": "{value}"
       },
       "allPartners": "See all {count} partners"
     },
@@ -172,7 +177,6 @@
     }
   },
   "About": {
-    "title": "Ideas into action, campus into the world",
     "lead": "A global startup club under the SKKU ANCHOR Division. We grow founders who can execute through education, practice and global experience.",
     "rise": {
       "title": "Four promises in our name",
@@ -185,62 +189,90 @@
     "supporter": {
       "title": "Backed by the SKKU ANCHOR Division",
       "body": "The ANCHOR Division supports RISE CREW. It is Sungkyunkwan University's division in the Seoul RISE (Regional Innovation System & Education) program, running from June 2025 to February 2030.",
-      "kpiFunding": "KRW 2.4 billion in cumulative startup funding",
-      "kpiGlobal": "10 registered Born to Global startups",
-      "kpiLabel": "Division five-year goals"
-    },
-    "steps": {
-      "title": "Five-step growth plan",
-      "body": "VCC lectures, 1:1 expert mentoring and a club room support every step."
-    },
-    "programs": {
-      "title": "Programs"
+      "period": "Program period",
+      "funding": "Five-year goal: total funding raised",
+      "fundingValue": "KRW 2.4 billion",
+      "global": "Five-year goal: Born to Global companies",
+      "globalValue": "10 teams",
+      "advisor": "Faculty advisor",
+      "advisorValue": "Prof. {name}"
     },
     "crew": {
-      "title": "Crew",
-      "advisor": "Faculty advisor",
-      "pending": "Crew names and photos will be published once each member consents."
+      "title": "Crew"
     },
-    "history": {
-      "title": "History"
+    "eyebrow": "About",
+    "milestones": {
+      "title": "Milestones",
+      "all": "See all activities"
     }
   },
   "Network": {
-    "title": "{count} mentors and our partners",
-    "lead": "Working experts and institutions back every RISE CREW team.",
+    "title": "Network",
+    "lead": "{mentors} mentors and {partners} partners support the growth of RISE CREW teams.",
     "mentors": {
       "title": "Mentors",
-      "note": "{listed} of our {total} mentors are listed by name."
+      "note": "{listed} of our {total} mentors agreed to be named here."
     },
     "partners": {
       "title": "Partners",
       "kind": {
-        "supporter": "Supporter",
-        "company": "Company",
-        "university": "University"
-      }
+        "supporter": "Supporters",
+        "university": "Universities",
+        "company": "Companies"
+      },
+      "count": "{count} partners"
     },
     "mou": {
       "title": "Partnership with Kakao Mobility",
       "date": "Nov 28, 2025 · signed by the SKKU ANCHOR Division",
       "crew": "Mentoring and growth support for RISE CREW and Seongchangjae teams",
       "vcc": "Co-developing and running the VCC curriculum",
-      "contest": "Co-planning and running a global university startup competition"
-    }
+      "contest": "Co-planning and running a global university startup competition",
+      "section": "Agreements",
+      "press": "In the press"
+    },
+    "cta": "Want to join as a mentor or partner?"
   },
   "Join": {
-    "title": "Board RISE CREW",
+    "eyebrow": "How to apply",
+    "title": "Apply to RISE CREW",
     "lead": "Startup teams, solo founders and individuals without a team can all apply.",
     "status": {
-      "open": "Recruiting now",
-      "closed": "Not recruiting right now"
+      "title": "Recruitment",
+      "label": "Status",
+      "open": "Recruiting",
+      "closed": "Closed",
+      "period": "Recruitment period",
+      "next": "We will announce the next intake once it is set.",
+      "apply": "Apply"
     },
-    "eligibility": {
+    "who": {
       "title": "Who can apply",
-      "campus": "Students at SKKU's Humanities and Social Sciences Campus and Natural Sciences Campus",
-      "types": "Startup teams, solo founders and individuals without a team",
-      "others": "Students from other universities and graduates can join. Individual benefits are limited to members who complete the program."
+      "columns": {
+        "who": "Who",
+        "join": "Can join",
+        "benefits": "Benefits"
+      },
+      "skku": {
+        "who": "SKKU students (Humanities and Social Sciences Campus, Natural Sciences Campus)",
+        "join": "Yes",
+        "benefits": "All"
+      },
+      "others": {
+        "who": "Students from other universities, graduates",
+        "join": "Yes",
+        "benefits": "Personal benefits go to those who complete the program"
+      },
+      "kinds": "Ways to apply",
+      "kind": {
+        "team": "Startup team",
+        "solo": "Solo founder",
+        "individual": "Individual without a team"
+      }
     },
+    "ask": "Any other questions?",
+    "copy": "Copy address",
+    "copied": "Copied",
     "benefits": {
       "title": "What you get"
     },
@@ -991,5 +1023,26 @@
     "files": "Files",
     "hasFiles": "Files",
     "photoAlt": "{title}, photo {number}"
+  },
+  "CtaBand": {
+    "title": "Join RISE CREW",
+    "partner": "Partner with us"
+  },
+  "Program": {
+    "eyebrow": "Program",
+    "title": "From campus to the world, in three stages",
+    "lead": "VCC talks, 1:1 mentoring and the club room support every stage.",
+    "tabs": "Stages",
+    "campus": {
+      "body": "Turn an idea into a business, form the team to run it, and build a working prototype (MVP)."
+    },
+    "domestic": {
+      "body": "Test the market with real customers, then use the results to win investors and funding."
+    },
+    "global": {
+      "body": "Take the model and the funding proven in Korea to markets abroad."
+    },
+    "lately": "Lately in this stage",
+    "cta": "Want to take part?"
   }
 }

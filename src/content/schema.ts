@@ -42,6 +42,8 @@ export const stampSchema = z
     // Awards and outcomes. They stay out of the title, so the caption names only the event.
     results: z.array(localizedSchema).optional(),
     photo: id.optional(),
+    // One of the few moments the about page lists as milestones.
+    milestone: z.boolean().optional(),
   })
   .superRefine((stamp, ctx) => {
     if (stamp.status === 'done' && stamp.evidence.length === 0) {
@@ -63,6 +65,8 @@ export const programSchema = z.object({
   id,
   stage: stageSchema,
   name: localizedSchema,
+  // How it runs, in a few words: "18 sessions · co-developed with Kakao Mobility".
+  meta: localizedSchema.optional(),
   summary: localizedSchema,
   details: z.array(localizedSchema),
 });

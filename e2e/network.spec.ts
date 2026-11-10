@@ -1,11 +1,30 @@
 import { expect, test } from '@playwright/test';
 
-test('network lists 19 named mentors, partners and the MOU', async ({ page }) => {
+test('network lists the named mentors, 25 partners by group and the agreement', async ({
+  page,
+}) => {
   await page.goto('/en/network');
   await expect(page.locator('[data-mentor]')).toHaveCount(19);
-  await expect(page.getByText('19 of our 33 mentors are listed by name.')).toBeVisible();
+  await expect(page.getByText('19 of our 33 mentors agreed to be named here.')).toBeVisible();
+  const partners = page.locator('#partners');
+  await expect(partners.locator('li')).toHaveCount(25);
+  await expect(partners.getByRole('heading', { level: 3 })).toHaveText([
+    'Supporters',
+    'Universities',
+    'Companies',
+  ]);
+  await expect(partners).not.toContainText('SKKU SPEC');
   await expect(
     page.getByRole('heading', { name: 'Partnership with Kakao Mobility' }),
   ).toBeVisible();
-  await expect(page.getByText('SKKU ANCHOR Division').first()).toBeVisible();
+});
+
+test('the Korean page uses the corrected names', async ({ page }) => {
+  await page.goto('/ko/network');
+  const partners = page.locator('#partners');
+  await expect(partners).toContainText('성균관대학교 앵커사업단');
+  await expect(partners).toContainText('서울앵커센터');
+  await expect(partners).toContainText('하노이외상대학교');
+  await expect(page.locator('main')).not.toContainText('ANCHOR 사업단');
+  await expect(page.locator('main')).not.toContainText('서울RISE센터');
 });

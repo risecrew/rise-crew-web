@@ -18,6 +18,7 @@ const seoul = { ko: '서울', en: 'Seoul' };
 export const stamps: Stamp[] = [
   {
     id: 'cohort-1',
+    milestone: true,
     date: '2025',
     city: seoul,
     country: 'KR',
@@ -29,6 +30,7 @@ export const stamps: Stamp[] = [
   },
   {
     id: 'kakao-mou',
+    milestone: true,
     date: '2025-11-28',
     city: seoul,
     country: 'KR',
@@ -75,6 +77,7 @@ export const stamps: Stamp[] = [
   },
   {
     id: 'aix-contest',
+    milestone: true,
     date: '2026-01-30',
     city: seoul,
     country: 'KR',
@@ -93,6 +96,7 @@ export const stamps: Stamp[] = [
   },
   {
     id: 'cohort-2',
+    milestone: true,
     date: '2026-03-23',
     city: seoul,
     country: 'KR',
@@ -128,6 +132,7 @@ export const stamps: Stamp[] = [
   },
   {
     id: 'techfest-vietnam',
+    milestone: true,
     date: '2025-12-12',
     city: { ko: '하노이, 베트남', en: 'Hanoi, Vietnam' },
     country: 'VN',
@@ -188,6 +193,7 @@ export const stamps: Stamp[] = [
   },
   {
     id: 'kuala-lumpur-ir',
+    milestone: true,
     date: '2026-10',
     city: { ko: '쿠알라룸푸르', en: 'Kuala Lumpur' },
     country: 'MY',

@@ -116,7 +116,10 @@ test('the menu has no activities or notices item while accounts are off', async 
   await expect(page.locator('a[href="/ko/notices"]')).toHaveCount(0);
 });
 
-test('the about page reads its history from the code while accounts are off', async ({ page }) => {
+test('the about page lists its milestones without a link to the closed activities page', async ({
+  page,
+}) => {
   await page.goto('/ko/about');
-  await expect(page.locator('[data-event]')).toHaveCount(15);
+  await expect(page.locator('section[aria-labelledby="milestones-title"] ol > li')).toHaveCount(6);
+  await expect(page.locator('main a[href="/ko/activities"]')).toHaveCount(0);
 });

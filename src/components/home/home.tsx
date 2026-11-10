@@ -48,7 +48,7 @@ export async function Home({
   const opening = photo('beyond-expo-crew-jersey-2026');
   const teams = value('teams')?.value ?? '';
   const open = recruitment.status === 'open';
-  const applyLabel = open ? nav('apply') : t('hero.applyInfo');
+  const applyLabel = open ? nav('apply') : nav('applyInfoLong');
   const members = value('members');
 
   return (
@@ -63,26 +63,19 @@ export async function Home({
       <Numbers
         locale={locale}
         numbers={[
-          {
-            id: 'members',
-            value: members?.value ?? '',
-            unit: t('numbers.unit.people'),
-            label: t('numbers.members'),
-          },
-          { id: 'teams', value: teams, unit: t('numbers.unit.teams'), label: t('numbers.teams') },
-          {
-            id: 'mentors',
-            value: value('mentors')?.value ?? '',
-            unit: t('numbers.unit.people'),
-            label: t('numbers.mentors'),
-          },
-          {
-            id: 'partners',
-            value: String(partners.length),
-            unit: t('numbers.unit.places'),
-            label: t('numbers.partners'),
-          },
-        ]}
+          { id: 'members', kind: 'people', value: members?.value ?? '' },
+          { id: 'teams', kind: 'teams', value: teams },
+          { id: 'mentors', kind: 'people', value: value('mentors')?.value ?? '' },
+          { id: 'partners', kind: 'places', value: String(partners.length) },
+        ].map((n) => ({
+          id: n.id,
+          label: t(`numbers.${n.id}`),
+          // The unit is smaller than the number, next to it.
+          shown: t.rich(`numbers.unit.${n.kind}`, {
+            value: n.value,
+            unit: (chunks) => <span className="ml-1 text-xl font-semibold">{chunks}</span>,
+          }),
+        }))}
         asOf={members ? pick(members.basis, locale) : ''}
         partners={partners}
       />
@@ -91,7 +84,6 @@ export async function Home({
         photos={{ domestic: shot('workshop-2026-01'), global: shot('techfest-vietnam') }}
         mentors={mentors}
         mentorCount={value('mentors')?.value ?? ''}
-        programPage={false}
       />
       <Recent
         locale={locale}

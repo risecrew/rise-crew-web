@@ -17,14 +17,11 @@ export async function Stages({
   photos,
   mentors,
   mentorCount,
-  programPage,
 }: {
   locale: Locale;
   photos: Partial<Record<Stage, StagePhoto>>;
   mentors: Mentor[];
   mentorCount: string;
-  // Whether the program page exists yet; without it the cards have no "more" links.
-  programPage: boolean;
 }) {
   const t = await getTranslations('Home.stages');
   const m = await getTranslations('Home.mentors');
@@ -39,7 +36,7 @@ export async function Stages({
             </h2>
             <p className="mt-4 text-lg break-keep text-white/80">{t('body')}</p>
           </div>
-          {programPage ? <TextLink href="/program">{t('more')}</TextLink> : null}
+          <TextLink href="/program">{t('more')}</TextLink>
         </div>
         <ol className="section-gap grid gap-6 md:grid-cols-3">
           {STAGES.map((stage, index) => {
@@ -91,16 +88,14 @@ export async function Stages({
                     </li>
                   ))}
                 </ul>
-                {programPage ? (
-                  <div className="mt-auto pt-5">
-                    <TextLink
-                      href={{ pathname: '/program', hash: stage }}
-                      aria-label={t('detailFor', { stage: t(`${stage}.label`) })}
-                    >
-                      {t('detail')}
-                    </TextLink>
-                  </div>
-                ) : null}
+                <div className="mt-auto pt-5">
+                  <TextLink
+                    href={{ pathname: '/program', hash: stage }}
+                    aria-label={t('detailFor', { stage: t(`${stage}.label`) })}
+                  >
+                    {t('detail')}
+                  </TextLink>
+                </div>
               </li>
             );
           })}

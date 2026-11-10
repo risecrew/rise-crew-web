@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Stamp } from '@/content/schema';
-import { applyCta, getMentors, getPress, getStamps, pick, stampState } from '@/lib/content';
+import { getMentors, getPress, getStamps, pick, stampState } from '@/lib/content';
 
 const L = (ko: string, en: string) => ({ ko, en });
 const planned = (date?: string): Stamp => ({
@@ -49,24 +49,6 @@ describe('stampState', () => {
   });
   it('treats an undated planned stamp as upcoming', () => {
     expect(stampState(planned(undefined), today)).toBe('upcoming');
-  });
-});
-
-describe('applyCta', () => {
-  it('links to the form when open', () => {
-    expect(
-      applyCta({ status: 'open', period: L('3월', 'March'), applyUrl: 'https://forms.gle/x' }),
-    ).toEqual({
-      kind: 'apply',
-      href: 'https://forms.gle/x',
-    });
-  });
-  it('falls back to a notice when closed', () => {
-    const notice = L('다음 모집 안내', 'Next intake');
-    expect(applyCta({ status: 'closed', nextNotice: notice })).toEqual({
-      kind: 'notice',
-      message: notice,
-    });
   });
 });
 
