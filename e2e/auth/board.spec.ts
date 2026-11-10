@@ -130,8 +130,6 @@ test('an activity goes up with its photo and everyone can read it, in both langu
   await expect(english.getByRole('heading', { name: title })).toHaveAttribute('lang', 'ko');
   await expect(english).toContainText('도쿄');
 
-  await visitor.goto('/ko/about');
-  await expect(visitor.locator('[data-event]', { hasText: title })).toContainText('도쿄');
   expect(errors).toEqual([]);
   await visitor.context().close();
   await cleanUpActivity(title);

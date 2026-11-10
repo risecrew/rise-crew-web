@@ -119,6 +119,11 @@ async function openMenu(page: Page) {
   if ((await summaryButton.isVisible()) && !open) await summaryButton.click();
 }
 
+// The phone menu is a modal sheet: the page behind it waits until it is closed.
+async function closeMenu(page: Page) {
+  if ((await page.locator('#site-menu[open]').count()) > 0) await page.keyboard.press('Escape');
+}
+
 function initialCircle(page: Page) {
   return page.locator('header [data-account-initial]:visible');
 }
@@ -404,6 +409,7 @@ test.describe('editing', () => {
       });
       await openMenu(page);
       await expect(initialCircle(page)).toHaveText('박');
+      await closeMenu(page);
 
       let rows = await accountRows(email);
       expect(rows.consents.map((c) => c.kind)).toEqual(['privacy', 'age14', 'recruit']);
@@ -426,6 +432,7 @@ test.describe('editing', () => {
       );
       await openMenu(page);
       await expect(initialCircle(page)).toHaveText('최');
+      await closeMenu(page);
 
       rows = await accountRows(email);
       expect(rows.profile).toMatchObject({
@@ -613,6 +620,7 @@ for (const locale of ['ko', 'en'] as const) {
         });
         await openMenu(page);
         await expect(initialCircle(page)).toBeVisible();
+        await closeMenu(page);
 
         // Folded away until asked for.
         const input = page.getByLabel(t.remove.prompt);
