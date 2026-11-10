@@ -9,7 +9,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(30);
+select plan(34);
 
 create function public._t_rows(statement text)
 returns integer
@@ -152,6 +152,22 @@ select is(
   (select count(*)::integer from public.activities
     where title_ko like '%·%' or title_ko like '%(1박 2일%' or title_ko like '%ANCHOR 사업단%'),
   0, 'no moved activity keeps an award, a duration or the old name in its title');
+-- The gallery (20261110140000_activity_gallery.sql).
+select lives_ok(
+  $$insert into public.activities (title_ko, city_ko, gallery) values
+    ('a', 'b', array['7e5c0000-0000-4000-8000-00000000c001.jpg', '7e5c0000-0000-4000-8000-00000000c002.webp'])$$,
+  'an operator can add photos to the gallery');
+select throws_ok(
+  $$insert into public.activities (title_ko, city_ko, gallery) values ('a', 'b', array['/images/activities/a.jpg'])$$,
+  '23514', null, 'the gallery holds only uploaded files');
+select throws_ok(
+  $$insert into public.activities (title_ko, city_ko, gallery) values
+    ('a', 'b', array['7e5c0000-0000-4000-8000-00000000c001.jpg', '7e5c0000-0000-4000-8000-00000000c001.jpg'])$$,
+  '23514', null, 'a photo is in the gallery once');
+select throws_ok(
+  $$insert into public.activities (title_ko, city_ko, gallery)
+    select 'a', 'b', array_agg(gen_random_uuid()::text || '.jpg') from generate_series(1, 41)$$,
+  '23514', null, 'the gallery holds at most 40 photos');
 select lives_ok(
   $$delete from public.activities$$, 'an operator can delete, including moved activities');
 

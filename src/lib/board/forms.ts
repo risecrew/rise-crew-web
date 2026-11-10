@@ -8,7 +8,20 @@ export const BOARD_LIMITS = {
   summary: 500,
   body: 5000,
   results: 1000,
+  gallery: 40,
 } as const;
+
+// A file a gallery may hold: one uploaded to the activity-photos bucket (the same rule as the database).
+const GALLERY_FILE = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
+
+// The gallery a form sent, in its order: every entry an uploaded file, none twice, at most the limit.
+// Anything else is not something the form sends, so the whole list is refused.
+export function readGallery(values: unknown[]): string[] | null {
+  if (values.length > BOARD_LIMITS.gallery) return null;
+  const paths = values.map((v) => (typeof v === 'string' ? v : ''));
+  if (!paths.every((p) => GALLERY_FILE.test(p))) return null;
+  return new Set(paths).size === paths.length ? paths : null;
+}
 
 // A year, a year and month, or a full date that exists on the calendar.
 export function isActivityDate(value: string): boolean {

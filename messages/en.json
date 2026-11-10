@@ -855,7 +855,12 @@
       "bodyEn": "Text (English, optional)",
       "resultsKo": "Results (Korean, optional)",
       "resultsEn": "Results (English, optional)",
-      "resultsHint": "One per line, for example: Top prize, Safety Shop"
+      "resultsHint": "One per line, for example: Top prize, Safety Shop",
+      "gallery": "More photos for the page (optional, up to {count})",
+      "galleryHint": "Pick the cover photo above; put the other photos for the activity page here. You can pick several at once.",
+      "galleryPhoto": "Photo {number}",
+      "galleryRemove": "Remove {number}",
+      "galleryTooMany": "An activity can have up to {count} more photos."
     }
   },
   "Teams": {
@@ -993,7 +998,14 @@
       "around": "Other activities",
       "older": "Earlier",
       "newer": "Later",
-      "open": "More about {title}"
+      "open": "More about {title}",
+      "gallery": "Photos",
+      "galleryAlt": "{title}, photo {number}",
+      "galleryOpen": "View photo",
+      "galleryClose": "Close",
+      "galleryPrevious": "Previous",
+      "galleryNext": "Next",
+      "galleryViewer": "Photos of {title}"
     }
   },
   "CtaBand": {

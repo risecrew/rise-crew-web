@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { Gallery } from '@/components/board/gallery';
 import { ArrowRightIcon } from '@/components/icons';
 import { asLocale } from '@/i18n/as-locale';
 import type { Locale } from '@/i18n/locales';
@@ -149,6 +150,30 @@ export default async function ActivityPage({ params }: Props) {
                 </li>
               ))}
             </ul>
+          </section>
+        ) : null}
+        {activity.gallery.length > 0 ? (
+          <section aria-labelledby="gallery-title" className="mt-12">
+            <h2 id="gallery-title" className="font-display text-headline">
+              {t('gallery')}
+            </h2>
+            <div className="mt-5">
+              <Gallery
+                photos={activity.gallery.map((path, i) => ({
+                  src: activityPhotoSrc(path),
+                  alt: t('galleryAlt', { title, number: i + 1 }),
+                  external: true,
+                }))}
+                caption={caption}
+                labels={{
+                  open: t('galleryOpen'),
+                  close: t('galleryClose'),
+                  previous: t('galleryPrevious'),
+                  next: t('galleryNext'),
+                  viewer: t('galleryViewer', { title }),
+                }}
+              />
+            </div>
           </section>
         ) : null}
 

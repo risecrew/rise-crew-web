@@ -455,3 +455,64 @@ test('an operator writes the end date, the text and the results, and the page sh
   ]);
   await cleanUpActivity(title);
 });
+
+test('an activity keeps one cover and a gallery, which opens large and goes when removed', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const title = `사진 모음 ${unique(testInfo)}`;
+  const photo = (name: string) => ({ name, mimeType: 'image/jpeg', buffer: JPEG });
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/admin/activities/new');
+  await page.getByLabel('제목', { exact: true }).fill(title);
+  await page.getByLabel('도시', { exact: true }).fill('서울');
+  await page.getByLabel('사진 (선택, 한 장)').setInputFiles(photo('cover.jpg'));
+  await page
+    .getByLabel(/상세 페이지 사진/)
+    .setInputFiles([photo('a.jpg'), photo('b.jpg'), photo('c.jpg')]);
+  await expect(page.getByRole('img', { name: /상세 사진 [123]/ })).toHaveCount(3);
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
+
+  const row = async () =>
+    (
+      await adminClient()
+        .from('activities')
+        .select('id, photo, gallery')
+        .eq('title_ko', title)
+        .single()
+    ).data!;
+  const saved = await row();
+  expect(saved.photo).toMatch(/^[0-9a-f-]{36}\.(jpg|png|webp)$/);
+  expect(saved.gallery).toHaveLength(3);
+
+  await page.goto(`/ko/activities/${saved.id}`);
+  const grid = page.locator('section[aria-labelledby="gallery-title"]');
+  await expect(grid.getByRole('button')).toHaveCount(3);
+  await grid.getByRole('button').nth(1).click();
+  const viewer = page.getByRole('dialog');
+  await expect(viewer).toBeVisible();
+  await expect(viewer.getByText('2 / 3')).toBeVisible();
+  await viewer.getByRole('button', { name: '다음' }).click();
+  await expect(viewer.getByText('3 / 3')).toBeVisible();
+  await page.keyboard.press('ArrowRight');
+  await expect(viewer.getByText('1 / 3')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(viewer).toBeHidden();
+  await expectAccessible(page);
+
+  // Removing a photo from the gallery removes its file too.
+  await page.goto(`/ko/admin/activities/${saved.id}`);
+  await page.getByRole('button', { name: '1번 빼기' }).click();
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
+  const after = await row();
+  expect(after.gallery).toEqual(saved.gallery.slice(1));
+  expect(await fileExists(saved.gallery[0])).toBe(false);
+
+  // Deleting the activity takes every file with it.
+  await cleanUpActivity(title);
+  await adminClient()
+    .storage.from('activity-photos')
+    .remove([saved.photo!, ...saved.gallery]);
+});

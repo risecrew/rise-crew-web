@@ -32,6 +32,7 @@ export type Database = {
           created_at: string;
           date: string | null;
           end_date: string | null;
+          gallery: string[];
           id: string;
           is_planned: boolean;
           photo: string | null;
@@ -54,6 +55,7 @@ export type Database = {
           created_at?: string;
           date?: string | null;
           end_date?: string | null;
+          gallery?: string[];
           id?: string;
           is_planned?: boolean;
           photo?: string | null;
@@ -75,6 +77,7 @@ export type Database = {
           created_at?: string;
           date?: string | null;
           end_date?: string | null;
+          gallery?: string[];
           id?: string;
           is_planned?: boolean;
           photo?: string | null;

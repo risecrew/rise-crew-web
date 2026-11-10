@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { activitySchema, BOARD_LIMITS, isActivityDate } from '@/lib/board/forms';
+import { activitySchema, BOARD_LIMITS, isActivityDate, readGallery } from '@/lib/board/forms';
 import { activityTimeline, isUploadedPhoto, localized, showsFallback } from '@/lib/board/text';
 
 const activity = {
@@ -124,5 +124,24 @@ describe('activityTimeline', () => {
       evidence: [],
     });
     expect(events[0]).not.toHaveProperty('date', null);
+  });
+});
+
+describe('readGallery', () => {
+  const a = '7e5c0000-0000-4000-8000-00000000c001.jpg';
+  const b = '7e5c0000-0000-4000-8000-00000000c002.webp';
+  it('keeps uploaded files in their order', () => {
+    expect(readGallery([b, a])).toEqual([b, a]);
+    expect(readGallery([])).toEqual([]);
+  });
+  it('refuses anything a form would not send', () => {
+    expect(readGallery(['/images/activities/a.jpg'])).toBeNull();
+    expect(readGallery([a, a])).toBeNull();
+    expect(readGallery([new File([], 'x')])).toBeNull();
+    const many = Array.from(
+      { length: BOARD_LIMITS.gallery + 1 },
+      () => `${crypto.randomUUID()}.jpg`,
+    );
+    expect(readGallery(many)).toBeNull();
   });
 });
