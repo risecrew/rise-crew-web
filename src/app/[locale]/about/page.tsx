@@ -1,31 +1,19 @@
 import type { Metadata } from 'next';
-import { connection } from 'next/server';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { CtaBand } from '@/components/site/cta-band';
 import { PageCover } from '@/components/site/page-cover';
-import { SectionHeading } from '@/components/site/section-heading';
-import { Fact, FactList } from '@/components/stage/facts';
-import { FIELD } from '@/components/stage/labels';
-import { Timeline } from '@/components/stage/timeline';
-import { isAuthEnabled } from '@/lib/auth/config';
-import { getActivities } from '@/lib/board/queries';
-import { activityTimeline } from '@/lib/board/text';
+import { TextLink } from '@/components/site/text-link';
 import { asLocale } from '@/i18n/as-locale';
-import {
-  getGrowthSteps,
-  getMentors,
-  getOfficers,
-  getPhoto,
-  getPrograms,
-  getStamps,
-  pick,
-} from '@/lib/content';
+import { isAuthEnabled } from '@/lib/auth/config';
+import { getMentors, getOfficers, getPhoto, getStamps, pick } from '@/lib/content';
+import { formatDateRange } from '@/lib/format';
 import { localizedAlternates } from '@/lib/metadata';
 
 export const revalidate = 86400;
 
 type Props = { params: Promise<{ locale: string }> };
 
-const SECTION = 'border-t border-white/10 bg-stage text-white';
+const SECTION = 'section-y border-t border-white/10 text-white';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = asLocale((await params).locale);
@@ -37,45 +25,64 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// Who we are, and nothing else (wireframe v1.1, §9): the growth plan and the programs live on the
+// program page, the full record on the activities page.
 export default async function AboutPage({ params }: Props) {
-  // With accounts on, the history comes from the database, as current as the activities page. With
-  // them off nothing here reads it, so the page stays static.
-  if (isAuthEnabled()) await connection();
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('About');
-  const common = await getTranslations('Common');
-  const [steps, programs, officers, mentors, stamps, photo] = await Promise.all([
-    getGrowthSteps(),
-    getPrograms(),
+  const [officers, mentors, stamps, photo] = await Promise.all([
     getOfficers(),
     getMentors(),
-    // With accounts off the database may not have these rows yet, and nobody can edit them.
-    isAuthEnabled() ? getActivities().then(activityTimeline) : getStamps(),
+    getStamps(),
     getPhoto('smu-vibe-coding-2025-12'),
   ]);
   const advisor = mentors.find((m) => m.id === 'shin-dongwon');
   const rise = (['r', 'i', 's', 'e'] as const).map((key) => t(`rise.${key}`));
+  // Students who agreed to be shown. With nobody yet, the section is left out.
+  const crew = officers.filter((o) => o.consent && o.name);
+  const milestones = stamps
+    .filter((s) => s.milestone && s.status === 'done')
+    .sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
+    .slice(0, 6);
+  const facts = [
+    { label: t('supporter.period'), value: '2025.06–2030.02' },
+    { label: t('supporter.funding'), value: t('supporter.fundingValue') },
+    { label: t('supporter.global'), value: t('supporter.globalValue') },
+    ...(advisor
+      ? [
+          {
+            label: t('supporter.advisor'),
+            value: t('supporter.advisorValue', { name: pick(advisor.name, locale) }),
+          },
+        ]
+      : []),
+  ];
 
   return (
     <main id="main" className="bg-stage">
       <PageCover
-        title={t('title')}
+        eyebrow={t('eyebrow')}
+        title="RISE CREW"
         lead={t('lead')}
-        photo={photo ? { photo, locale, temporaryLabel: common('temporaryPhoto') } : undefined}
+        photo={photo ? { photo, locale } : undefined}
       />
 
       <section aria-labelledby="rise-title" className={SECTION}>
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-2">
-          <SectionHeading id="rise-title" title={t('rise.title')} body={t('rise.born')} />
-          <ol className="border-b border-white/15">
+        <div className="shell grid gap-12 lg:grid-cols-2">
+          <div>
+            <h2 id="rise-title" className="font-display text-headline text-balance break-keep">
+              {t('rise.title')}
+            </h2>
+            <p className="mt-4 text-lg break-keep text-white/80">{t('rise.born')}</p>
+          </div>
+          <ol className="grid gap-x-8 sm:grid-cols-2">
             {rise.map((line) => (
-              <li
-                key={line}
-                className="border-t border-white/15 py-5 font-display text-subhead break-keep"
-              >
-                <span className="text-lime">{line.slice(0, 1)}</span>
-                {line.slice(1)}
+              <li key={line} className="border-t border-white/15 py-5">
+                <p className="font-display text-subhead break-keep">
+                  <span className="text-lime">{line.slice(0, 1)}</span>
+                  {line.slice(1)}
+                </p>
               </li>
             ))}
           </ol>
@@ -83,99 +90,79 @@ export default async function AboutPage({ params }: Props) {
       </section>
 
       <section aria-labelledby="supporter-title" className={SECTION}>
-        <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-2">
-          <SectionHeading
-            id="supporter-title"
-            title={t('supporter.title')}
-            body={t('supporter.body')}
-          />
-          <FactList>
-            <Fact label={t('supporter.kpiLabel')}>{t('supporter.kpiFunding')}</Fact>
-            <Fact label={t('supporter.kpiLabel')}>{t('supporter.kpiGlobal')}</Fact>
-            <Fact label={pick(FIELD.period, locale)}>2025.06 – 2030.02</Fact>
-            <Fact label={pick(FIELD.brand, locale)}>
-              <span lang="en">SKKU with Seoul, My Soulmate</span>
-            </Fact>
-          </FactList>
-        </div>
-      </section>
-
-      <section aria-labelledby="steps-title" className={SECTION}>
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
-          <SectionHeading id="steps-title" title={t('steps.title')} body={t('steps.body')} />
-          {/* The order is the information here, so the steps keep their numbers. */}
-          <ol className="mt-12 grid gap-8 md:grid-cols-5 md:gap-6">
-            {steps.map((step) => (
-              <li key={step.id} data-step className="border-t-2 border-lime pt-5">
-                <p className="font-mono text-sm text-lime">{String(step.order).padStart(2, '0')}</p>
-                <p lang="en" className="mt-2 font-display text-xl font-[850]">
-                  {pick(step.name, locale)}
-                </p>
-                <p className="mt-2 text-sm break-keep text-white/75">
-                  {pick(step.summary, locale)}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section aria-labelledby="programs-title" className={SECTION}>
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
-          <SectionHeading id="programs-title" title={t('programs.title')} />
-          <ul className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
-            {programs.map((program) => (
-              <li key={program.id} className="border-t border-white/15 pt-5">
-                <h3 className="font-display text-2xl font-[850] break-keep">
-                  {pick(program.name, locale)}
-                </h3>
-                <p className="mt-2 break-keep text-white/75">{pick(program.summary, locale)}</p>
-                {program.details.length > 0 ? (
-                  <ul className="mt-4 flex flex-col gap-2 text-sm break-keep text-white/85">
-                    {program.details.map((detail) => (
-                      <li key={detail.en} className="border-l border-white/25 pl-3">
-                        {pick(detail, locale)}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section aria-labelledby="crew-title" className={SECTION}>
-        <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-2">
-          <SectionHeading id="crew-title" title={t('crew.title')} body={t('crew.pending')} />
+        <div className="shell grid items-start gap-12 lg:grid-cols-2">
           <div>
-            {advisor ? (
-              <FactList columns={2}>
-                <Fact label={pick(FIELD.role, locale)}>{t('crew.advisor')}</Fact>
-                <Fact label={pick(FIELD.person, locale)}>{pick(advisor.name, locale)}</Fact>
-              </FactList>
-            ) : null}
-            <ul className="mt-6 flex flex-wrap gap-2">
-              {officers.map((officer) => (
-                <li
-                  key={officer.id}
-                  className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold"
-                >
-                  {pick(officer.role, locale)}
-                  {officer.consent && officer.name ? ` · ${pick(officer.name, locale)}` : null}
+            <h2 id="supporter-title" className="font-display text-headline text-balance break-keep">
+              {t('supporter.title')}
+            </h2>
+            {/* TODO(운영진 확인): whether the RISE program sentence stays (wireframe v1.1, C3-b), and
+                how the Seoul ANCHOR Center sits between the program and the division (§9 A3). */}
+            <p className="mt-4 text-lg break-keep text-white/80">{t('supporter.body')}</p>
+          </div>
+          <dl className="grid gap-x-8 sm:grid-cols-2">
+            {facts.map((fact) => (
+              <div key={fact.label} className="border-t border-white/15 py-5">
+                <dt className="text-sm text-white/64">{fact.label}</dt>
+                <dd className="mt-1 font-display text-subhead break-keep">{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {crew.length > 0 ? (
+        <section aria-labelledby="crew-title" className={SECTION}>
+          <div className="shell">
+            <h2 id="crew-title" className="font-display text-headline">
+              {t('crew.title')}
+            </h2>
+            <ul className="section-gap grid grid-cols-3 gap-6 md:grid-cols-6">
+              {crew.map((officer) => (
+                <li key={officer.id} className="text-center">
+                  <span
+                    aria-hidden
+                    className="mx-auto flex size-16 items-center justify-center rounded-full bg-white/15 font-semibold"
+                  >
+                    {Array.from(pick(officer.name!, locale))[0]}
+                  </span>
+                  <p className="mt-2 font-semibold">{pick(officer.name!, locale)}</p>
+                  <p className="text-sm text-white/64">{pick(officer.role, locale)}</p>
                 </li>
               ))}
             </ul>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      <section aria-labelledby="history-title" className={SECTION}>
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
-          <SectionHeading id="history-title" title={t('history.title')} />
-          <Timeline events={stamps} locale={locale} today={new Date()} className="mt-10" />
-        </div>
-      </section>
+      {milestones.length > 0 ? (
+        <section aria-labelledby="milestones-title" className={SECTION}>
+          <div className="shell">
+            <div className="flex items-end justify-between gap-6">
+              <h2 id="milestones-title" className="font-display text-headline break-keep">
+                {t('milestones.title')}
+              </h2>
+              {isAuthEnabled() ? (
+                <TextLink href="/activities">{t('milestones.all')}</TextLink>
+              ) : null}
+            </div>
+            <ol className="section-gap grid gap-0 border-l border-white/15 md:grid-cols-3 md:border-t md:border-l-0 lg:grid-cols-6">
+              {milestones.map((stamp) => (
+                <li
+                  key={stamp.id}
+                  className="relative py-4 pl-6 before:absolute before:top-6 before:-left-[5px] before:size-2.5 before:rounded-full before:bg-lime md:pt-6 md:pr-4 md:pl-0 md:before:-top-[5px] md:before:left-0"
+                >
+                  <p className="font-mono text-sm text-white/64">
+                    {stamp.date ? formatDateRange(stamp.date, stamp.endDate, locale) : null}
+                  </p>
+                  <p className="mt-1 font-semibold break-keep">{pick(stamp.title, locale)}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      ) : null}
+
+      <CtaBand />
     </main>
   );
 }

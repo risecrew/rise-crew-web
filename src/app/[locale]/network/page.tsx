@@ -1,19 +1,21 @@
+/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { CtaBand } from '@/components/site/cta-band';
 import { PageCover } from '@/components/site/page-cover';
-import { SectionHeading } from '@/components/site/section-heading';
-import { Fact, FactList } from '@/components/stage/facts';
-import { PartnerMark } from '@/components/stage/partner-mark';
-import type { Partner } from '@/content/schema';
+import type { Mentor, Partner } from '@/content/schema';
 import { asLocale } from '@/i18n/as-locale';
-import { getMentors, getPartners, getPhoto, getStats, pick } from '@/lib/content';
+import type { Locale } from '@/i18n/locales';
+import { getMentors, getPartners, getPress, getStats, pick } from '@/lib/content';
+import { formatStampDate } from '@/lib/format';
 import { localizedAlternates } from '@/lib/metadata';
 
 type Props = { params: Promise<{ locale: string }> };
 
-const KINDS: Partner['kind'][] = ['supporter', 'company', 'university', 'program'];
+const KINDS: Partner['kind'][] = ['supporter', 'university', 'company'];
 const MOU_ITEMS = ['crew', 'vcc', 'contest'] as const;
-const SECTION = 'border-t border-white/10 bg-stage text-white';
+const SECTION = 'section-y scroll-mt-[88px] border-t border-white/10 text-white';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = asLocale((await params).locale);
@@ -25,90 +27,181 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// Mentors, partners and agreements (wireframe v1.1, §13).
 export default async function NetworkPage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('Network');
-  const common = await getTranslations('Common');
-  const [mentors, partners, stats, photo] = await Promise.all([
+  const [mentors, partners, stats, press] = await Promise.all([
     getMentors(),
     getPartners(),
     getStats(),
-    getPhoto('workshop-2026-01'),
+    getPress(),
   ]);
   const total = stats.find((s) => s.id === 'mentors')?.value ?? String(mentors.length);
+  const mouPress = press.find((p) => p.id === 'smart-economy-mou');
+  const jump = [
+    { href: '#mentors', label: t('mentors.title') },
+    { href: '#partners', label: t('partners.title') },
+    { href: '#mou', label: t('mou.section') },
+  ];
 
   return (
     <main id="main" className="bg-stage">
-      <PageCover
-        title={t('title', { count: total })}
-        lead={t('lead')}
-        photo={photo ? { photo, locale, temporaryLabel: common('temporaryPhoto') } : undefined}
-      />
+      <PageCover title={t('title')} lead={t('lead', { mentors: total, partners: partners.length })}>
+        <ul className="mt-8 flex flex-wrap gap-2">
+          {jump.map((item) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                className="inline-flex h-11 items-center rounded-full border border-white/25 px-4 text-[15px] font-semibold text-white/80 transition-colors duration-150 hover:text-white"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </PageCover>
 
-      <section aria-labelledby="mentors-title" className={SECTION}>
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
-          <SectionHeading
-            id="mentors-title"
-            title={t('mentors.title')}
-            body={t('mentors.note', { listed: mentors.length, total })}
-          />
-          <ul className="mt-12 grid gap-x-10 md:grid-cols-2 xl:grid-cols-3">
+      <section id="mentors" aria-labelledby="mentors-title" className={SECTION}>
+        <div className="shell">
+          <h2 id="mentors-title" className="font-display text-headline">
+            {t('mentors.title')}
+          </h2>
+          <p className="mt-4 text-lg break-keep text-white/80">
+            {t('mentors.note', { listed: mentors.length, total })}
+          </p>
+          <ul className="section-gap grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {mentors.map((mentor) => (
-              <li key={mentor.id} data-mentor className="border-t border-white/15 py-5">
-                <p className="font-display text-2xl font-[850]">{pick(mentor.name, locale)}</p>
-                <p className="mt-1 font-semibold break-keep text-white/90">
-                  {pick(mentor.org, locale)}
-                </p>
-                <p className="mt-1 text-sm break-keep text-white/70">{pick(mentor.role, locale)}</p>
-                <p className="mt-3 text-sm break-keep text-lime">
-                  {mentor.expertise.map((e) => pick(e, locale)).join(' · ')}
-                </p>
+              <li key={mentor.id}>
+                <MentorCard mentor={mentor} locale={locale} />
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section aria-labelledby="partners-title" className={SECTION}>
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
-          <SectionHeading id="partners-title" title={t('partners.title')} />
-          <dl className="mt-12 grid gap-10 md:grid-cols-2">
-            {KINDS.map((kind) => (
-              <div key={kind} className="border-t border-white/15 pt-4">
-                <dt className="text-sm font-medium text-white/60">{t(`partners.kind.${kind}`)}</dt>
-                <dd className="mt-3">
-                  <ul className="flex flex-wrap gap-2">
-                    {partners
-                      .filter((p) => p.kind === kind)
-                      .map((partner) => (
-                        <li
-                          key={partner.id}
-                          className="rounded-full border border-white/20 px-4 py-2"
-                        >
-                          <PartnerMark partner={partner} locale={locale} />
-                        </li>
-                      ))}
-                  </ul>
-                </dd>
+      <section id="partners" aria-labelledby="partners-title" className={SECTION}>
+        <div className="shell">
+          <h2 id="partners-title" className="font-display text-headline">
+            {t('partners.title')}
+          </h2>
+          <p className="mt-4 text-lg text-white/80">
+            {t('partners.count', { count: partners.length })}
+          </p>
+          {KINDS.map((kind) => {
+            const group = partners.filter((p) => p.kind === kind);
+            return group.length > 0 ? (
+              <div key={kind} className="section-gap">
+                <h3 className="font-display text-subhead">{t(`partners.kind.${kind}`)}</h3>
+                <ul className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+                  {group.map((partner) => (
+                    <li key={partner.id}>
+                      <PartnerTile partner={partner} locale={locale} />
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ))}
-          </dl>
+            ) : null;
+          })}
         </div>
       </section>
 
-      <section aria-labelledby="mou-title" className={SECTION}>
-        <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-2">
-          <SectionHeading id="mou-title" title={t('mou.title')} body={t('mou.date')} />
-          <FactList>
-            {MOU_ITEMS.map((key) => (
-              <Fact key={key} label="MOU">
-                {t(`mou.${key}`)}
-              </Fact>
-            ))}
-          </FactList>
+      <section id="mou" aria-labelledby="mou-title" className={SECTION}>
+        <div className="shell">
+          <h2 className="font-display text-headline">{t('mou.section')}</h2>
+          <article className="section-gap max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+            <h3 id="mou-title" className="font-display text-subhead break-keep">
+              {t('mou.title')}
+            </h3>
+            <p className="mt-1 text-sm text-white/64">{t('mou.date')}</p>
+            <ul className="mt-5 grid gap-2 text-base break-keep text-white/80">
+              {MOU_ITEMS.map((key) => (
+                <li key={key} className="border-l border-white/25 pl-3">
+                  {t(`mou.${key}`)}
+                </li>
+              ))}
+            </ul>
+            {mouPress ? (
+              <p className="mt-5 text-sm text-white/64">
+                {t('mou.press')} · {pick(mouPress.outlet, locale)} ·{' '}
+                {formatStampDate(mouPress.date, locale)}
+                {/* The article's own title, in the language it was written in. */}
+                <span lang="ko" className="mt-1 block text-white/80">
+                  {mouPress.title}
+                </span>
+              </p>
+            ) : null}
+          </article>
         </div>
       </section>
+
+      <CtaBand title={t('cta')} />
     </main>
+  );
+}
+
+// A mentor (wireframe v1.1, §5.7): photo or initial, name, where they work, one line, up to three
+// fields. Only mentors who agreed to be named are in the list.
+function MentorCard({ mentor, locale }: { mentor: Mentor; locale: Locale }) {
+  const name = pick(mentor.name, locale);
+  return (
+    <article data-mentor className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      {mentor.photo ? (
+        <Image
+          src={mentor.photo}
+          alt=""
+          width={64}
+          height={64}
+          className="size-16 rounded-full object-cover"
+        />
+      ) : (
+        <span
+          aria-hidden
+          className="flex size-16 items-center justify-center rounded-full bg-white/15 font-display text-xl font-semibold"
+        >
+          {Array.from(name)[0]}
+        </span>
+      )}
+      <h3 className="mt-4 font-display text-subhead break-keep">{name}</h3>
+      <p className="mt-1 font-semibold break-keep text-white/80">{pick(mentor.org, locale)}</p>
+      <p className="mt-1 text-sm break-keep text-white/64">{pick(mentor.role, locale)}</p>
+      <ul className="mt-4 flex flex-wrap gap-1.5">
+        {mentor.expertise.slice(0, 3).map((field) => (
+          <li
+            key={field.en}
+            className="rounded-full border border-white/20 px-2.5 py-0.5 text-[13px] text-white/80"
+          >
+            {pick(field, locale)}
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+// A partner: its logo when one is approved, otherwise its name, and the country for a university.
+function PartnerTile({ partner, locale }: { partner: Partner; locale: Locale }) {
+  const name = pick(partner.name, locale);
+  const body = (
+    <>
+      {partner.logo && partner.logoApproved ? (
+        <img src={partner.logo} alt={name} className="h-10 w-auto" />
+      ) : (
+        <span className="font-semibold break-keep">{name}</span>
+      )}
+      {partner.kind === 'university' && partner.country ? (
+        <span className="mt-1 text-sm text-white/64">{pick(partner.country, locale)}</span>
+      ) : null}
+    </>
+  );
+  const tile =
+    'flex h-full min-h-24 flex-col items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center';
+  return partner.url ? (
+    <a href={partner.url} target="_blank" rel="noreferrer" className={tile}>
+      {body}
+    </a>
+  ) : (
+    <div className={tile}>{body}</div>
   );
 }

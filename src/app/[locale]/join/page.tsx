@@ -1,19 +1,20 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { EMAIL } from '@/components/home/contact';
 import { PlusIcon } from '@/components/icons';
+import { PRIMARY } from '@/components/site/buttons';
+import { CopyButton } from '@/components/site/copy-button';
+import { FaqHash } from '@/components/site/faq-hash';
 import { PageCover } from '@/components/site/page-cover';
-import { SectionHeading } from '@/components/site/section-heading';
-import { AskButton } from '@/components/stage/ask-button';
-import { Fact, FactList } from '@/components/stage/facts';
-import { FIELD } from '@/components/stage/labels';
 import { asLocale } from '@/i18n/as-locale';
-import { applyCta, getBenefits, getFaqs, getPhoto, getRecruitment, pick } from '@/lib/content';
+import { getBenefits, getFaqs, getRecruitment, pick } from '@/lib/content';
 import { localizedAlternates } from '@/lib/metadata';
+import { cn } from '@/lib/utils';
 
 type Props = { params: Promise<{ locale: string }> };
 
-const ELIGIBILITY = ['campus', 'types', 'others'] as const;
-const SECTION = 'border-t border-white/10 bg-stage text-white';
+const SECTION = 'section-y border-t border-white/10 text-white';
+const KINDS = ['team', 'solo', 'individual'] as const;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = asLocale((await params).locale);
@@ -25,72 +26,143 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// What to do next, whether or not we are recruiting (wireframe v1.1, §14). Rows without a value are
+// left out until the organizers confirm them.
 export default async function JoinPage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
   const t = await getTranslations('Join');
-  const common = await getTranslations('Common');
-  const [recruitment, benefits, faqs, photo] = await Promise.all([
+  const [recruitment, benefits, faqs] = await Promise.all([
     getRecruitment(),
     getBenefits(),
     getFaqs(),
-    getPhoto('sushi-tech-tokyo-2026'),
   ]);
-  const cta = applyCta(recruitment);
+  const open = recruitment.status === 'open';
 
   return (
     <main id="main" className="bg-stage">
-      <PageCover
-        title={t('title')}
-        lead={t('lead')}
-        photo={photo ? { photo, locale, temporaryLabel: common('temporaryPhoto') } : undefined}
-      />
+      <PageCover eyebrow={t('eyebrow')} title={t('title')} lead={t('lead')} />
 
-      <section aria-label={t(`status.${recruitment.status}`)} className={SECTION}>
-        <div className="mx-auto grid max-w-7xl items-start gap-10 px-5 py-20 md:px-10 md:py-24 lg:grid-cols-[1fr_auto]">
-          <FactList>
-            <Fact label={pick(FIELD.status, locale)}>{t(`status.${recruitment.status}`)}</Fact>
-            {recruitment.status === 'open' ? (
-              <Fact label={pick(FIELD.period, locale)}>{pick(recruitment.period, locale)}</Fact>
-            ) : null}
-            {recruitment.nextNotice ? (
-              <Fact label={pick(FIELD.notice, locale)}>
-                <span className="text-base font-normal text-white/85">
-                  {pick(recruitment.nextNotice, locale)}
+      <section aria-labelledby="status-title" className="text-white">
+        <div className="shell">
+          <h2 id="status-title" className="sr-only">
+            {t('status.title')}
+          </h2>
+          <dl className="grid gap-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:grid-cols-[auto_1fr_auto] md:items-center md:gap-10 md:p-8">
+            <div>
+              <dt className="sr-only">{t('status.label')}</dt>
+              <dd>
+                <span
+                  className={cn(
+                    'inline-flex rounded-full px-3 py-1 text-[13px] font-semibold',
+                    open ? 'bg-lime text-cobalt' : 'bg-white/15 text-white',
+                  )}
+                >
+                  {open ? t('status.open') : t('status.closed')}
                 </span>
-              </Fact>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-white/64">{t('status.period')}</dt>
+              <dd className="mt-1 text-base break-keep">
+                {open
+                  ? pick(recruitment.period, locale)
+                  : recruitment.nextNotice
+                    ? pick(recruitment.nextNotice, locale)
+                    : t('status.next')}
+              </dd>
+            </div>
+            {open ? (
+              <div>
+                <dt className="sr-only">{t('status.apply')}</dt>
+                <dd>
+                  <a
+                    href={recruitment.applyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={PRIMARY}
+                  >
+                    {t('status.apply')}
+                  </a>
+                </dd>
+              </div>
             ) : null}
-          </FactList>
-          {cta.kind === 'apply' ? <AskButton cta={cta} /> : null}
+          </dl>
         </div>
       </section>
 
-      <section aria-labelledby="eligibility-title" className={SECTION}>
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-2">
-          <SectionHeading id="eligibility-title" title={t('eligibility.title')} />
-          <ul className="border-b border-white/15">
-            {ELIGIBILITY.map((key) => (
+      <section aria-labelledby="who-title" className={cn(SECTION, 'mt-[72px] md:mt-24')}>
+        <div className="shell">
+          <h2 id="who-title" className="font-display text-headline">
+            {t('who.title')}
+          </h2>
+          {/* A phone scrolls the table sideways; the keyboard can too. */}
+          <div
+            role="region"
+            aria-labelledby="who-title"
+            tabIndex={0}
+            className="section-gap overflow-x-auto"
+          >
+            <table className="w-full min-w-[520px] border-collapse text-left text-base">
+              <thead>
+                <tr className="border-b border-white/15 text-sm text-white/64">
+                  <th scope="col" className="py-3 pr-6 font-semibold">
+                    {t('who.columns.who')}
+                  </th>
+                  <th scope="col" className="py-3 pr-6 font-semibold">
+                    {t('who.columns.join')}
+                  </th>
+                  <th scope="col" className="py-3 font-semibold">
+                    {t('who.columns.benefits')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {(['skku', 'others'] as const).map((row) => (
+                  <tr key={row} className="border-b border-white/10">
+                    <th scope="row" className="py-4 pr-6 font-semibold break-keep">
+                      {t(`who.${row}.who`)}
+                    </th>
+                    <td className="py-4 pr-6">{t(`who.${row}.join`)}</td>
+                    <td className="py-4 break-keep text-white/80">{t(`who.${row}.benefits`)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <ul className="mt-6 flex flex-wrap gap-2" aria-label={t('who.kinds')}>
+            {KINDS.map((kind) => (
               <li
-                key={key}
-                className="border-t border-white/15 py-5 text-lg break-keep text-white/90"
+                key={kind}
+                className="rounded-full border border-white/20 px-3 py-1 text-[13px] font-semibold"
               >
-                {t(`eligibility.${key}`)}
+                {t(`who.kind.${kind}`)}
               </li>
             ))}
           </ul>
+          {/* TODO(운영진 확인): the selection steps and the activity details (period, meetings, required
+              sessions, completion, fee) go here once confirmed (wireframe v1.1, §14 J4–J5). */}
         </div>
       </section>
 
       <section aria-labelledby="benefits-title" className={SECTION}>
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-10 md:py-28">
-          <SectionHeading id="benefits-title" title={t('benefits.title')} />
-          <ul className="mt-12 grid gap-x-12 md:grid-cols-2">
+        <div className="shell">
+          <h2 id="benefits-title" className="font-display text-headline">
+            {t('benefits.title')}
+          </h2>
+          <ul className="section-gap grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {benefits.map((benefit) => (
-              <li key={benefit.id} data-benefit className="border-t border-white/15 py-6">
-                <h3 className="font-display text-xl font-[850] break-keep">
+              <li
+                key={benefit.id}
+                data-benefit
+                className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+              >
+                <h3 className="font-display text-subhead break-keep">
                   {pick(benefit.title, locale)}
                 </h3>
-                <p className="mt-2 break-keep text-white/75">{pick(benefit.body, locale)}</p>
+                <p className="mt-2 text-base break-keep text-white/80">
+                  {pick(benefit.body, locale)}
+                </p>
               </li>
             ))}
           </ul>
@@ -98,21 +170,33 @@ export default async function JoinPage({ params }: Props) {
       </section>
 
       <section aria-labelledby="faq-title" className={SECTION}>
-        <div className="mx-auto max-w-4xl px-5 py-20 md:px-10 md:py-28">
-          <SectionHeading id="faq-title" title={t('faq.title')} />
-          <ul className="mt-10 border-b border-white/15">
+        <div className="shell max-w-[calc(800px+48px)]">
+          <h2 id="faq-title" className="font-display text-headline">
+            {t('faq.title')}
+          </h2>
+          <ul className="section-gap border-b border-white/15">
             {faqs.map((faq) => (
               <li key={faq.id} className="border-t border-white/15">
-                <details className="group py-5">
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-lg font-semibold break-keep [&::-webkit-details-marker]:hidden">
+                {/* One open at a time: the browser closes the others in the same group. */}
+                <details id={`faq-${faq.id}`} name="faq" className="group scroll-mt-[88px] py-5">
+                  <summary className="flex min-h-11 cursor-pointer list-none items-start justify-between gap-6 text-lg font-semibold break-keep [&::-webkit-details-marker]:hidden">
                     {pick(faq.question, locale)}
                     <PlusIcon className="mt-1 text-lime transition-transform duration-200 ease-out group-open:rotate-45" />
                   </summary>
-                  <p className="mt-3 break-keep text-white/75">{pick(faq.answer, locale)}</p>
+                  <p className="mt-3 text-base break-keep text-white/80">
+                    {pick(faq.answer, locale)}
+                  </p>
                 </details>
               </li>
             ))}
           </ul>
+          <FaqHash />
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-base break-keep text-white/80">
+              {t('ask')} <span className="font-semibold text-white select-all">{EMAIL}</span>
+            </p>
+            <CopyButton text={EMAIL} label={t('copy')} done={t('copied')} />
+          </div>
         </div>
       </section>
     </main>

@@ -75,7 +75,7 @@ pnpm e2e:auth       # 로그인과 계정 화면 e2e (위 "검사" 참고)
 
 ## 계정 기능 스위치
 
-로그인, 가입, 마이페이지, 회원 관리, 팀 공간, 활동, 공지는 환경변수 `NEXT_PUBLIC_AUTH_ENABLED` 하나로 켜고 끕니다.
+로그인, 가입, 마이페이지, 회원 관리, 팀 공간, 활동은 환경변수 `NEXT_PUBLIC_AUTH_ENABLED` 하나로 켜고 끕니다.
 
 - **꺼져 있으면** 사이트는 계정 기능이 생기기 전과 같습니다. 메뉴에 로그인이 보이지 않고, 로그인·가입·마이페이지·회원 관리 주소는 404이고, 공개 페이지는 정적입니다. 개인정보 처리방침도 404이므로, 확인은 미리보기 주소의 `/ko/privacy`에서 받습니다.
 - **켜지는 조건**은 값이 정확히 `true`이고, `NEXT_PUBLIC_SUPABASE_URL`과 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`가 둘 다 있을 때입니다. 하나라도 빠지면 꺼진 것으로 동작합니다.
@@ -84,14 +84,14 @@ pnpm e2e:auth       # 로그인과 계정 화면 e2e (위 "검사" 참고)
 
 ### Production에서 켜기
 
-켜기 전에 처리방침 초안을 팀 공간 내용(`docs/superpowers/specs/2026-11-05-phase2-team-spaces-design.md` 8절)으로 고칩니다. 그다음 운영진과 ANCHOR 사업단 담당자가 개인정보 처리방침을 미리보기 주소의 `/ko/privacy`에서 확인해 **승인한 뒤에만** 켭니다. 스위치를 켜면 처리방침 페이지와 푸터 링크도 함께 열립니다. 처리방침 초안은 표준 양식에 맞춘 것이고 법률 검토가 아닙니다.
+켜기 전에 처리방침 초안을 팀 공간 내용(`docs/superpowers/specs/2026-11-05-phase2-team-spaces-design.md` 8절)으로 고칩니다. 그다음 운영진과 앵커사업단 담당자가 개인정보 처리방침을 미리보기 주소의 `/ko/privacy`에서 확인해 **승인한 뒤에만** 켭니다. 스위치를 켜면 처리방침 페이지와 푸터 링크도 함께 열립니다. 처리방침 초안은 표준 양식에 맞춘 것이고 법률 검토가 아닙니다.
 
 1. 승인한 날짜(`YYYY-MM-DD`)를 `src/lib/auth/profile.ts`의 `PRIVACY_POLICY_VERSION`에 넣고, `tests/lib/auth-profile.test.ts`가 가진 같은 값도 고쳐 PR로 merge한다. 이 값이 처리방침 맨 아래의 시행일이고 동의 기록에 남는 버전이다. 승인 전에 글이 바뀌는 동안은 값을 그대로 두고, 승인한 날에만 바꾼다. 켠 뒤 글을 고치면 새 날짜로 바꾼다.
 2. Vercel의 **Production** 환경변수에 `NEXT_PUBLIC_AUTH_ENABLED=true` **하나만** 더한다. `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`는 이 PR을 merge하기 **전에** 이미 운영용 Supabase 프로젝트의 값으로 Production에 넣어 두었어야 한다(아래 "7. Vercel 환경변수"). 스위치가 없으면 이 세 값이 있어도 계정 기능은 꺼진 채라서, merge해도 공개 사이트는 그대로다. 출시 때 새로 더하는 것은 스위치 하나뿐이다.
 3. 다시 배포한다.
 4. 실제 주소에서 구글 로그인, 인증번호 가입, 비밀번호 로그인이 끝까지 되는지 확인한다.
-5. 운영용 프로젝트에 운영진이 팀을 입력하고 공개를 켠다. 팀 공간, 활동, 공지의 테이블과 저장소는 마이그레이션으로 만들어진다. 스위치를 켜기 **전에** 운영 DB에 올린다(스위치를 켜면 `/about`도 이 테이블을 읽는다).
-6. `/ko/activities`와 `/ko/about` 연혁에 활동 16건이 나오는지 확인한다. 이때부터 연혁은 DB를 읽는다. 홈은 계속 `src/content/data/stamps.ts`를 읽으므로, 새 활동을 홈에도 넣으려면 그 파일을 고친다.
+5. 운영용 프로젝트에 운영진이 팀을 입력하고 공개를 켠다. 팀 공간과 활동의 테이블과 저장소는 마이그레이션으로 만들어진다. 스위치를 켜기 **전에** 운영 DB에 올린다.
+6. `/ko/activities`에 활동 16건이 나오는지 확인한다. 홈, 소개, 프로그램은 계속 `src/content/data/stamps.ts`를 읽으므로, 새 활동을 그쪽에도 넣으려면 그 파일을 고친다.
 7. 검색엔진에 사이트를 열 때 `/startups`, `/activities`를 sitemap에 더한다.
 
 ## 클라우드 Supabase 설정

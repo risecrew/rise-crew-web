@@ -37,8 +37,13 @@ function summary(page: Page) {
 
 // Phones keep the account entries inside the menu panel; on a desktop they sit in the bar.
 async function openMenu(page: Page) {
-  const summaryButton = page.locator('header summary');
+  const summaryButton = page.locator('header button[aria-controls="site-menu"]');
   if (await summaryButton.isVisible()) await summaryButton.click();
+}
+
+// The phone menu is a modal sheet: the page behind it waits until it is closed.
+async function closeMenu(page: Page) {
+  if ((await page.locator('#site-menu[open]').count()) > 0) await page.keyboard.press('Escape');
 }
 
 function initialCircle(page: Page) {
@@ -320,6 +325,7 @@ test('asks for what is missing, keeps what was typed, and finishes once it is al
     );
     await openMenu(page);
     await expect(initialCircle(page)).toHaveText('박');
+    await closeMenu(page);
 
     rows = await accountRows(email);
     expect(rows.profile).toMatchObject({
@@ -377,6 +383,7 @@ test('an alumnus signs up in English, with an affiliation and the recruitment ma
     await expect(page).toHaveURL(`${baseURL}/en/me`);
     await openMenu(page);
     await expect(initialCircle(page)).toHaveText('R');
+    await closeMenu(page);
 
     const rows = await accountRows(email);
     expect(rows.profile).toMatchObject({

@@ -30,6 +30,8 @@ export const stampSchema = z
   .object({
     id,
     date: isoDate.optional(),
+    // The last day, for something that ran over several days.
+    endDate: isoDate.optional(),
     city: localizedSchema,
     country: z.string().regex(/^[A-Z]{2}$/, 'ISO 3166-1 alpha-2'),
     title: localizedSchema,
@@ -37,7 +39,11 @@ export const stampSchema = z
     stage: stageSchema,
     status: z.enum(['done', 'planned']),
     evidence: z.array(evidenceSchema),
+    // Awards and outcomes. They stay out of the title, so the caption names only the event.
+    results: z.array(localizedSchema).optional(),
     photo: id.optional(),
+    // One of the few moments the about page lists as milestones.
+    milestone: z.boolean().optional(),
   })
   .superRefine((stamp, ctx) => {
     if (stamp.status === 'done' && stamp.evidence.length === 0) {
@@ -59,6 +65,8 @@ export const programSchema = z.object({
   id,
   stage: stageSchema,
   name: localizedSchema,
+  // How it runs, in a few words: "18 sessions · co-developed with Kakao Mobility".
+  meta: localizedSchema.optional(),
   summary: localizedSchema,
   details: z.array(localizedSchema),
 });
@@ -79,7 +87,8 @@ export const partnerSchema = z
   .object({
     id,
     name: localizedSchema,
-    kind: z.enum(['supporter', 'company', 'university', 'program']),
+    kind: z.enum(['supporter', 'university', 'company']),
+    country: localizedSchema.optional(),
     url: z.url().optional(),
     logo: z.string().startsWith('/').optional(),
     logoApproved: z.boolean(),
@@ -140,5 +149,8 @@ export const photoSchema = z.object({
   alt: localizedSchema,
   source: localizedSchema,
   temporary: z.boolean(),
+  // The activity the photo was taken at, when no activity names it as its own photo. The caption
+  // comes from that activity.
+  event: id.optional(),
 });
 export type Photo = z.infer<typeof photoSchema>;

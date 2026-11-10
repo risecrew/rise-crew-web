@@ -1565,11 +1565,10 @@ test.describe('the width of the page', () => {
       1.5,
     );
     expect(Math.abs((await left(page.getByRole('table'))) - edge)).toBeLessThan(1.5);
-    // And end where the header's content ends.
-    const nav = page.locator('header nav').first();
-    const navBox = (await nav.boundingBox())!;
+    // And end where the header's content ends (its last item, the account circle).
+    const end = (await page.locator('header [data-account-initial]').first().boundingBox())!;
     const tableBox = (await page.getByRole('table').boundingBox())!;
-    expect(Math.abs(tableBox.x + tableBox.width - (navBox.x + navBox.width))).toBeLessThan(1.5);
+    expect(Math.abs(tableBox.x + tableBox.width - (end.x + end.width))).toBeLessThan(1.5);
 
     // The narrowest wide layout: every column inside the screen.
     await page.setViewportSize({ width: 1024, height: 800 });

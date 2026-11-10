@@ -22,21 +22,19 @@ for (const locale of LOCALES) {
   }
 }
 
-// Inner pages open the way the home's chapters do: a photo from edge to edge with the title
-// on it, not a framed screen beside the title.
-for (const path of ['/about', '/network', '/join'] as const) {
-  test(`${path} opens on an edge-to-edge photo with the title on it`, async ({ page }) => {
-    await page.goto(`/ko${path}`);
-    const cover = page.locator('[data-page-cover]');
-    const photo = await cover.locator('img').first().boundingBox();
-    const viewport = page.viewportSize()!;
-    expect(photo?.x).toBeLessThanOrEqual(0);
-    expect(photo!.width).toBeGreaterThanOrEqual(viewport.width);
-    const title = await cover.locator('h1').boundingBox();
-    expect(title!.y).toBeGreaterThan(photo!.y);
-    expect(title!.y + title!.height).toBeLessThanOrEqual(photo!.y + photo!.height);
-  });
-}
+// Inner pages open on their name and title; a photo stretches edge to edge behind them only when
+// the page has one of its own.
+test('/about opens on an edge-to-edge photo with the title on it', async ({ page }) => {
+  await page.goto('/ko/about');
+  const cover = page.locator('[data-page-cover]');
+  const photo = await cover.locator('img').first().boundingBox();
+  const viewport = page.viewportSize()!;
+  expect(photo?.x).toBeLessThanOrEqual(0);
+  expect(photo!.width).toBeGreaterThanOrEqual(viewport.width);
+  const title = await cover.locator('h1').boundingBox();
+  expect(title!.y).toBeGreaterThan(photo!.y);
+  expect(title!.y + title!.height).toBeLessThanOrEqual(photo!.y + photo!.height);
+});
 
 test('an unknown page has a title saying so', async ({ page }) => {
   await page.goto('/ko/startups');
@@ -45,9 +43,9 @@ test('an unknown page has a title saying so', async ({ page }) => {
 
 test('following a link from far down a page lands at the top at once', async ({ page }) => {
   await page.goto('/ko');
-  const ask = page.locator('[data-ask]');
-  await ask.scrollIntoViewIfNeeded();
-  await ask.getByRole('link', { name: '모집 안내 보기' }).click();
+  const recruit = page.locator('section[aria-labelledby="recruit-title"]');
+  await recruit.scrollIntoViewIfNeeded();
+  await recruit.getByRole('link', { name: '지원 안내 보기' }).click();
   await page.waitForURL('**/ko/join');
   await page.waitForTimeout(120);
   expect(await page.evaluate(() => scrollY)).toBe(0);
@@ -56,7 +54,7 @@ test('following a link from far down a page lands at the top at once', async ({ 
 test('keyboard focus is visible on lime buttons', async ({ page }) => {
   await page.goto('/ko');
   await page.keyboard.press('Tab');
-  const cta = page.locator('[data-hero]').getByRole('link', { name: '모집 안내 보기' });
+  const cta = page.locator('[data-hero]').getByRole('link', { name: '지원 안내 보기' });
   await cta.focus();
   const outline = await cta.evaluate((el) => getComputedStyle(el).outlineColor);
   expect(outline).toBe('rgb(159, 201, 82)');

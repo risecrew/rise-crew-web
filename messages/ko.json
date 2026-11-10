@@ -2,7 +2,7 @@
   "Meta": {
     "home": {
       "title": "RISE CREW | 성균관대학교 창업 동아리",
-      "description": "성균관대학교 ANCHOR 사업단 공식 창업 동아리 RISE CREW. 캠퍼스에서 세계로, 실행하는 창업가를 키웁니다."
+      "description": "성균관대학교 앵커사업단 산하 글로벌 창업 동아리 RISE CREW. 캠퍼스에서 세계로, 실행하는 창업가를 키웁니다."
     },
     "about": {
       "title": "소개 | RISE CREW",
@@ -13,7 +13,7 @@
       "description": "RISE CREW와 함께하는 멘토와 협력 기관."
     },
     "join": {
-      "title": "지원하기 | RISE CREW",
+      "title": "지원 안내 | RISE CREW",
       "description": "RISE CREW 모집 안내, 지원 자격, 혜택, 자주 묻는 질문."
     },
     "notFound": {
@@ -22,29 +22,37 @@
     "privacy": {
       "title": "개인정보 처리방침 | RISE CREW",
       "description": "RISE CREW 웹사이트 계정의 수집 항목, 이용 목적, 보유 기간, 이용자의 권리와 개인정보 보호책임자."
+    },
+    "program": {
+      "title": "프로그램 | RISE CREW",
+      "description": "캠퍼스에서 세계까지, RISE CREW의 3단계 성장 프로그램."
     }
   },
   "Nav": {
     "primary": "주 메뉴",
     "footer": "사이트 메뉴",
-    "home": "홈",
     "about": "소개",
     "network": "네트워크",
-    "join": "지원하기",
+    "join": "지원 안내",
     "menu": "메뉴",
     "skip": "본문으로 건너뛰기",
-    "switchTo": "English",
     "startups": "창업팀",
     "activities": "활동",
-    "notices": "공지"
+    "apply": "지원하기",
+    "applyInfo": "지원 안내",
+    "openMenu": "메뉴 열기",
+    "closeMenu": "메뉴 닫기",
+    "switchLabel": "English로 보기",
+    "applyInfoLong": "지원 안내 보기",
+    "program": "프로그램"
   },
   "Footer": {
-    "tagline": "캠퍼스에서 세계로.",
-    "supportedBy": "성균관대학교 ANCHOR 사업단 공식 창업 동아리",
+    "supportedBy": "성균관대학교 앵커사업단 산하 글로벌 창업 동아리",
     "address": "서울 종로구 성균관로 25-2 호암관 50322호",
     "rights": "© {year} RISE CREW",
     "madeBy": "Made by RISE CREW 개발팀",
-    "privacy": "개인정보 처리방침"
+    "privacy": "개인정보 처리방침",
+    "contact": "제휴 문의"
   },
   "Common": {
     "upcoming": "예정",
@@ -67,59 +75,104 @@
     },
     "temporaryPhoto": "임시 사진"
   },
-  "Cta": {
-    "apply": "지원하기",
-    "notice": "모집 안내 보기",
-    "partner": "제휴 문의"
-  },
   "Home": {
-    "cover": {
-      "subline": "비전에 도달하고, 아이디어에 불을 붙이며, 영향력을 확장하고, 미래를 끌어올려라!"
+    "hero": {
+      "eyebrow": "성균관대학교 앵커사업단 산하 글로벌 창업 동아리",
+      "title": "캠퍼스에서 세계로,\n실행하는 창업가를 키웁니다",
+      "body": "교육과 멘토링, 사업화 지원, 해외 전시와 IR까지. {teams}개 창업팀이 함께 성장하고 있습니다.",
+      "partner": "제휴 문의"
     },
-    "traction": {
-      "title": "숫자로 보는 RISE CREW"
+    "numbers": {
+      "title": "숫자로 보는 RISE CREW",
+      "members": "멤버",
+      "teams": "창업팀",
+      "mentors": "멘토",
+      "partners": "협력 기관",
+      "unit": {
+        "people": "{value}<unit>명</unit>",
+        "teams": "{value}<unit>팀</unit>",
+        "places": "{value}<unit>곳</unit>"
+      },
+      "allPartners": "협력 기관 {count}곳 전체 보기"
     },
-    "rail": {
-      "label": "RISE CREW 3단계"
+    "stages": {
+      "title": "캠퍼스에서 세계까지, 3단계로 성장합니다",
+      "body": "교내에서 기본기를 다지고, 국내에서 사업화를 검증하고, 해외로 확장합니다.",
+      "more": "프로그램 자세히 보기",
+      "detail": "자세히",
+      "detailFor": "{stage} 단계 자세히",
+      "campus": {
+        "label": "캠퍼스",
+        "word": "Campus",
+        "goal": "창업의 기본기",
+        "item1": "VCC 실전 창업 교육 18회",
+        "item2": "전문 멘토단 1:1 멘토링",
+        "item3": "팀 빌딩·정기 세미나"
+      },
+      "domestic": {
+        "label": "국내",
+        "word": "Domestic",
+        "goal": "사업화 검증",
+        "item1": "창업팀 라운드테이블 워크숍",
+        "item2": "성창재 우수 창업팀 육성",
+        "item3": "법인 설립·정부지원사업 지원"
+      },
+      "global": {
+        "label": "해외",
+        "word": "Global",
+        "goal": "해외 진출",
+        "item1": "해외 전시·박람회 참가",
+        "item2": "해외 대학 공동 프로그램",
+        "item3": "글로벌 IR·투자 연계"
+      }
     },
-    "backing": {
-      "title": "학교와 기업이 함께 키웁니다",
-      "anchor": "성균관대학교 ANCHOR 사업단 공식 창업 동아리",
-      "mou": "카카오모빌리티 업무협약",
-      "mouDate": "2025.11.28 · ANCHOR 사업단 체결",
-      "seed": "성창재 선발 팀 사업화 자금",
-      "seedValue": "팀당 500만 원",
-      "reported": "보도"
+    "mentors": {
+      "title": "모든 단계에 멘토 {count}명이 함께합니다",
+      "faces": "멘토",
+      "all": "멘토 전체 보기",
+      "body": "카카오모빌리티, VC, 액셀러레이터, 교수진의 현직 전문가가 아이디어부터 투자와 해외 진출까지 함께합니다."
     },
-    "route": {
-      "title": "캠퍼스에서 세계까지, 세 단계",
-      "body": "교내에서 기초를 다지고, 국내에서 사업화를 검증하고, 해외로 확장합니다."
+    "recent": {
+      "title": "최근 활동",
+      "all": "활동 전체 보기",
+      "upcoming": "다가오는 일정"
     },
-    "campus": {
-      "body": "VCC 18회차와 교내 트랙으로 창업의 기본기를 다집니다."
+    "recruit": {
+      "badge": {
+        "open": "모집 중",
+        "closed": "모집 마감"
+      },
+      "title": {
+        "open": "지금 모집하고 있습니다",
+        "closed": "이번 모집은 마감되었습니다"
+      },
+      "body": "창업팀, 1인 창업자, 팀이 없는 개인 모두 지원할 수 있습니다.",
+      "who": "대상",
+      "whoValue": "성균관대학교 학생. 타교생과 졸업생도 가입할 수 있습니다.",
+      "period": "기간"
     },
-    "global": {
-      "title": "해외 무대에 직접 섭니다"
-    },
-    "contest": {
-      "title": "AI+X 글로벌 창업경진대회를 함께 열었습니다",
-      "body": "서울RISE센터, ANCHOR 사업단, 카카오모빌리티와 공동 주최. 아시아 대학 창업팀이 영어로 겨룬 무대입니다.",
-      "reported": "보도"
-    },
-    "network": {
-      "title": "멘토 {count}명이 함께합니다",
-      "body": "카카오모빌리티, VC, 액셀러레이터, 교수진의 현직 전문가가 아이디어부터 투자와 해외 진출까지 함께합니다.",
-      "partners": "함께하는 기관",
-      "cta": "네트워크 전체 보기"
-    },
-    "ask": {
-      "title": "다음 무대의 주인공을 찾습니다",
-      "body": "창업팀, 1인 창업자, 팀이 없는 개인 모두 지원할 수 있습니다."
+    "contact": {
+      "title": "함께할 기업과 기관을 찾습니다",
+      "company": {
+        "title": "기업·기관 협력",
+        "body": "공동 프로그램, 후원, 해외 연계"
+      },
+      "mentor": {
+        "title": "멘토 참여",
+        "body": "현직 전문가 멘토링, 강연"
+      },
+      "press": {
+        "title": "언론·취재",
+        "body": "보도 자료, 인터뷰 요청"
+      },
+      "copy": "주소 복사",
+      "copied": "복사했습니다",
+      "write": "메일 쓰기",
+      "subject": "[제휴 문의] "
     }
   },
   "About": {
-    "title": "아이디어를 실행으로, 캠퍼스를 세계로",
-    "lead": "RISE CREW는 성균관대학교 ANCHOR 사업단과 함께하는 공식 창업 동아리입니다. 교육, 실습, 글로벌 경험으로 실행력을 갖춘 창업 인재를 키웁니다.",
+    "lead": "성균관대학교 앵커사업단 산하 글로벌 창업 동아리입니다. 교육, 실습, 글로벌 경험으로 실행력을 갖춘 창업 인재를 키웁니다.",
     "rise": {
       "title": "이름에 담은 네 가지 약속",
       "r": "Reach · 비전에 도달한다",
@@ -129,71 +182,92 @@
       "born": "Born to Global: 사업자 등록과 동시에 해외 시장을 겨냥하는 창업을 목표로 합니다."
     },
     "supporter": {
-      "title": "성균관대학교 ANCHOR 사업단",
-      "body": "ANCHOR 사업단은 RISE CREW를 지원하는 기관입니다. 서울시와 교육부의 RISE(지역혁신중심 대학지원체계) 사업에 참여하는 성균관대학교 사업단으로, 2025년 6월부터 2030년 2월까지 운영됩니다.",
-      "kpiFunding": "창업팀 누적 펀딩 유치 24억 원",
-      "kpiGlobal": "Born to Global 사업자 등록 창업팀 10개",
-      "kpiLabel": "사업단 5개년 목표"
-    },
-    "steps": {
-      "title": "5단계 육성 플랜",
-      "body": "VCC 강연, 전문 멘토단 1:1 멘토링, 동아리방이 모든 단계를 받칩니다."
-    },
-    "programs": {
-      "title": "프로그램"
+      "title": "앵커사업단과 함께합니다",
+      "body": "성균관대학교 앵커사업단은 RISE CREW를 지원하는 기관입니다. 서울시와 교육부의 RISE(지역혁신중심 대학지원체계) 사업에 참여하는 성균관대학교 사업단으로, 2025년 6월부터 2030년 2월까지 운영됩니다.",
+      "period": "사업 기간",
+      "funding": "5개년 목표 누적 펀딩",
+      "fundingValue": "24억 원",
+      "global": "5개년 목표 Born to Global 사업자 등록",
+      "globalValue": "10팀",
+      "advisor": "지도교수",
+      "advisorValue": "{name} 교수"
     },
     "crew": {
-      "title": "운영진",
-      "advisor": "지도교수",
-      "pending": "운영진의 이름과 사진은 게시 동의를 받은 뒤 공개합니다."
+      "title": "운영진"
     },
-    "history": {
-      "title": "연혁"
+    "eyebrow": "소개",
+    "milestones": {
+      "title": "주요 이정표",
+      "all": "활동 전체 보기"
     }
   },
   "Network": {
-    "title": "멘토 {count}명과 협력 기관",
-    "lead": "현직 전문가와 기관이 RISE CREW 팀의 성장을 받칩니다.",
+    "title": "네트워크",
+    "lead": "멘토 {mentors}명과 협력 기관 {partners}곳이 RISE CREW 팀의 성장을 함께합니다.",
     "mentors": {
       "title": "멘토",
-      "note": "전체 멘토 {total}명 중 이름이 공개된 {listed}명을 소개합니다."
+      "note": "전체 {total}명 중 공개에 동의한 {listed}명을 소개합니다."
     },
     "partners": {
       "title": "협력 기관",
       "kind": {
         "supporter": "지원 기관",
         "company": "기업",
-        "university": "대학",
-        "program": "협력 프로그램"
-      }
+        "university": "대학"
+      },
+      "count": "{count}곳"
     },
     "mou": {
       "title": "카카오모빌리티 업무협약",
-      "date": "2025년 11월 28일 · 성균관대학교 ANCHOR 사업단 체결",
+      "date": "2025.11.28 · 앵커사업단 체결",
       "crew": "RISE CREW와 성창재 창업팀 멘토링·성장 지원",
       "vcc": "VCC 커리큘럼 공동 개발과 운영",
-      "contest": "글로벌 대학생 창업경진대회 공동 기획과 운영"
-    }
-  },
-  "Contact": {
-    "title": "제휴와 협업을 기다립니다",
-    "lead": "기업, 기관, 멘토, 언론 문의는 이메일로 보내주세요.",
-    "subject": "[문의] ",
-    "button": "이메일로 문의하기"
+      "contest": "글로벌 대학생 창업경진대회 공동 기획과 운영",
+      "section": "협약",
+      "press": "관련 보도"
+    },
+    "cta": "멘토나 협력 기관으로 함께하고 싶다면"
   },
   "Join": {
-    "title": "RISE CREW에 탑승하세요",
+    "eyebrow": "지원 안내",
+    "title": "RISE CREW에 지원하기",
     "lead": "창업팀, 1인 창업자, 팀이 없는 개인 모두 지원할 수 있습니다.",
     "status": {
+      "title": "모집 상태",
+      "label": "상태",
       "open": "모집 중",
-      "closed": "모집 기간이 아닙니다"
+      "closed": "모집 마감",
+      "period": "모집 기간",
+      "next": "다음 모집은 확정되면 안내합니다.",
+      "apply": "지원하기"
     },
-    "eligibility": {
-      "title": "지원 자격",
-      "campus": "성균관대학교 인문사회과학캠퍼스와 자연과학캠퍼스 학생",
-      "types": "창업팀, 1인 창업자, 팀이 없는 개인",
-      "others": "타교생과 졸업생도 가입할 수 있습니다. 개인 혜택은 수료자에게만 제공됩니다."
+    "who": {
+      "title": "지원 대상",
+      "columns": {
+        "who": "구분",
+        "join": "가입",
+        "benefits": "혜택"
+      },
+      "skku": {
+        "who": "성균관대학교 학생 (인문사회과학캠퍼스·자연과학캠퍼스)",
+        "join": "가능",
+        "benefits": "전체"
+      },
+      "others": {
+        "who": "타교생·졸업생",
+        "join": "가능",
+        "benefits": "개인 혜택은 수료자에게만 제공됩니다"
+      },
+      "kinds": "지원 형태",
+      "kind": {
+        "team": "창업팀",
+        "solo": "1인 창업자",
+        "individual": "팀이 없는 개인"
+      }
     },
+    "ask": "다른 궁금한 점은",
+    "copy": "주소 복사",
+    "copied": "복사했습니다",
     "benefits": {
       "title": "받을 수 있는 것"
     },
@@ -378,8 +452,7 @@
       "members": "회원 관리",
       "teams": "팀 관리",
       "signOut": "로그아웃",
-      "activities": "활동 관리",
-      "notices": "공지 관리"
+      "activities": "활동 관리"
     },
     "login": {
       "title": "로그인",
@@ -550,7 +623,7 @@
       },
       "deleted": "탈퇴가 완료됐어요. 함께해 주셔서 고마웠어요.",
       "changePassword": "비밀번호 변경",
-      "applying": "가입 신청이 접수됐어요. 운영진이 승인하면 공지와 가입자 전용 글을 볼 수 있어요."
+      "applying": "가입 신청이 접수됐어요. 운영진이 승인하면 가입자 전용 글을 볼 수 있어요."
     },
     "switch": {
       "label": "로그인 또는 회원가입",
@@ -744,7 +817,8 @@
       "fieldErrors": {
         "required": "꼭 입력해 주세요.",
         "tooLong": "글자 수가 너무 많아요.",
-        "invalidDate": "2026, 2026-11, 2026-11-06 중 하나의 형식으로, 실제 있는 날짜를 입력해 주세요."
+        "invalidDate": "2026, 2026-11, 2026-11-06 중 하나의 형식으로, 실제 있는 날짜를 입력해 주세요.",
+        "endBeforeStart": "끝난 날은 시작 날짜와 같거나 뒤여야 하고, 시작 날짜가 있어야 해요."
       },
       "upload": {
         "tooLarge": "사진이 너무 커요. 30MB 이하로 골라 주세요.",
@@ -774,39 +848,26 @@
       "summaryEn": "짧은 설명 (영어, 선택)",
       "planned": "아직 안 열린 행사",
       "plannedHint": "켜 두면 \"예정\"으로 보여요. 행사가 끝나면 꺼 주세요.",
-      "deleteQuestion": "이 활동을 지울까요? 되돌릴 수 없어요."
-    },
-    "notices": {
-      "title": "공지 관리",
-      "new": "공지 쓰기",
-      "edit": "공지 고치기",
-      "toPage": "공지 페이지 보기",
-      "empty": "아직 쓴 공지가 없어요.",
-      "titleKo": "제목",
-      "titleEn": "제목 (영어, 선택)",
-      "bodyKo": "본문",
+      "deleteQuestion": "이 활동을 지울까요? 되돌릴 수 없어요.",
+      "endDate": "끝난 날 (선택)",
+      "endDateHint": "며칠 동안 열렸으면 마지막 날을 적어 주세요. 시작 날짜보다 앞설 수 없어요.",
+      "bodyKo": "본문 (선택)",
       "bodyEn": "본문 (영어, 선택)",
-      "pinned": "맨 위에 고정",
-      "deleteQuestion": "이 공지를 지울까요? 되돌릴 수 없어요.",
-      "photos": "사진 (선택, {count}장까지)",
-      "files": "첨부 파일 (선택, {count}개까지)",
-      "filesHint": "PDF, 한글, 워드, 엑셀, 파워포인트 파일을 개당 10MB까지 올릴 수 있어요.",
-      "publicWarning": "올린 사진과 파일은 승인된 가입자만 볼 수 있어요. 그래도 합격자 명단이나 연락처처럼 개인정보가 든 파일은 올리지 마세요.",
-      "remove": "빼기",
-      "removeLabel": "{name} 빼기",
-      "removePhoto": "사진 {number} 빼기",
-      "photoAlt": "첨부 사진 {number}",
-      "tooManyPhotos": "사진은 {count}장까지 올릴 수 있어요.",
-      "tooManyFiles": "파일은 {count}개까지 올릴 수 있어요.",
-      "fileTooLarge": "{name}은(는) 10MB가 넘어요.",
-      "fileBadType": "{name}은(는) 올릴 수 없는 형식이에요."
+      "resultsKo": "성과 (선택)",
+      "resultsEn": "성과 (영어, 선택)",
+      "resultsHint": "한 줄에 하나씩 적어 주세요. 예: 최우수상 안전상점",
+      "gallery": "상세 페이지 사진 (선택, 최대 {count}장)",
+      "galleryHint": "대표 사진은 위에서 한 장 고르고, 상세 페이지에 더 보여 줄 사진은 여기에 올려요. 여러 장을 한 번에 고를 수 있어요.",
+      "galleryPhoto": "상세 사진 {number}",
+      "galleryRemove": "{number}번 빼기",
+      "galleryTooMany": "상세 사진은 {count}장까지 올릴 수 있어요."
     }
   },
   "Teams": {
-    "metaTitle": "창업팀",
+    "metaTitle": "창업팀 | RISE CREW",
     "metaDescription": "RISE CREW의 창업팀과 그들이 직접 올리는 소식.",
     "title": "창업팀",
-    "lead": "RISE CREW에서 실제로 무언가를 만들고 있는 팀들이에요. 팀이 직접 소개를 쓰고 소식을 올려요.",
+    "lead": "RISE CREW에서 활동 중인 창업팀입니다. 각 팀이 직접 소개를 쓰고 소식을 올립니다.",
     "filters": {
       "label": "거르기",
       "field": "분야",
@@ -816,8 +877,8 @@
     },
     "cohort": "{cohort}기",
     "total": "{count}개 팀",
-    "empty": "아직 소개할 팀이 없어요.",
-    "emptyFiltered": "조건에 맞는 팀이 없어요.",
+    "empty": "아직 소개할 팀이 없습니다.",
+    "emptyFiltered": "조건에 맞는 팀이 없습니다.",
     "fields": {
       "ai-software": "AI·소프트웨어",
       "edutech": "에듀테크",
@@ -916,7 +977,8 @@
       "removeCover": "지금 표지 사진 빼기"
     },
     "emptyPage": "이 쪽에는 팀이 없어요.",
-    "lockedApplying": "가입자 전용 글이 {count}개 있어요. 가입이 승인되면 볼 수 있어요."
+    "lockedApplying": "가입자 전용 글이 {count}개 있어요. 가입이 승인되면 볼 수 있어요.",
+    "metaTeamTitle": "{name} | RISE CREW 창업팀"
   },
   "Error": {
     "title": "잠시 문제가 생겼어요",
@@ -925,23 +987,46 @@
     "home": "홈으로"
   },
   "Board": {
-    "pinned": "고정",
-    "edited": "{date} 수정",
     "activities": {
-      "metaTitle": "활동",
+      "metaTitle": "활동 | RISE CREW",
       "title": "활동",
-      "lead": "RISE CREW가 캠퍼스와 세계에서 해 온 일들입니다.",
-      "empty": "아직 올라온 활동이 없어요."
+      "lead": "RISE CREW가 캠퍼스와 세계에서 해 온 일을 기록합니다.",
+      "empty": "아직 올라온 활동이 없습니다.",
+      "metaDetail": "{title} | RISE CREW 활동",
+      "toList": "← 활동 목록",
+      "results": "성과",
+      "around": "다른 활동",
+      "older": "이전 활동",
+      "newer": "다음 활동",
+      "open": "{title} 자세히 보기",
+      "gallery": "사진",
+      "galleryAlt": "{title} 사진 {number}",
+      "galleryOpen": "사진 크게 보기",
+      "galleryClose": "닫기",
+      "galleryPrevious": "이전",
+      "galleryNext": "다음",
+      "galleryViewer": "{title} 사진 보기"
+    }
+  },
+  "CtaBand": {
+    "title": "RISE CREW와 함께하세요",
+    "partner": "제휴 문의"
+  },
+  "Program": {
+    "eyebrow": "프로그램",
+    "title": "캠퍼스에서 세계까지, 3단계로 성장합니다",
+    "lead": "VCC 강연, 전문 멘토단 1:1 멘토링, 동아리방이 모든 단계를 받칩니다.",
+    "tabs": "단계",
+    "campus": {
+      "body": "아이디어를 사업 아이템으로 구체화하고 실행할 팀을 꾸린 뒤, 작동하는 프로토타입(MVP)을 만듭니다."
     },
-    "notices": {
-      "metaTitle": "공지사항",
-      "title": "공지사항",
-      "lead": "모집 안내와 행사 소식을 알려 드립니다.",
-      "empty": "아직 올라온 공지가 없어요.",
-      "toList": "공지 목록으로"
+    "domestic": {
+      "body": "실제 고객에게 시장 반응을 확인하고, 검증한 결과로 투자자를 설득해 자금을 확보합니다."
     },
-    "files": "첨부 파일",
-    "hasFiles": "첨부",
-    "photoAlt": "{title} 사진 {number}"
+    "global": {
+      "body": "국내에서 검증한 모델과 투자금으로 해외 시장에 진출합니다."
+    },
+    "lately": "이 단계의 최근 활동",
+    "cta": "프로그램에 참여하고 싶다면"
   }
 }

@@ -2,7 +2,7 @@
   "Meta": {
     "home": {
       "title": "RISE CREW | Sungkyunkwan University startup club",
-      "description": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We grow founders who execute, from campus to the world."
+      "description": "RISE CREW is a global startup club under the SKKU ANCHOR Division. We grow founders who execute, from campus to the world."
     },
     "about": {
       "title": "About | RISE CREW",
@@ -13,7 +13,7 @@
       "description": "Mentors and partners who work with RISE CREW."
     },
     "join": {
-      "title": "Join | RISE CREW",
+      "title": "How to apply | RISE CREW",
       "description": "RISE CREW recruitment, eligibility, benefits and FAQ."
     },
     "notFound": {
@@ -22,29 +22,37 @@
     "privacy": {
       "title": "Privacy policy | RISE CREW",
       "description": "What RISE CREW collects when you create an account on this website, why, how long we keep it, and your rights."
+    },
+    "program": {
+      "title": "Program | RISE CREW",
+      "description": "From campus to the world: the three stages of the RISE CREW program."
     }
   },
   "Nav": {
     "primary": "Main menu",
     "footer": "Site menu",
-    "home": "Home",
     "about": "About",
     "network": "Network",
-    "join": "Join",
+    "join": "How to apply",
     "menu": "Menu",
     "skip": "Skip to content",
-    "switchTo": "한국어",
     "startups": "Startups",
     "activities": "Activities",
-    "notices": "Notices"
+    "apply": "Apply",
+    "applyInfo": "How to apply",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "switchLabel": "한국어로 보기",
+    "applyInfoLong": "See how to apply",
+    "program": "Program"
   },
   "Footer": {
-    "tagline": "From campus to the world.",
-    "supportedBy": "Official startup club of the SKKU ANCHOR Division",
+    "supportedBy": "Global startup club under the SKKU ANCHOR Division",
     "address": "Room 50322, Hoam Hall, 25-2 Sungkyunkwan-ro, Jongno-gu, Seoul",
     "rights": "© {year} RISE CREW",
     "madeBy": "Made by the RISE CREW dev team",
-    "privacy": "Privacy policy"
+    "privacy": "Privacy policy",
+    "contact": "Partnerships"
   },
   "Common": {
     "upcoming": "Upcoming",
@@ -67,59 +75,104 @@
     },
     "temporaryPhoto": "Temporary photo"
   },
-  "Cta": {
-    "apply": "Apply",
-    "notice": "See recruitment",
-    "partner": "Partner with us"
-  },
   "Home": {
-    "cover": {
-      "subline": "The official startup club of the SKKU ANCHOR Division."
+    "hero": {
+      "eyebrow": "A global startup club under the SKKU ANCHOR Division",
+      "title": "From campus to the world,\nwe grow founders who execute",
+      "body": "Education and mentoring, commercialization support, overseas expos and IR. {teams} startup teams are growing with us.",
+      "partner": "Partner with us"
     },
-    "traction": {
-      "title": "RISE CREW in numbers"
-    },
-    "rail": {
-      "label": "RISE CREW's three stages"
-    },
-    "backing": {
-      "title": "Backed by the university and industry",
-      "anchor": "Official startup club of the SKKU ANCHOR Division",
-      "mou": "MOU with Kakao Mobility",
-      "mouDate": "Nov 28, 2025 · signed by the ANCHOR Division",
-      "seed": "Seongchangjae funding for selected teams",
-      "seedValue": "KRW 5M per team",
-      "reported": "In the press"
-    },
-    "route": {
-      "title": "From campus to the world, in three stages",
-      "body": "Build the basics on campus, prove the business at home, then expand abroad."
-    },
-    "campus": {
-      "body": "The 18-session VCC and campus tracks build the fundamentals."
-    },
-    "global": {
-      "title": "We take the stage abroad"
-    },
-    "contest": {
-      "title": "We co-hosted the AI+X Global Startup Competition",
-      "body": "Co-hosted with the Seoul RISE Center, the ANCHOR Division and Kakao Mobility, with university teams from across Asia pitching in English.",
-      "reported": "In the press"
-    },
-    "network": {
-      "title": "{count} mentors on board",
-      "body": "Experts from Kakao Mobility, venture capital, accelerators and faculty support teams from idea to fundraising and global expansion.",
+    "numbers": {
+      "title": "RISE CREW in numbers",
+      "members": "Members",
+      "teams": "Startup teams",
+      "mentors": "Mentors",
       "partners": "Partners",
-      "cta": "See the full network"
+      "unit": {
+        "people": "{value}",
+        "teams": "{value}",
+        "places": "{value}"
+      },
+      "allPartners": "See all {count} partners"
     },
-    "ask": {
-      "title": "Your turn on stage",
-      "body": "Startup teams, solo founders and individuals without a team can all apply."
+    "stages": {
+      "title": "From campus to the world, in three stages",
+      "body": "We build the basics on campus, test the business in Korea, and expand abroad.",
+      "more": "About the program",
+      "detail": "More",
+      "detailFor": "More about the {stage} stage",
+      "campus": {
+        "label": "Campus",
+        "word": "Campus",
+        "goal": "The basics of a startup",
+        "item1": "18 VCC startup sessions",
+        "item2": "1:1 mentoring",
+        "item3": "Team building and seminars"
+      },
+      "domestic": {
+        "label": "Domestic",
+        "word": "Domestic",
+        "goal": "Testing the business",
+        "item1": "Startup roundtable workshops",
+        "item2": "Seongchangjae incubation",
+        "item3": "Incorporation and government programs"
+      },
+      "global": {
+        "label": "Global",
+        "word": "Global",
+        "goal": "Going abroad",
+        "item1": "Overseas expos and fairs",
+        "item2": "Joint programs with universities abroad",
+        "item3": "Global IR and investment"
+      }
+    },
+    "mentors": {
+      "title": "{count} mentors stand behind every stage",
+      "faces": "Mentors",
+      "all": "See all mentors",
+      "body": "Working professionals from Kakao Mobility, VCs, accelerators and faculty, from idea to fundraising and going abroad."
+    },
+    "recent": {
+      "title": "Recent activities",
+      "all": "See all activities",
+      "upcoming": "Coming up"
+    },
+    "recruit": {
+      "badge": {
+        "open": "Recruiting",
+        "closed": "Closed"
+      },
+      "title": {
+        "open": "We are recruiting now",
+        "closed": "This round of recruitment has closed"
+      },
+      "body": "Startup teams, solo founders and individuals without a team can all apply.",
+      "who": "Who",
+      "whoValue": "SKKU students. Students from other universities and graduates can join too.",
+      "period": "When"
+    },
+    "contact": {
+      "title": "We are looking for companies and institutions to work with",
+      "company": {
+        "title": "Companies and institutions",
+        "body": "Joint programs, sponsorship, links abroad"
+      },
+      "mentor": {
+        "title": "Mentoring",
+        "body": "Mentoring and talks by working professionals"
+      },
+      "press": {
+        "title": "Press",
+        "body": "Press releases and interview requests"
+      },
+      "copy": "Copy address",
+      "copied": "Copied",
+      "write": "Write an email",
+      "subject": "[Partnership] "
     }
   },
   "About": {
-    "title": "Ideas into action, campus into the world",
-    "lead": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We grow founders who can execute through education, practice and global experience.",
+    "lead": "A global startup club under the SKKU ANCHOR Division. We grow founders who can execute through education, practice and global experience.",
     "rise": {
       "title": "Four promises in our name",
       "r": "Reach your vision",
@@ -129,71 +182,92 @@
       "born": "Born to Global: we aim for ventures that target overseas markets from the day they register."
     },
     "supporter": {
-      "title": "SKKU ANCHOR Division",
+      "title": "Backed by the SKKU ANCHOR Division",
       "body": "The ANCHOR Division supports RISE CREW. It is Sungkyunkwan University's division in the Seoul RISE (Regional Innovation System & Education) program, running from June 2025 to February 2030.",
-      "kpiFunding": "KRW 2.4 billion in cumulative startup funding",
-      "kpiGlobal": "10 registered Born to Global startups",
-      "kpiLabel": "Division five-year goals"
-    },
-    "steps": {
-      "title": "Five-step growth plan",
-      "body": "VCC lectures, 1:1 expert mentoring and a club room support every step."
-    },
-    "programs": {
-      "title": "Programs"
+      "period": "Program period",
+      "funding": "Five-year goal: total funding raised",
+      "fundingValue": "KRW 2.4 billion",
+      "global": "Five-year goal: Born to Global companies",
+      "globalValue": "10 teams",
+      "advisor": "Faculty advisor",
+      "advisorValue": "Prof. {name}"
     },
     "crew": {
-      "title": "Crew",
-      "advisor": "Faculty advisor",
-      "pending": "Crew names and photos will be published once each member consents."
+      "title": "Crew"
     },
-    "history": {
-      "title": "History"
+    "eyebrow": "About",
+    "milestones": {
+      "title": "Milestones",
+      "all": "See all activities"
     }
   },
   "Network": {
-    "title": "{count} mentors and our partners",
-    "lead": "Working experts and institutions back every RISE CREW team.",
+    "title": "Network",
+    "lead": "{mentors} mentors and {partners} partners support the growth of RISE CREW teams.",
     "mentors": {
       "title": "Mentors",
-      "note": "{listed} of our {total} mentors are listed by name."
+      "note": "{listed} of our {total} mentors agreed to be named here."
     },
     "partners": {
       "title": "Partners",
       "kind": {
-        "supporter": "Supporter",
-        "company": "Company",
-        "university": "University",
-        "program": "Partner program"
-      }
+        "supporter": "Supporters",
+        "university": "Universities",
+        "company": "Companies"
+      },
+      "count": "{count} partners"
     },
     "mou": {
       "title": "Partnership with Kakao Mobility",
-      "date": "November 28, 2025 · signed by the SKKU ANCHOR Division",
+      "date": "Nov 28, 2025 · signed by the SKKU ANCHOR Division",
       "crew": "Mentoring and growth support for RISE CREW and Seongchangjae teams",
       "vcc": "Co-developing and running the VCC curriculum",
-      "contest": "Co-planning and running a global university startup competition"
-    }
-  },
-  "Contact": {
-    "title": "Let's work together",
-    "lead": "Companies, institutions, mentors and press: please reach us by email.",
-    "subject": "[Inquiry] ",
-    "button": "Email us"
+      "contest": "Co-planning and running a global university startup competition",
+      "section": "Agreements",
+      "press": "In the press"
+    },
+    "cta": "Want to join as a mentor or partner?"
   },
   "Join": {
-    "title": "Board RISE CREW",
+    "eyebrow": "How to apply",
+    "title": "Apply to RISE CREW",
     "lead": "Startup teams, solo founders and individuals without a team can all apply.",
     "status": {
-      "open": "Recruiting now",
-      "closed": "Not recruiting right now"
+      "title": "Recruitment",
+      "label": "Status",
+      "open": "Recruiting",
+      "closed": "Closed",
+      "period": "Recruitment period",
+      "next": "We will announce the next intake once it is set.",
+      "apply": "Apply"
     },
-    "eligibility": {
+    "who": {
       "title": "Who can apply",
-      "campus": "Students at SKKU's Humanities and Social Sciences Campus and Natural Sciences Campus",
-      "types": "Startup teams, solo founders and individuals without a team",
-      "others": "Students from other universities and graduates can join. Individual benefits are limited to members who complete the program."
+      "columns": {
+        "who": "Who",
+        "join": "Can join",
+        "benefits": "Benefits"
+      },
+      "skku": {
+        "who": "SKKU students (Humanities and Social Sciences Campus, Natural Sciences Campus)",
+        "join": "Yes",
+        "benefits": "All"
+      },
+      "others": {
+        "who": "Students from other universities, graduates",
+        "join": "Yes",
+        "benefits": "Personal benefits go to those who complete the program"
+      },
+      "kinds": "Ways to apply",
+      "kind": {
+        "team": "Startup team",
+        "solo": "Solo founder",
+        "individual": "Individual without a team"
+      }
     },
+    "ask": "Any other questions?",
+    "copy": "Copy address",
+    "copied": "Copied",
     "benefits": {
       "title": "What you get"
     },
@@ -378,8 +452,7 @@
       "members": "Members",
       "teams": "Teams",
       "signOut": "Sign out",
-      "activities": "Manage activities",
-      "notices": "Manage notices"
+      "activities": "Manage activities"
     },
     "login": {
       "title": "Sign in",
@@ -550,7 +623,7 @@
       },
       "deleted": "Your account has been deleted. Thanks for being part of RISE CREW.",
       "changePassword": "Change password",
-      "applying": "We've received your application. Once an operator approves it, you can read notices and posts for members."
+      "applying": "We've received your application. Once an operator approves it, you can read posts for members."
     },
     "switch": {
       "label": "Sign in or sign up",
@@ -744,7 +817,8 @@
       "fieldErrors": {
         "required": "This is required.",
         "tooLong": "This is too long.",
-        "invalidDate": "Use 2026, 2026-11 or 2026-11-06, with a date that exists."
+        "invalidDate": "Use 2026, 2026-11 or 2026-11-06, with a date that exists.",
+        "endBeforeStart": "The end date needs a start date and cannot come before it."
       },
       "upload": {
         "tooLarge": "That photo is too large. Pick one of 30MB or less.",
@@ -774,36 +848,23 @@
       "summaryEn": "Short description (English, optional)",
       "planned": "Has not happened yet",
       "plannedHint": "Shows as \"Upcoming\". Turn it off once the event is over.",
-      "deleteQuestion": "Delete this activity? This cannot be undone."
-    },
-    "notices": {
-      "title": "Manage notices",
-      "new": "Write a notice",
-      "edit": "Edit notice",
-      "toPage": "View the notices page",
-      "empty": "No notices yet.",
-      "titleKo": "Title (Korean)",
-      "titleEn": "Title (English, optional)",
-      "bodyKo": "Body (Korean)",
-      "bodyEn": "Body (English, optional)",
-      "pinned": "Pin to the top",
-      "deleteQuestion": "Delete this notice? This cannot be undone.",
-      "photos": "Photos (optional, up to {count})",
-      "files": "Files (optional, up to {count})",
-      "filesHint": "PDF, Hangul, Word, Excel and PowerPoint files, up to 10MB each.",
-      "publicWarning": "Only approved accounts can see the photos and files you attach. Even so, never attach anything with personal details, such as a list of applicants or contacts.",
-      "remove": "Remove",
-      "removeLabel": "Remove {name}",
-      "removePhoto": "Remove photo {number}",
-      "photoAlt": "Attached photo {number}",
-      "tooManyPhotos": "You can attach up to {count} photos.",
-      "tooManyFiles": "You can attach up to {count} files.",
-      "fileTooLarge": "{name} is over 10MB.",
-      "fileBadType": "{name} isn't a type that can be attached."
+      "deleteQuestion": "Delete this activity? This cannot be undone.",
+      "endDate": "End date (optional)",
+      "endDateHint": "For something that ran over several days, the last day. It cannot come before the start.",
+      "bodyKo": "Text (Korean, optional)",
+      "bodyEn": "Text (English, optional)",
+      "resultsKo": "Results (Korean, optional)",
+      "resultsEn": "Results (English, optional)",
+      "resultsHint": "One per line, for example: Top prize, Safety Shop",
+      "gallery": "More photos for the page (optional, up to {count})",
+      "galleryHint": "Pick the cover photo above; put the other photos for the activity page here. You can pick several at once.",
+      "galleryPhoto": "Photo {number}",
+      "galleryRemove": "Remove {number}",
+      "galleryTooMany": "An activity can have up to {count} more photos."
     }
   },
   "Teams": {
-    "metaTitle": "Startups",
+    "metaTitle": "Startups | RISE CREW",
     "metaDescription": "The startup teams of RISE CREW, and the updates they post themselves.",
     "title": "Startups",
     "lead": "The teams building something real at RISE CREW. They write their own pages and post their own updates.",
@@ -916,7 +977,8 @@
       "removeCover": "Remove the current cover photo"
     },
     "emptyPage": "No teams on this page.",
-    "lockedApplying": "{count, plural, one {# post is} other {# posts are}} for members. You can read them once your application is approved."
+    "lockedApplying": "{count, plural, one {# post is} other {# posts are}} for members. You can read them once your application is approved.",
+    "metaTeamTitle": "{name} | RISE CREW Startups"
   },
   "Error": {
     "title": "Something went wrong",
@@ -925,23 +987,46 @@
     "home": "Go home"
   },
   "Board": {
-    "pinned": "Pinned",
-    "edited": "Edited {date}",
     "activities": {
-      "metaTitle": "Activities",
+      "metaTitle": "Activities | RISE CREW",
       "title": "Activities",
       "lead": "What RISE CREW has been doing, on campus and around the world.",
-      "empty": "No activities yet."
+      "empty": "No activities yet.",
+      "metaDetail": "{title} | RISE CREW activities",
+      "toList": "← All activities",
+      "results": "Results",
+      "around": "Other activities",
+      "older": "Earlier",
+      "newer": "Later",
+      "open": "More about {title}",
+      "gallery": "Photos",
+      "galleryAlt": "{title}, photo {number}",
+      "galleryOpen": "View photo",
+      "galleryClose": "Close",
+      "galleryPrevious": "Previous",
+      "galleryNext": "Next",
+      "galleryViewer": "Photos of {title}"
+    }
+  },
+  "CtaBand": {
+    "title": "Join RISE CREW",
+    "partner": "Partner with us"
+  },
+  "Program": {
+    "eyebrow": "Program",
+    "title": "From campus to the world, in three stages",
+    "lead": "VCC talks, 1:1 mentoring and the club room support every stage.",
+    "tabs": "Stages",
+    "campus": {
+      "body": "Turn an idea into a business, form the team to run it, and build a working prototype (MVP)."
     },
-    "notices": {
-      "metaTitle": "Notices",
-      "title": "Notices",
-      "lead": "Recruitment and event announcements.",
-      "empty": "No notices yet.",
-      "toList": "Back to notices"
+    "domestic": {
+      "body": "Test the market with real customers, then use the results to win investors and funding."
     },
-    "files": "Files",
-    "hasFiles": "Files",
-    "photoAlt": "{title}, photo {number}"
+    "global": {
+      "body": "Take the model and the funding proven in Korea to markets abroad."
+    },
+    "lately": "Lately in this stage",
+    "cta": "Want to take part?"
   }
 }

@@ -107,7 +107,7 @@ test('a team row shows its cover when it has one, and none otherwise', async ({ 
 
 test('a filter nothing matches says so', async ({ page }) => {
   await page.goto('/ko/startups?cohort=9999&field=healthcare');
-  await expect(page.getByText('조건에 맞는 팀이 없어요.')).toBeVisible();
+  await expect(page.getByText('조건에 맞는 팀이 없습니다.')).toBeVisible();
   await page.getByRole('link', { name: '거르기 지우기' }).click();
   await expect(page).toHaveURL(/\/ko\/startups$/);
 });
@@ -242,7 +242,7 @@ test('the account menu leads a member straight to their team; others get no such
 }) => {
   const open = async (page: Page) => {
     await page
-      .locator('header summary')
+      .locator('header button[aria-controls="site-menu"]')
       .or(page.getByRole('button', { name: /계정 메뉴/ }))
       .locator('visible=true')
       .first()

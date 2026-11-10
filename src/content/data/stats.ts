@@ -1,23 +1,27 @@
 import type { Stat } from '@/content/schema';
 
+// One date for every number on the home (wireframe v1.1, C6).
+// TODO(운영진 확인): the date and the member count.
+const AS_OF = { ko: '2026.11 기준', en: 'As of Nov 2026' };
+
 export const stats: Stat[] = [
   {
     id: 'members',
     value: '90+',
     label: { ko: '멤버', en: 'Members' },
-    basis: { ko: '2026.01 기준', en: 'As of Jan 2026' },
+    basis: AS_OF,
   },
   {
     id: 'teams',
-    value: '22+',
+    value: '25',
     label: { ko: '창업팀', en: 'Startup teams' },
-    basis: { ko: '2026.01 기준', en: 'As of Jan 2026' },
+    basis: AS_OF,
   },
   {
     id: 'mentors',
     value: '33',
     label: { ko: '멘토', en: 'Mentors' },
-    basis: { ko: '2026.03 2기 OT 기준', en: 'As of the Mar 2026 orientation' },
+    basis: AS_OF,
   },
   {
     id: 'vcc-sessions',

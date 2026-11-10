@@ -37,8 +37,9 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   if (!team) return {};
   const description = team.tagline || team.intro.slice(0, 120) || undefined;
   const image = teamShareImage(team);
+  const t = await getTranslations({ locale, namespace: 'Teams' });
   return {
-    title: team.name,
+    title: t('metaTeamTitle', { name: team.name }),
     description,
     alternates: localizedAlternates(locale, `/startups/${team.slug}`),
     openGraph: {

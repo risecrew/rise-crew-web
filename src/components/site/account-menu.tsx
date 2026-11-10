@@ -22,7 +22,6 @@ export type AccountLabels = {
   members: string;
   teams: string;
   activities: string;
-  notices: string;
   signOut: string;
 };
 
@@ -33,7 +32,7 @@ type Tone = 'stage' | 'paper';
 // rows inside the phone menu). Which one shows is read in the browser, so the pages around it stay
 // static; see account-store.ts. A blocked account looks signed out.
 //
-// `bar` is the desktop header, `panel` the paper panel of the phone menu.
+// `bar` is the desktop header, `panel` the rows at the foot of the phone menu.
 export function AccountMenu({
   labels,
   variant = 'bar',
@@ -60,17 +59,17 @@ export function AccountMenu({
       locale={locale}
     />
   ) : (
-    <div className="mt-2 border-t border-paper-edge pt-2">
+    <div className="border-t border-white/10 pt-2">
       <div className="flex items-center gap-3 px-3 py-3">
-        <Circle letter={initial} tone="paper" />
-        <Who name={name} email={account.email} tone="paper" />
+        <Circle letter={initial} tone="stage" />
+        <Who name={name} email={account.email} tone="stage" />
       </div>
       <AccountLinks
         labels={labels}
         staff={staff}
         teams={account.teams}
         locale={locale}
-        tone="paper"
+        tone="stage"
       />
     </div>
   );
@@ -89,18 +88,14 @@ function SignInLink({ label, variant }: { label: string; variant: 'bar' | 'panel
       prefetch={false}
       className={
         variant === 'bar'
-          ? 'underline-offset-4 hover:underline'
-          : 'block rounded px-3 py-3 hover:bg-paper-edge'
+          ? 'inline-flex min-h-11 items-center text-[15px] font-medium text-white/80 underline-offset-4 hover:text-white hover:underline'
+          : 'flex min-h-11 items-center text-base text-white/80 underline-offset-4 hover:underline'
       }
     >
       {label}
     </Link>
   );
-  return variant === 'bar' ? (
-    link
-  ) : (
-    <div className="mt-2 border-t border-paper-edge pt-2">{link}</div>
-  );
+  return variant === 'bar' ? link : <div>{link}</div>;
 }
 
 // The first letter of the name in a circle. The letter is decoration for the eye; the button or
@@ -111,7 +106,7 @@ function Circle({ letter, tone }: { letter: string; tone: Tone }) {
       data-account-initial
       aria-hidden
       className={cn(
-        'inline-flex size-9 shrink-0 items-center justify-center rounded-full font-display text-base font-[800]',
+        'inline-flex size-9 shrink-0 items-center justify-center rounded-full font-display text-base font-bold',
         tone === 'stage' ? 'border border-white/50 text-white' : 'bg-cobalt text-white',
       )}
     >
@@ -183,11 +178,6 @@ function AccountLinks({
           <li>
             <Link href="/admin/activities" prefetch={false} className={row}>
               {labels.activities}
-            </Link>
-          </li>
-          <li>
-            <Link href="/admin/notices" prefetch={false} className={row}>
-              {labels.notices}
             </Link>
           </li>
         </>
@@ -285,5 +275,19 @@ function Dropdown({
         </div>
       ) : null}
     </div>
+  );
+}
+
+// The footer's account line: sign in, or My page once signed in (wireframe v1.1, §7).
+export function FooterAccountLink({ signIn, myPage }: { signIn: string; myPage: string }) {
+  const account = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return (
+    <Link
+      href={account.status === 'in' ? '/me' : '/login'}
+      prefetch={false}
+      className="underline-offset-4 hover:underline"
+    >
+      {account.status === 'in' ? myPage : signIn}
+    </Link>
   );
 }

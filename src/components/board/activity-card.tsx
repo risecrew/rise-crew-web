@@ -5,11 +5,12 @@ import type { Locale } from '@/i18n/locales';
 import { stampState } from '@/lib/content';
 import type { Activity } from '@/lib/board/queries';
 import { activityPhotoSrc, activityTimeline, localized, showsFallback } from '@/lib/board/text';
-import { formatStampDate } from '@/lib/format';
+import { Link } from '@/i18n/navigation';
+import { formatDateRange } from '@/lib/format';
 
 type Props = { activity: Activity; locale: Locale; today: Date };
 
-// One thing the club did: everything there is to say about it, so it has no page of its own.
+// One thing the club did, as the list shows it. The whole card leads to its own page.
 export async function ActivityCard({ activity, locale, today }: Props) {
   const t = await getTranslations('Common');
   const state = stampState(activityTimeline([activity])[0], today);
@@ -19,7 +20,7 @@ export async function ActivityCard({ activity, locale, today }: Props) {
   const alt = localized(activity.photo_alt_ko, activity.photo_alt_en, locale) || title;
 
   return (
-    <article data-activity data-state={state} className="flex flex-col">
+    <article data-activity data-state={state} className="relative flex flex-col">
       {activity.photo ? (
         <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-white/5">
           <Image
@@ -47,7 +48,9 @@ export async function ActivityCard({ activity, locale, today }: Props) {
       )}
       <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65">
         <time dateTime={activity.date ?? undefined} className="font-mono">
-          {activity.date ? formatStampDate(activity.date, locale) : t('dateTbc')}
+          {activity.date
+            ? formatDateRange(activity.date, activity.end_date ?? undefined, locale)
+            : t('dateTbc')}
         </time>
         <span lang={lang(activity.city_en)} className="font-semibold text-white/85">
           {localized(activity.city_ko, activity.city_en, locale)}
@@ -62,7 +65,14 @@ export async function ActivityCard({ activity, locale, today }: Props) {
         lang={lang(activity.title_en)}
         className="mt-2 text-xl leading-snug font-bold text-balance break-keep text-white"
       >
-        {title}
+        {/* The title is the link; it stretches over the whole card, so the photo and the text lead
+            there too. */}
+        <Link
+          href={`/activities/${activity.id}`}
+          className="underline-offset-4 after:absolute after:inset-0 hover:underline"
+        >
+          {title}
+        </Link>
       </h2>
       {summary ? (
         <p

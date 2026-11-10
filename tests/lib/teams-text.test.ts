@@ -50,6 +50,6 @@ describe('linkify', () => {
 describe('postDate', () => {
   it('shows the date in Korea, whichever server renders it', () => {
     expect(postDate('2026-11-05T15:30:00Z', 'ko')).toBe('2026.11.06');
-    expect(postDate('2026-11-05T15:30:00Z', 'en')).toBe('6 NOV 2026');
+    expect(postDate('2026-11-05T15:30:00Z', 'en')).toBe('Nov 6, 2026');
   });
 });
