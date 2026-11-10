@@ -150,6 +150,7 @@ export const stamps: Stamp[] = [
     milestone: true,
     date: '2025-12-12',
     city: { ko: '하노이, 베트남', en: 'Hanoi, Vietnam' },
+    endDate: '2025-12-14',
     country: 'VN',
     title: { ko: 'SKKU × FTU TECHFEST 전시', en: 'SKKU × FTU TECHFEST exhibition' },
     label: { ko: 'TECHFEST', en: 'TECHFEST' },

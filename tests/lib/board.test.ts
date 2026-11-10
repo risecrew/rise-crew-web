@@ -4,12 +4,17 @@ import { activityTimeline, isUploadedPhoto, localized, showsFallback } from '@/l
 
 const activity = {
   date: '2026-11-06',
+  end_date: '',
   title_ko: '행사',
   title_en: '',
   city_ko: '서울',
   city_en: '',
   summary_ko: '',
   summary_en: '',
+  body_ko: '',
+  body_en: '',
+  results_ko: '',
+  results_en: '',
   is_planned: false,
 };
 
@@ -53,6 +58,29 @@ describe('activitySchema', () => {
   it('needs a city in Korean but not in English', () => {
     expect(activitySchema.safeParse({ ...activity, city_ko: '' }).success).toBe(false);
     expect(activitySchema.safeParse({ ...activity, city_en: '' }).success).toBe(true);
+  });
+  it('takes an end date on or after the start, and only with a start', () => {
+    const ok = (fields: Partial<typeof activity>) =>
+      activitySchema.safeParse({ ...activity, ...fields }).success;
+    expect(ok({ end_date: '2026-11-08' })).toBe(true);
+    expect(ok({ end_date: '2026-11-06' })).toBe(true);
+    expect(ok({ end_date: '2026-11-05' })).toBe(false);
+    expect(ok({ date: '', end_date: '2026-11-08' })).toBe(false);
+    const refused = activitySchema.safeParse({ ...activity, end_date: '2026-11-05' });
+    expect(refused.success ? null : refused.error.issues[0]).toMatchObject({
+      path: ['end_date'],
+      message: 'endBeforeStart',
+    });
+  });
+  it('keeps the body and the results within what the database takes', () => {
+    expect(
+      activitySchema.safeParse({ ...activity, body_ko: '가'.repeat(BOARD_LIMITS.body + 1) })
+        .success,
+    ).toBe(false);
+    expect(
+      activitySchema.safeParse({ ...activity, results_ko: '가'.repeat(BOARD_LIMITS.results + 1) })
+        .success,
+    ).toBe(false);
   });
   it('counts a summary the way the database does', () => {
     const summary = `${'가'.repeat(BOARD_LIMITS.summary - 1)}\r\n`;

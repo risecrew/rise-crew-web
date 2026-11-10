@@ -817,7 +817,8 @@
       "fieldErrors": {
         "required": "꼭 입력해 주세요.",
         "tooLong": "글자 수가 너무 많아요.",
-        "invalidDate": "2026, 2026-11, 2026-11-06 중 하나의 형식으로, 실제 있는 날짜를 입력해 주세요."
+        "invalidDate": "2026, 2026-11, 2026-11-06 중 하나의 형식으로, 실제 있는 날짜를 입력해 주세요.",
+        "endBeforeStart": "끝난 날은 시작 날짜와 같거나 뒤여야 하고, 시작 날짜가 있어야 해요."
       },
       "upload": {
         "tooLarge": "사진이 너무 커요. 30MB 이하로 골라 주세요.",
@@ -847,7 +848,14 @@
       "summaryEn": "짧은 설명 (영어, 선택)",
       "planned": "아직 안 열린 행사",
       "plannedHint": "켜 두면 \"예정\"으로 보여요. 행사가 끝나면 꺼 주세요.",
-      "deleteQuestion": "이 활동을 지울까요? 되돌릴 수 없어요."
+      "deleteQuestion": "이 활동을 지울까요? 되돌릴 수 없어요.",
+      "endDate": "끝난 날 (선택)",
+      "endDateHint": "며칠 동안 열렸으면 마지막 날을 적어 주세요. 시작 날짜보다 앞설 수 없어요.",
+      "bodyKo": "본문 (선택)",
+      "bodyEn": "본문 (영어, 선택)",
+      "resultsKo": "성과 (선택)",
+      "resultsEn": "성과 (영어, 선택)",
+      "resultsHint": "한 줄에 하나씩 적어 주세요. 예: 최우수상 안전상점"
     }
   },
   "Teams": {
@@ -978,7 +986,14 @@
       "metaTitle": "활동 | RISE CREW",
       "title": "활동",
       "lead": "RISE CREW가 캠퍼스와 세계에서 해 온 일을 기록합니다.",
-      "empty": "아직 올라온 활동이 없습니다."
+      "empty": "아직 올라온 활동이 없습니다.",
+      "metaDetail": "{title} | RISE CREW 활동",
+      "toList": "← 활동 목록",
+      "results": "성과",
+      "around": "다른 활동",
+      "older": "이전 활동",
+      "newer": "다음 활동",
+      "open": "{title} 자세히 보기"
     }
   },
   "CtaBand": {

@@ -13,12 +13,17 @@ const PHOTO = /^([0-9a-f-]{36}\.(jpg|png|webp)|\/images\/activities\/[a-z0-9-]+\
 function fields(form: FormData) {
   return {
     date: text(form, 'date'),
+    end_date: text(form, 'end_date'),
     title_ko: text(form, 'title_ko'),
     title_en: text(form, 'title_en'),
     city_ko: text(form, 'city_ko'),
     city_en: text(form, 'city_en'),
     summary_ko: text(form, 'summary_ko'),
     summary_en: text(form, 'summary_en'),
+    body_ko: text(form, 'body_ko'),
+    body_en: text(form, 'body_en'),
+    results_ko: text(form, 'results_ko'),
+    results_en: text(form, 'results_en'),
     is_planned: form.get('is_planned') === 'on',
   };
 }

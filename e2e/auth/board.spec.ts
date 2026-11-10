@@ -197,11 +197,11 @@ test('activities moved from the code can be edited and keep their photo', async 
 }) => {
   await signIn(page, OPERATOR, baseURL!);
   await page.goto('/ko/admin/activities');
-  await page.getByRole('link', { name: /Sushi Tech Tokyo 2026 참가/ }).click();
+  await page.getByRole('link', { name: /Sushi Tech Tokyo 2026/ }).click();
   await expect(page.getByRole('img', { name: '지금 사진' })).toBeVisible();
   await page.getByRole('button', { name: '저장' }).click();
   await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
-  expect(await photoOf('Sushi Tech Tokyo 2026 참가')).toBe(
+  expect(await photoOf('Sushi Tech Tokyo 2026')).toBe(
     '/images/activities/sushi-tech-tokyo-2026.jpg',
   );
 });
@@ -380,5 +380,78 @@ test('removing the photo also cancels one just picked', async ({ page, baseURL }
   await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
   expect(await photoOf(title)).toBeNull();
   expect(await fileExists(first)).toBe(false);
+  await cleanUpActivity(title);
+});
+
+test('each activity has a page: name, place and dates, results, and the ones around it', async ({
+  page,
+}) => {
+  await page.goto('/ko/activities');
+  const card = page.locator('[data-activity]', {
+    hasText: '카카오모빌리티 × RISE CREW 라운드테이블 멘토링 워크숍',
+  });
+  await expect(card).toContainText('2026.01.23–01.24');
+  // Anywhere on the card leads there, the photo included.
+  await card.click({ position: { x: 24, y: 24 } });
+  await expect(page).toHaveURL(/\/ko\/activities\/[0-9a-f-]{36}$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    '카카오모빌리티 × RISE CREW 라운드테이블 멘토링 워크숍',
+  );
+  await expect(page).toHaveTitle(/라운드테이블 멘토링 워크숍 \| RISE CREW 활동/);
+  await expect(page.locator('figcaption')).toHaveText(
+    '카카오모빌리티 × RISE CREW 라운드테이블 멘토링 워크숍 · 시흥 · 2026.01.23–01.24',
+  );
+  await expect(page.locator('section[aria-labelledby="results-title"] li')).toHaveText([
+    '최우수상 안전상점',
+    '우수상 MORTON·곁은',
+  ]);
+  const around = page.getByRole('navigation', { name: '다른 활동' });
+  await expect(around.getByRole('link')).toHaveCount(2);
+  await expectAccessible(page);
+  await expectNoHorizontalScroll(page);
+
+  await page.getByRole('link', { name: '← 활동 목록' }).click();
+  await expect(page).toHaveURL(/\/ko\/activities$/);
+});
+
+test('an activity address that does not exist is a 404', async ({ request }) => {
+  expect((await request.get('/ko/activities/7e5c0000-0000-4000-8000-000000000000')).status()).toBe(
+    404,
+  );
+  expect((await request.get('/ko/activities/not-an-id')).status()).toBe(404);
+});
+
+test('an operator writes the end date, the text and the results, and the page shows them', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const title = `상세 ${unique(testInfo)}`;
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/admin/activities/new');
+  await page.getByLabel('제목', { exact: true }).fill(title);
+  await page.getByLabel('도시', { exact: true }).fill('서울');
+  await page.getByLabel('날짜', { exact: true }).fill('2026-11-06');
+  await page.getByLabel('끝난 날 (선택)').fill('2026-11-05');
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page.getByText('끝난 날은 시작 날짜와 같거나 뒤여야')).toBeVisible();
+
+  await page.getByLabel('끝난 날 (선택)').fill('2026-11-07');
+  await page.getByLabel('본문 (선택)', { exact: true }).fill('첫 줄\n둘째 줄');
+  await page.getByLabel('성과 (선택)', { exact: true }).fill('대상 팀하나\n\n장려상 팀둘');
+  await page.getByRole('button', { name: '저장' }).click();
+  await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
+
+  const { data } = await adminClient()
+    .from('activities')
+    .select('id')
+    .eq('title_ko', title)
+    .single();
+  await page.goto(`/ko/activities/${data!.id}`);
+  await expect(page.getByText('2026.11.06–11.07')).toBeVisible();
+  await expect(page.locator('main')).toContainText('첫 줄');
+  await expect(page.locator('section[aria-labelledby="results-title"] li')).toHaveText([
+    '대상 팀하나',
+    '장려상 팀둘',
+  ]);
   await cleanUpActivity(title);
 });

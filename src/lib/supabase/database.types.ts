@@ -25,15 +25,20 @@ export type Database = {
     Tables: {
       activities: {
         Row: {
+          body_en: string;
+          body_ko: string;
           city_en: string;
           city_ko: string;
           created_at: string;
           date: string | null;
+          end_date: string | null;
           id: string;
           is_planned: boolean;
           photo: string | null;
           photo_alt_en: string;
           photo_alt_ko: string;
+          results_en: string;
+          results_ko: string;
           summary_en: string;
           summary_ko: string;
           title_en: string;
@@ -42,15 +47,20 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          body_en?: string;
+          body_ko?: string;
           city_en?: string;
           city_ko: string;
           created_at?: string;
           date?: string | null;
+          end_date?: string | null;
           id?: string;
           is_planned?: boolean;
           photo?: string | null;
           photo_alt_en?: string;
           photo_alt_ko?: string;
+          results_en?: string;
+          results_ko?: string;
           summary_en?: string;
           summary_ko?: string;
           title_en?: string;
@@ -58,15 +68,20 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          body_en?: string;
+          body_ko?: string;
           city_en?: string;
           city_ko?: string;
           created_at?: string;
           date?: string | null;
+          end_date?: string | null;
           id?: string;
           is_planned?: boolean;
           photo?: string | null;
           photo_alt_en?: string;
           photo_alt_ko?: string;
+          results_en?: string;
+          results_ko?: string;
           summary_en?: string;
           summary_ko?: string;
           title_en?: string;

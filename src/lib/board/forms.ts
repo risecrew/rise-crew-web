@@ -6,6 +6,8 @@ export const BOARD_LIMITS = {
   activityTitle: 200,
   city: 50,
   summary: 500,
+  body: 5000,
+  results: 1000,
 } as const;
 
 // A year, a year and month, or a full date that exists on the calendar.
@@ -34,20 +36,34 @@ function requiredText(max: number) {
     .pipe(z.string().min(1, 'required').max(max, 'tooLong'));
 }
 
-export const activitySchema = z.object({
-  date: z
-    .string()
-    .trim()
-    .refine((value) => value === '' || isActivityDate(value), 'invalidDate')
-    .transform((value) => (value === '' ? null : value)),
-  title_ko: requiredText(BOARD_LIMITS.activityTitle),
-  title_en: optionalText(BOARD_LIMITS.activityTitle),
-  city_ko: requiredText(BOARD_LIMITS.city),
-  city_en: optionalText(BOARD_LIMITS.city),
-  summary_ko: optionalText(BOARD_LIMITS.summary),
-  summary_en: optionalText(BOARD_LIMITS.summary),
-  is_planned: z.boolean(),
-});
+const optionalDate = z
+  .string()
+  .trim()
+  .refine((value) => value === '' || isActivityDate(value), 'invalidDate')
+  .transform((value) => (value === '' ? null : value));
+
+export const activitySchema = z
+  .object({
+    date: optionalDate,
+    // The last day, for something that ran over several days.
+    end_date: optionalDate,
+    title_ko: requiredText(BOARD_LIMITS.activityTitle),
+    title_en: optionalText(BOARD_LIMITS.activityTitle),
+    city_ko: requiredText(BOARD_LIMITS.city),
+    city_en: optionalText(BOARD_LIMITS.city),
+    summary_ko: optionalText(BOARD_LIMITS.summary),
+    summary_en: optionalText(BOARD_LIMITS.summary),
+    body_ko: optionalText(BOARD_LIMITS.body),
+    body_en: optionalText(BOARD_LIMITS.body),
+    results_ko: optionalText(BOARD_LIMITS.results),
+    results_en: optionalText(BOARD_LIMITS.results),
+    is_planned: z.boolean(),
+  })
+  // An end needs a start, and never comes before it (dates written the same way sort as text).
+  .refine((v) => v.end_date === null || (v.date !== null && v.end_date >= v.date), {
+    path: ['end_date'],
+    message: 'endBeforeStart',
+  });
 
 // What an operator's form hears back.
 export type BoardState =

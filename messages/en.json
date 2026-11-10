@@ -817,7 +817,8 @@
       "fieldErrors": {
         "required": "This is required.",
         "tooLong": "This is too long.",
-        "invalidDate": "Use 2026, 2026-11 or 2026-11-06, with a date that exists."
+        "invalidDate": "Use 2026, 2026-11 or 2026-11-06, with a date that exists.",
+        "endBeforeStart": "The end date needs a start date and cannot come before it."
       },
       "upload": {
         "tooLarge": "That photo is too large. Pick one of 30MB or less.",
@@ -847,7 +848,14 @@
       "summaryEn": "Short description (English, optional)",
       "planned": "Has not happened yet",
       "plannedHint": "Shows as \"Upcoming\". Turn it off once the event is over.",
-      "deleteQuestion": "Delete this activity? This cannot be undone."
+      "deleteQuestion": "Delete this activity? This cannot be undone.",
+      "endDate": "End date (optional)",
+      "endDateHint": "For something that ran over several days, the last day. It cannot come before the start.",
+      "bodyKo": "Text (Korean, optional)",
+      "bodyEn": "Text (English, optional)",
+      "resultsKo": "Results (Korean, optional)",
+      "resultsEn": "Results (English, optional)",
+      "resultsHint": "One per line, for example: Top prize, Safety Shop"
     }
   },
   "Teams": {
@@ -978,7 +986,14 @@
       "metaTitle": "Activities | RISE CREW",
       "title": "Activities",
       "lead": "What RISE CREW has been doing, on campus and around the world.",
-      "empty": "No activities yet."
+      "empty": "No activities yet.",
+      "metaDetail": "{title} | RISE CREW activities",
+      "toList": "← All activities",
+      "results": "Results",
+      "around": "Other activities",
+      "older": "Earlier",
+      "newer": "Later",
+      "open": "More about {title}"
     }
   },
   "CtaBand": {

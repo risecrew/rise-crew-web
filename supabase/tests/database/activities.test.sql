@@ -9,7 +9,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(30);
 
 create function public._t_rows(statement text)
 returns integer
@@ -134,6 +134,24 @@ select throws_ok(
 select throws_ok(
   $$insert into public.activities (title_ko, city_ko, photo) values ('a', 'b', 'https://example.test/a.jpg')$$,
   '23514', null, 'a photo is not an address elsewhere');
+-- The details of an activity's own page (20261110130000_activity_details.sql).
+select throws_ok(
+  $$insert into public.activities (date, end_date, title_ko, city_ko) values ('2026-11-06', '2026-11-05', 'a', 'b')$$,
+  '23514', null, 'an activity cannot end before it starts');
+select throws_ok(
+  $$insert into public.activities (end_date, title_ko, city_ko) values ('2026-11-05', 'a', 'b')$$,
+  '23514', null, 'an end date needs a start date');
+select throws_ok(
+  $$insert into public.activities (title_ko, city_ko, results_ko) values ('a', 'b', repeat('가', 1001))$$,
+  '23514', null, 'results are at most 1000 characters');
+select lives_ok(
+  $$insert into public.activities (date, end_date, title_ko, city_ko, body_ko, results_ko)
+    values ('2026-11-06', '2026-11-07', 'a', 'b', '본문', '성과')$$,
+  'an operator can write the details');
+select is(
+  (select count(*)::integer from public.activities
+    where title_ko like '%·%' or title_ko like '%(1박 2일%' or title_ko like '%ANCHOR 사업단%'),
+  0, 'no moved activity keeps an award, a duration or the old name in its title');
 select lives_ok(
   $$delete from public.activities$$, 'an operator can delete, including moved activities');
 

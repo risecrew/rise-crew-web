@@ -24,12 +24,17 @@ import { BoardField, BoardPair } from './fields';
 type Activity = {
   id: string;
   date: string | null;
+  end_date: string | null;
   title_ko: string;
   title_en: string;
   city_ko: string;
   city_en: string;
   summary_ko: string;
   summary_en: string;
+  body_ko: string;
+  body_en: string;
+  results_ko: string;
+  results_en: string;
   photo: string | null;
   is_planned: boolean;
 };
@@ -46,12 +51,17 @@ export function ActivityForm({ activity }: { activity?: Activity }) {
 
   const [values, setValues] = useState({
     date: activity?.date ?? '',
+    end_date: activity?.end_date ?? '',
     title_ko: activity?.title_ko ?? '',
     title_en: activity?.title_en ?? '',
     city_ko: activity?.city_ko ?? '',
     city_en: activity?.city_en ?? '',
     summary_ko: activity?.summary_ko ?? '',
     summary_en: activity?.summary_en ?? '',
+    body_ko: activity?.body_ko ?? '',
+    body_en: activity?.body_en ?? '',
+    results_ko: activity?.results_ko ?? '',
+    results_en: activity?.results_en ?? '',
   });
   const [planned, setPlanned] = useState(activity?.is_planned ?? false);
   const [photo, setPhoto] = useState(activity?.photo ?? null);
@@ -97,7 +107,15 @@ export function ActivityForm({ activity }: { activity?: Activity }) {
         maxLength={maxLength}
         rows={rows}
         error={fields[name]}
-        hint={name === 'date' ? t('dateHint') : undefined}
+        hint={
+          name === 'date'
+            ? t('dateHint')
+            : name === 'end_date'
+              ? t('endDateHint')
+              : name === 'results_ko' || name === 'results_en'
+                ? t('resultsHint')
+                : undefined
+        }
       />
     );
   }
@@ -112,7 +130,10 @@ export function ActivityForm({ activity }: { activity?: Activity }) {
         {field('title_ko', t('titleKo'), BOARD_LIMITS.activityTitle)}
         {field('title_en', t('titleEn'), BOARD_LIMITS.activityTitle)}
       </BoardPair>
-      <div className={ROW}>{field('date', t('date'))}</div>
+      <BoardPair>
+        {field('date', t('date'))}
+        {field('end_date', t('endDate'))}
+      </BoardPair>
       <BoardPair>
         {field('city_ko', t('cityKo'), BOARD_LIMITS.city)}
         {field('city_en', t('cityEn'), BOARD_LIMITS.city)}
@@ -165,6 +186,14 @@ export function ActivityForm({ activity }: { activity?: Activity }) {
       <BoardPair>
         {field('summary_ko', t('summaryKo'), BOARD_LIMITS.summary, 3)}
         {field('summary_en', t('summaryEn'), BOARD_LIMITS.summary, 3)}
+      </BoardPair>
+      <BoardPair>
+        {field('body_ko', t('bodyKo'), BOARD_LIMITS.body, 8)}
+        {field('body_en', t('bodyEn'), BOARD_LIMITS.body, 8)}
+      </BoardPair>
+      <BoardPair>
+        {field('results_ko', t('resultsKo'), BOARD_LIMITS.results, 3)}
+        {field('results_en', t('resultsEn'), BOARD_LIMITS.results, 3)}
       </BoardPair>
 
       <div className={ROW}>
