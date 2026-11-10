@@ -73,7 +73,9 @@ export async function Home({
           // The unit is smaller than the number, next to it.
           shown: t.rich(`numbers.unit.${n.kind}`, {
             value: n.value,
-            unit: (chunks) => <span className="ml-1 text-xl font-semibold">{chunks}</span>,
+            unit: (chunks) => (
+              <span className="ml-1 text-xl font-semibold text-lime">{chunks}</span>
+            ),
           }),
         }))}
         asOf={members ? pick(members.basis, locale) : ''}

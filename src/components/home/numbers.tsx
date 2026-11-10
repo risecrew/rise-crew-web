@@ -4,6 +4,7 @@ import { TextLink } from '@/components/site/text-link';
 import type { Partner } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { pick } from '@/lib/content';
+import { cn } from '@/lib/utils';
 
 export type HomeNumber = { id: string; shown: React.ReactNode; label: string };
 
@@ -25,14 +26,32 @@ export async function Numbers({
   const logos = partners.filter((p) => p.logo && p.logoApproved).slice(0, 12);
 
   return (
-    <section aria-labelledby="numbers-title" className="section-y text-white">
+    // The numbers stand under the cobalt stage light, so they read as their own moment after the
+    // opening photo rather than as more text on black.
+    <section
+      aria-labelledby="numbers-title"
+      className="relative isolate overflow-hidden section-y text-white"
+    >
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_60%_at_50%_45%,rgb(0_62_145/0.7),transparent_75%)]"
+      />
       <div className="shell">
         <h2 id="numbers-title" className="sr-only">
           {t('title')}
         </h2>
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
-          {numbers.map((n) => (
-            <div key={n.id} className="flex flex-col">
+        <dl className="grid grid-cols-2 gap-y-10 border-y border-white/15 py-10 md:grid-cols-4 md:py-12">
+          {numbers.map((n, index) => (
+            <div
+              key={n.id}
+              className={cn(
+                'flex flex-col',
+                // A thin line between neighbours, so the first of each row starts on the column's
+                // edge: every second one on a phone, all but the first from a tablet up.
+                index % 2 === 1 && 'border-l border-white/15 pl-5',
+                index > 0 && 'md:border-l md:border-white/15 md:pl-8',
+              )}
+            >
               <dt className="order-2 mt-2 text-[15px] text-white/80">{n.label}</dt>
               <dd className="order-1 font-display text-numeral">{n.shown}</dd>
             </div>
