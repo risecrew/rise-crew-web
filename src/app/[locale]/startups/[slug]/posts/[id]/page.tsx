@@ -95,7 +95,7 @@ export default async function PostPage({ params }: Props) {
         >
           {t('posts.backToTeam', { team: team.name })}
         </Link>
-        <h1 className="mt-4 font-display text-[clamp(1.9rem,4vw,3.4rem)] leading-[1.04] font-[850] text-balance wrap-anywhere break-keep">
+        <h1 className="mt-4 font-display text-headline text-balance wrap-anywhere break-keep">
           {post.title}
         </h1>
         <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-white/60">

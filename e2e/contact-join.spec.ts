@@ -1,13 +1,16 @@
 import { expect, test } from '@playwright/test';
 
-test('contact offers email and a prefilled partnership mail', async ({ page }) => {
+test('contact is the end of the home, and the old address leads there', async ({ page }) => {
   await page.goto('/ko/contact');
-  await expect(page.getByRole('link', { name: 'risecrew4@gmail.com' }).first()).toHaveAttribute(
+  await expect(page).toHaveURL(/\/ko$/);
+  const contact = page.locator('#contact');
+  await expect(contact).toContainText('제휴와 협업을 기다립니다');
+  await expect(contact.getByRole('link', { name: '이메일로 문의하기' })).toHaveAttribute(
     'href',
-    'mailto:risecrew4@gmail.com',
+    /^mailto:risecrew4@gmail\.com\?subject=/,
   );
-  const partner = page.getByRole('link', { name: '제휴 문의' }).last();
-  await expect(partner).toHaveAttribute('href', /^mailto:risecrew4@gmail\.com\?subject=/);
+  // The menu no longer has a contact page.
+  await expect(page.locator('header a[href="/ko/contact"]')).toHaveCount(0);
 });
 
 test('join shows closed status, eligibility, benefits and an expandable FAQ', async ({ page }) => {

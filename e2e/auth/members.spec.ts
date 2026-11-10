@@ -572,7 +572,7 @@ test.describe('an account that has not finished signing up', () => {
       }, unfinishedId);
       await button(page, 'ko', 'member', 1).click();
       await expect(alert(page)).toHaveText(t.missing);
-      expect((await roleRow(unfinishedId)).role).toBe('guest');
+      expect((await roleRow(unfinishedId)).role).toBe('applicant');
       expect((await roleRow(doneId)).role).toBe('guest');
 
       // Family name first, no space (Korean); the given name alone; the English order.

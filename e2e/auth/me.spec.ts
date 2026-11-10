@@ -552,13 +552,13 @@ test.describe('editing', () => {
       expect(rows.consents).toEqual([]);
 
       // 2. A `next` that leaves the site is not followed: the account is signed up, and the
-      //    visitor ends on this site's home.
+      //    visitor ends on this site's My page.
       await page.reload();
       await expect(page.getByLabel(t.signUp.lastName, { exact: true })).toBeVisible();
       await fill('경영학');
       await tamper(page, 'next', 'https://evil.example');
       await page.getByRole('button', { name: t.signUp.submit }).click();
-      await expect(page).toHaveURL(`${baseURL}/ko`);
+      await expect(page).toHaveURL(`${baseURL}/ko/me`);
       rows = await accountRows(email);
       expect(rows.profile.onboarded_at).not.toBeNull();
       expect(rows.consents).toHaveLength(3);

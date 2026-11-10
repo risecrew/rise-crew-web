@@ -119,7 +119,7 @@ export async function createOnboardedAccount(
     recruit = false,
     details = {},
   }: {
-    role?: 'guest' | 'member' | 'operator' | 'admin';
+    role?: 'applicant' | 'guest' | 'member' | 'operator' | 'admin';
     names?: [string, string];
     recruit?: boolean;
     // A student gives a school and a major; anyone else may give an affiliation.
@@ -160,7 +160,7 @@ export async function createOnboardedAccount(
     .eq('id', id);
   if (profile.error) throw profile.error;
 
-  if (role !== 'guest') {
+  if (role !== 'applicant') {
     const set = await admin.from('user_roles').update({ role }).eq('user_id', id);
     if (set.error) throw set.error;
   }

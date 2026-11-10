@@ -61,6 +61,9 @@ insert into auth.users (id, email) values
 update public.user_roles set blocked_at = now()
  where user_id = '7e5a0000-0000-4000-8000-000000000007';
 
+-- Approved, like everyone these tests sign in as; applying is tested in applicant_approval.
+update public.user_roles set role = 'guest'
+ where user_id in (select id from auth.users where email like 'pgtap-%');
 update public.user_roles set role = 'member'
  where user_id in ('7e5a0000-0000-4000-8000-000000000003',
                    '7e5a0000-0000-4000-8000-000000000004');

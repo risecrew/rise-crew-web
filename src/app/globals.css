@@ -21,20 +21,20 @@
   /* The display type scale, largest first. Each step is roughly 0.7 of the one above at full
      width, so two neighbours never look like the same size. Every large heading uses one of
      these; below `subhead` the plain Tailwind steps (2xl and down) take over. */
-  --text-numeral: clamp(5rem, 13vw, 11rem); /* the counted numbers: 90+, 22+, 33, VCC 18 */
+  --text-numeral: clamp(3.5rem, 9vw, 7.5rem); /* the counted numbers: 90+, 22+, 33, VCC 18 */
   --text-numeral--line-height: 0.85;
-  --text-display: clamp(3rem, 8.5vw, 8rem); /* page and chapter names, the contest numbers */
+  --text-display: clamp(2.25rem, 6vw, 5.5rem); /* page and chapter names, the contest numbers */
   --text-display--line-height: 0.92;
   --text-display--letter-spacing: -0.025em;
   --text-display--font-weight: 900;
-  --text-hero: clamp(2.6rem, 7vw, 6rem); /* the home slogan, the closing ask, account titles */
+  --text-hero: clamp(2rem, 4.9vw, 4.125rem); /* the home slogan, the closing ask, account titles */
   --text-hero--line-height: 0.95;
   --text-hero--letter-spacing: -0.025em;
   --text-hero--font-weight: 900;
-  --text-headline: clamp(2.125rem, 4vw, 3.4rem); /* section titles */
+  --text-headline: clamp(1.625rem, 2.9vw, 2.4rem); /* section titles */
   --text-headline--line-height: 1.04;
   --text-headline--font-weight: 850;
-  --text-subhead: clamp(1.75rem, 2.6vw, 2.25rem); /* titles inside a section */
+  --text-subhead: clamp(1.375rem, 1.9vw, 1.65rem); /* titles inside a section */
   --text-subhead--line-height: 1.15;
   --text-subhead--font-weight: 850;
 

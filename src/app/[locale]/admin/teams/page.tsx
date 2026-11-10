@@ -13,8 +13,7 @@ import { AccountLayout, accountMetadata } from '../../account-layout';
 
 type Props = { params: Promise<{ locale: string }> };
 
-const TITLE =
-  'font-display text-[clamp(2.5rem,6vw,4rem)] leading-[0.95] font-[900] tracking-[-0.025em] text-balance break-keep';
+const TITLE = 'font-display text-hero text-balance break-keep';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = asLocale((await params).locale);

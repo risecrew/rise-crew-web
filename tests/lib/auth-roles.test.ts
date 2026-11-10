@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { ROLE_ORDER, atLeast, canBlock, canChangeRole, type AppRole } from '@/lib/auth/roles';
 
 describe('ROLE_ORDER and atLeast', () => {
-  it('orders the roles from guest up to admin', () => {
-    expect(ROLE_ORDER).toEqual(['guest', 'member', 'operator', 'admin']);
+  it('orders the roles from applicant up to admin', () => {
+    expect(ROLE_ORDER).toEqual(['applicant', 'guest', 'member', 'operator', 'admin']);
   });
 
   it('compares a role against a minimum', () => {

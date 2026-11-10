@@ -10,6 +10,7 @@ import {
   useState,
   useSyncExternalStore,
   type FormEvent,
+  type ReactNode,
   type KeyboardEvent,
 } from 'react';
 import { useCurrentLocale } from '@/i18n/use-current-locale';
@@ -69,7 +70,15 @@ const CHIP = 'inline-flex rounded-full border px-3 py-0.5 text-sm font-semibold 
 // It is one plain form: the ticked rows are `id` fields, the button pressed is `to=<role>` or
 // `blocked=<true|false>`, and the server action does the rest, so everything works before the
 // page's scripts have loaded.
-export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: boolean }) {
+export function MembersTable({
+  rows,
+  admin,
+  empty,
+}: {
+  rows: MemberRowView[];
+  admin: boolean;
+  empty: ReactNode;
+}) {
   const t = useTranslations('Admin.members');
   const locale = useCurrentLocale();
   const [state, formAction, pending] = useActionState<MemberState, FormData>(
@@ -162,8 +171,9 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
   const stuck = count > 0 || state?.ok === true;
 
   // A button's name says how many it is for once somebody is ticked.
-  const actionLabel = (name: 'member' | 'guest' | 'operator' | 'admin' | 'block' | 'unblock') =>
-    count > 0 ? t(`actions.counted.${name}`, { count }) : t(`actions.${name}`);
+  const actionLabel = (
+    name: 'member' | 'guest' | 'operator' | 'admin' | 'block' | 'unblock' | 'reject',
+  ) => (count > 0 ? t(`actions.counted.${name}`, { count }) : t(`actions.${name}`));
 
   function toggle(id: string, on: boolean) {
     const next = new Set(selected);
@@ -185,6 +195,20 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     const data = new FormData(event.currentTarget, submitter);
     startTransition(() => formAction(data));
+  }
+
+  // Nobody left to show: what the last press did, then the empty list.
+  if (rows.length === 0) {
+    return (
+      <>
+        {state?.ok ? (
+          <div className="mt-8">
+            <Answer state={state} pending={pending} />
+          </div>
+        ) : null}
+        {empty}
+      </>
+    );
   }
 
   return (
@@ -367,9 +391,19 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
               <button
                 ref={confirmRef}
                 type="submit"
-                name={asked.change.kind === 'role' ? 'to' : 'blocked'}
+                name={
+                  asked.change.kind === 'reject'
+                    ? 'reject'
+                    : asked.change.kind === 'role'
+                      ? 'to'
+                      : 'blocked'
+                }
                 value={
-                  asked.change.kind === 'role' ? asked.change.to : String(asked.change.blocked)
+                  asked.change.kind === 'reject'
+                    ? 'true'
+                    : asked.change.kind === 'role'
+                      ? asked.change.to
+                      : String(asked.change.blocked)
                 }
                 disabled={pending}
                 className={PLAIN}
@@ -448,6 +482,15 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
             <span className="flex flex-wrap gap-3 lg:ml-auto">
               <button
                 type="submit"
+                name="reject"
+                value="true"
+                disabled={pending || idle}
+                className={PLAIN}
+              >
+                {actionLabel('reject')}
+              </button>
+              <button
+                type="submit"
                 name="blocked"
                 value="true"
                 disabled={pending || idle}
@@ -510,12 +553,14 @@ function Cell({ col, value, className }: { col: string; value: string; className
 
 // The name a button of the form goes by: the field it sends.
 function changeKey(change: MemberChange): string {
+  if (change.kind === 'reject') return 'reject=true';
   return change.kind === 'role' ? `to=${change.to}` : `blocked=${change.blocked}`;
 }
 
 // Which question a change asks (only the changes of needsConfirmation ever do: blocking, and a
 // role change, which for member or guest asks only when staff would lose their role).
-function askName(change: MemberChange): 'block' | AppRole {
+function askName(change: MemberChange): 'block' | 'reject' | AppRole {
+  if (change.kind === 'reject') return 'reject';
   return change.kind === 'block' ? 'block' : change.to;
 }
 
@@ -531,7 +576,14 @@ function Answer({ state, pending }: { state: MemberState; pending: boolean }) {
   let done: string | null = null;
   if (state?.ok) {
     const { change } = state;
-    const key = change.kind === 'role' ? change.to : change.blocked ? 'block' : 'unblock';
+    const key =
+      change.kind === 'reject'
+        ? 'reject'
+        : change.kind === 'role'
+          ? change.to
+          : change.blocked
+            ? 'block'
+            : 'unblock';
     done = t(`result.done.${key}`, { count: state.count });
   }
 
@@ -567,11 +619,13 @@ function Refusal({ failure }: { failure: MemberFailure }) {
   let sentences: string[] = [];
   if (failure.error === 'refused') {
     const lead =
-      change?.kind === 'block'
-        ? change.blocked
-          ? 'refusedBlock'
-          : 'refusedUnblock'
-        : 'refusedRole';
+      change?.kind === 'reject'
+        ? 'refusedReject'
+        : change?.kind === 'block'
+          ? change.blocked
+            ? 'refusedBlock'
+            : 'refusedUnblock'
+          : 'refusedRole';
     sentences = [
       t(`result.errors.${lead}`),
       ...failure.groups.map((group) => {
@@ -585,6 +639,8 @@ function Refusal({ failure }: { failure: MemberFailure }) {
             });
           case 'self':
             return t('result.reasons.self', { who });
+          case 'notApplicant':
+            return t('result.reasons.notApplicant', { who });
           case 'authority':
             return t(
               change?.kind === 'block'

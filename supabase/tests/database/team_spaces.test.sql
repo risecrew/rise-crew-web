@@ -60,6 +60,9 @@ insert into auth.users (id, email) values
   ('7e590000-0000-4000-8000-00000000000a', 'pgtap-team-admin@example.test'),
   ('7e590000-0000-4000-8000-00000000000b', 'pgtap-team-x@example.test');
 
+-- Approved, like everyone these tests sign in as; applying is tested in applicant_approval.
+update public.user_roles set role = 'guest'
+ where user_id in (select id from auth.users where email like 'pgtap-%');
 update public.user_roles set role = 'member'
  where user_id in ('7e590000-0000-4000-8000-000000000003',
                    '7e590000-0000-4000-8000-000000000004',

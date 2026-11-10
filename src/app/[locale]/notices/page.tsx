@@ -6,32 +6,30 @@ import { CHIP } from '@/components/teams/post-list';
 import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
-import { getNotices } from '@/lib/board/queries';
+import { getNotices, requireNoticeReader } from '@/lib/board/queries';
 import { readAttachments } from '@/lib/board/forms';
 import { localized, showsFallback } from '@/lib/board/text';
-import { localizedAlternates } from '@/lib/metadata';
 import { postDate } from '@/lib/teams/text';
+
+import { accountMetadata } from '../account-layout';
 
 type Props = { params: Promise<{ locale: string }> };
 
-// Always the current rows, like the activities page.
+// Always the current rows, and always asked as this visitor.
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isAuthEnabled()) return {};
   const locale = asLocale((await params).locale);
   const t = await getTranslations({ locale, namespace: 'Board' });
-  return {
-    title: t('notices.metaTitle'),
-    description: t('notices.lead'),
-    alternates: localizedAlternates(locale, '/notices'),
-  };
+  return accountMetadata(t('notices.metaTitle'));
 }
 
 export default async function NoticesPage({ params }: Props) {
   if (!isAuthEnabled()) notFound();
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
+  await requireNoticeReader();
   const t = await getTranslations('Board');
   const notices = await getNotices();
 

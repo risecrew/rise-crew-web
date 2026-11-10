@@ -12,6 +12,7 @@ import {
   isRole,
   needsConfirmation,
   planBlock,
+  planReject,
   planRoleChange,
   readMemberForm,
   refusalReason,
@@ -119,7 +120,9 @@ async function applyChange(
   if (
     !ids ||
     change === null ||
-    !(change.kind === 'role' ? isRole(change.to) : typeof change.blocked === 'boolean')
+    !(change.kind === 'role'
+      ? isRole(change.to)
+      : change.kind === 'reject' || typeof change.blocked === 'boolean')
   ) {
     return failure('failed', change);
   }
@@ -158,7 +161,9 @@ async function applyChange(
     const plan =
       change.kind === 'role'
         ? planRoleChange(actor, targets, change.to, adminIds)
-        : planBlock(actor, targets, change.blocked, adminIds);
+        : change.kind === 'reject'
+          ? planReject(targets)
+          : planBlock(actor, targets, change.blocked, adminIds);
     if (!plan.ok) {
       if (plan.error === 'lastAdmin') return failure('lastAdmin', change, { ids });
       const refusals = plan.refused.map((id) => {
@@ -193,6 +198,24 @@ async function applyChange(
         .in('role', from)
         .select('user_id');
       if (error) throw new Error(error.message);
+      complete = data.length === ids.length;
+    } else if (change.kind === 'reject') {
+      // Their roles once more right before the deletion, which cannot be taken back: someone another
+      // operator approved a moment ago stays. The profile, role and consent rows go with the account.
+      const { data, error } = await admin
+        .from('user_roles')
+        .select('user_id')
+        .in('user_id', ids)
+        .eq('role', 'applicant');
+      if (error) throw new Error(error.message);
+      for (const { user_id: id } of data) {
+        const deleted = await admin.auth.admin.deleteUser(id);
+        if (deleted.error) {
+          console.error('Could not delete an applicant:', deleted.error.code ?? 'unknown');
+          refresh();
+          return failure('failed', change, { ids });
+        }
+      }
       complete = data.length === ids.length;
     } else if (change.blocked) {
       // The site's own record first (it is what shuts the account out at once), then Auth, so a
@@ -280,6 +303,15 @@ export async function setBlocked(
   blocked: boolean,
 ): Promise<MemberResult> {
   return applyChange(localeArg, userIds, { kind: 'block', blocked });
+}
+
+// Turns down everyone in `userIds`, deleting their accounts and what they entered. Only applicants:
+// the whole batch is refused if anyone in it has been approved. They can apply again later.
+export async function rejectApplicants(
+  localeArg: Locale,
+  userIds: string[],
+): Promise<MemberResult> {
+  return applyChange(localeArg, userIds, { kind: 'reject' });
 }
 
 // What the members table calls. `useActionState` hands the previous state in front of the form, and

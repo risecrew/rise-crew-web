@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { AccountMenu } from './account-menu';
+import { ApprovedOnly } from './approved-only';
 import { LocaleSwitch } from './locale-switch';
 import { MobileNav } from './mobile-nav';
 
@@ -17,11 +18,11 @@ export function getNavItems() {
       ? ([
           { href: '/startups', key: 'startups' },
           { href: '/activities', key: 'activities' },
-          { href: '/notices', key: 'notices' },
+          // Approved accounts only: see ApprovedOnly.
+          { href: '/notices', key: 'notices', approvedOnly: true },
         ] as const)
       : []),
     { href: '/network', key: 'network' },
-    { href: '/contact', key: 'contact' },
   ] as const;
 }
 
@@ -31,6 +32,7 @@ async function getAccountLabels() {
     signIn: t('signIn'),
     account: t('account'),
     myPage: t('myPage'),
+    myTeam: t('myTeam'),
     members: t('members'),
     teams: t('teams'),
     activities: t('activities'),
@@ -41,7 +43,11 @@ async function getAccountLabels() {
 
 export async function SiteHeader() {
   const t = await getTranslations('Nav');
-  const items = getNavItems().map((item) => ({ href: item.href, label: t(item.key) }));
+  const items = getNavItems().map((item) => ({
+    href: item.href,
+    label: t(item.key),
+    approvedOnly: 'approvedOnly' in item,
+  }));
 
   // With accounts switched off the header is exactly what it was before they existed.
   const accountLabels = isAuthEnabled() ? await getAccountLabels() : null;
@@ -69,11 +75,14 @@ export async function SiteHeader() {
             accountLabels ? 'lg:flex' : 'md:flex',
           )}
         >
-          {items.map((item) => (
-            <Link key={item.href} href={item.href} className="underline-offset-4 hover:underline">
-              {item.label}
-            </Link>
-          ))}
+          {items.map((item) => {
+            const link = (
+              <Link key={item.href} href={item.href} className="underline-offset-4 hover:underline">
+                {item.label}
+              </Link>
+            );
+            return item.approvedOnly ? <ApprovedOnly key={item.href}>{link}</ApprovedOnly> : link;
+          })}
           <LocaleSwitch />
           {accountLabels ? <AccountMenu labels={accountLabels} /> : null}
         </nav>

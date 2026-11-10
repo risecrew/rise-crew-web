@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
   images: { qualities: [75, 90] },
   // Vendored fonts live in versioned folders (public/fonts/<package>-<version>), so a file at a
   // given URL never changes and can be cached for a year.
+  // Contact used to be its own page; it is now the end of the home. The old address opens the
+  // home at the top: a #contact jump on load lands short, as the Global gallery grows after it.
+  async redirects() {
+    return [{ source: '/:locale(ko|en)/contact', destination: '/:locale', permanent: false }];
+  },
   async headers() {
     return [
       {
