@@ -8,6 +8,18 @@ const archive = (ko: string, en: string) =>
 // removed. The originals stay outside the repository.
 export const photos: Photo[] = [
   {
+    id: 'seminar-2025-11',
+    src: '/images/activities/seminar-2025-11.jpg',
+    width: 2000,
+    height: 1500,
+    alt: L(
+      '강의실에서 제품 가설검증과 프로젝트 관리 강연을 듣는 RISE CREW 2025 세미나',
+      'RISE CREW at the 2025 seminar, listening to a talk on testing product ideas and running projects',
+    ),
+    source: archive('2025.11.19', 'Nov 19, 2025'),
+    temporary: false,
+  },
+  {
     id: 'workshop-2026-01',
     src: '/images/activities/workshop-2026-01.jpg',
     width: 2400,

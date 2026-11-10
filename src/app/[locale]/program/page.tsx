@@ -26,6 +26,7 @@ const STEPS: Record<Stage, string[]> = {
 };
 // Each stage's photo.
 const PHOTO: Partial<Record<Stage, string>> = {
+  campus: 'seminar-2025-11',
   domestic: 'workshop-2026-01',
   global: 'techfest-vietnam',
 };

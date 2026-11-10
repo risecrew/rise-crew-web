@@ -29,6 +29,21 @@ export const stamps: Stamp[] = [
     evidence: [brochure],
   },
   {
+    // TODO(운영진 확인): whether this was a VCC session, and its official name.
+    id: 'seminar-2025',
+    date: '2025-11-19',
+    city: seoul,
+    country: 'KR',
+    title: { ko: '2025 세미나', en: '2025 Seminar' },
+    label: { ko: '2025 세미나', en: '2025 Seminar' },
+    stage: 'campus',
+    photo: 'seminar-2025-11',
+    status: 'done',
+    evidence: [
+      { kind: 'photo', label: { ko: '행사 사진 (2025.11)', en: 'Event photos (Nov 2025)' } },
+    ],
+  },
+  {
     id: 'kakao-mou',
     milestone: true,
     date: '2025-11-28',

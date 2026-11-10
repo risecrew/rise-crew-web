@@ -83,7 +83,11 @@ export async function Home({
       />
       <Stages
         locale={locale}
-        photos={{ domestic: shot('workshop-2026-01'), global: shot('techfest-vietnam') }}
+        photos={{
+          campus: shot('seminar-2025-11'),
+          domestic: shot('workshop-2026-01'),
+          global: shot('techfest-vietnam'),
+        }}
         mentors={mentors}
         mentorCount={value('mentors')?.value ?? ''}
       />
