@@ -1,4 +1,5 @@
--- pgTAP tests for activities, notices and the activity-photos bucket. Run with `pnpm db:test`.
+-- pgTAP tests for activities and the activity-photos bucket, and that the notices are gone. Run with
+-- `pnpm db:test`.
 -- Everything rolls back. Fake accounts only (example.test).
 --   member    7e5c0000-0000-4000-8000-000000000001
 --   operator  7e5c0000-0000-4000-8000-000000000002
@@ -8,7 +9,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(31);
+select plan(25);
 
 create function public._t_rows(statement text)
 returns integer
@@ -36,12 +37,14 @@ update public.user_roles set role = 'operator'
 update public.user_roles set blocked_at = now()
  where user_id = '7e5c0000-0000-4000-8000-000000000003';
 
--- Notices others left on a local stack do not count here. All of this rolls back.
-delete from public.notices;
-insert into public.notices (id, title_ko, body_ko) values
-  ('7e5c0000-0000-4000-8000-00000000a001', '기존 공지', '본문');
 insert into storage.objects (bucket_id, name) values
   ('activity-photos', '7e5c0000-0000-4000-8000-00000000b001.jpg');
+
+-- The notice board was removed (20261110120000_drop_notices.sql).
+select hasnt_table('public', 'notices', 'there is no notices table');
+select is(
+  (select count(*)::integer from storage.buckets where id = 'notice-files'), 0,
+  'there is no notice-files bucket');
 
 select results_eq(
   $$select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'activity-photos'$$,
@@ -67,10 +70,6 @@ set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
 select ok((select count(*) from public.activities) >= 15, 'anon reads activities');
-select throws_ok('select * from public.notices', '42501', null, 'anon cannot read notices');
-select throws_ok(
-  $$insert into public.notices (title_ko, body_ko) values ('x', 'x')$$,
-  '42501', null, 'anon cannot write a notice');
 select throws_ok(
   $$insert into public.activities (title_ko, city_ko) values ('x', 'x')$$,
   '42501', null, 'anon cannot write an activity');
@@ -82,16 +81,9 @@ select throws_ok(
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"7e5c0000-0000-4000-8000-000000000001","role":"authenticated"}';
 
-select is((select count(*)::integer from public.notices), 1, 'a member reads notices');
-select throws_ok(
-  $$insert into public.notices (title_ko, body_ko) values ('x', 'x')$$,
-  '42501', null, 'a member cannot write a notice');
 select throws_ok(
   $$insert into public.activities (title_ko, city_ko) values ('x', 'x')$$,
   '42501', null, 'a member cannot write an activity');
-select is(
-  public._t_rows($$update public.notices set title_ko = 'x'$$), 0, 'a member changes no notice');
-select is(public._t_rows($$delete from public.notices$$), 0, 'a member deletes no notice');
 select is(public._t_rows($$delete from public.activities$$), 0, 'a member deletes no activity');
 select throws_ok(
   $$insert into storage.objects (bucket_id, name) values
@@ -102,7 +94,7 @@ select throws_ok(
 set local request.jwt.claims = '{"sub":"7e5c0000-0000-4000-8000-000000000003","role":"authenticated","app_role":"operator"}';
 
 select throws_ok(
-  $$insert into public.notices (title_ko, body_ko) values ('x', 'x')$$,
+  $$insert into public.activities (title_ko, city_ko) values ('x', 'x')$$,
   '42501', null, 'a blocked operator cannot write');
 
 -- An operator.
@@ -112,8 +104,6 @@ select lives_ok(
   $$insert into public.activities (date, title_ko, city_ko, photo) values
     ('2026-11-06', '새 활동', '서울', '7e5c0000-0000-4000-8000-00000000b001.jpg')$$,
   'an operator can write an activity');
-select is(
-  public._t_rows($$update public.notices set is_pinned = true$$), 1, 'an operator can pin a notice');
 select lives_ok(
   $$insert into storage.objects (bucket_id, name) values
     ('activity-photos', '7e5c0000-0000-4000-8000-00000000b003.png')$$,
@@ -144,9 +134,6 @@ select throws_ok(
 select throws_ok(
   $$insert into public.activities (title_ko, city_ko, photo) values ('a', 'b', 'https://example.test/a.jpg')$$,
   '23514', null, 'a photo is not an address elsewhere');
-select throws_ok(
-  $$insert into public.notices (title_ko, body_ko) values ('a', repeat('가', 5001))$$,
-  '23514', null, 'a notice is at most 5000 characters');
 select lives_ok(
   $$delete from public.activities$$, 'an operator can delete, including moved activities');
 
