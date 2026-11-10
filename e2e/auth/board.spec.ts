@@ -398,7 +398,8 @@ test('an operator approves one applicant and declines another, who is then delet
     .single();
   expect(role!.role).toBe('guest');
 
-  await page.goto('/ko/admin/members?role=applicant');
+  // Only this applicant is listed, so declining empties the list: the answer is still said.
+  await page.goto(`/ko/admin/members?role=applicant&q=${encodeURIComponent(drop)}`);
   await row('거절').getByRole('checkbox').check();
   await page
     .getByRole('button', { name: /가입 거절/ })
@@ -407,6 +408,7 @@ test('an operator approves one applicant and declines another, who is then delet
   await expect(page.getByText(/가입 신청을 거절할까요/)).toBeVisible();
   await page.getByRole('button', { name: '거절하고 삭제' }).click();
   await expect(page.getByText(/거절하고 삭제했어요/)).toBeVisible();
+  await expect(page.getByText('조건에 맞는 회원이 없어요.')).toBeVisible();
   const { data: gone } = await adminClient().from('profiles').select('id').eq('email', drop);
   expect(gone).toEqual([]);
 

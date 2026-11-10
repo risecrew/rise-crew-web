@@ -10,6 +10,7 @@ import {
   useState,
   useSyncExternalStore,
   type FormEvent,
+  type ReactNode,
   type KeyboardEvent,
 } from 'react';
 import { useCurrentLocale } from '@/i18n/use-current-locale';
@@ -69,7 +70,15 @@ const CHIP = 'inline-flex rounded-full border px-3 py-0.5 text-sm font-semibold 
 // It is one plain form: the ticked rows are `id` fields, the button pressed is `to=<role>` or
 // `blocked=<true|false>`, and the server action does the rest, so everything works before the
 // page's scripts have loaded.
-export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: boolean }) {
+export function MembersTable({
+  rows,
+  admin,
+  empty,
+}: {
+  rows: MemberRowView[];
+  admin: boolean;
+  empty: ReactNode;
+}) {
   const t = useTranslations('Admin.members');
   const locale = useCurrentLocale();
   const [state, formAction, pending] = useActionState<MemberState, FormData>(
@@ -186,6 +195,20 @@ export function MembersTable({ rows, admin }: { rows: MemberRowView[]; admin: bo
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     const data = new FormData(event.currentTarget, submitter);
     startTransition(() => formAction(data));
+  }
+
+  // Nobody left to show: what the last press did, then the empty list.
+  if (rows.length === 0) {
+    return (
+      <>
+        {state?.ok ? (
+          <div className="mt-8">
+            <Answer state={state} pending={pending} />
+          </div>
+        ) : null}
+        {empty}
+      </>
+    );
   }
 
   return (

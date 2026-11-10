@@ -205,39 +205,41 @@ export default async function MembersPage({ params, searchParams }: Props) {
           </button>
         </form>
 
-        {rows.length === 0 ? (
-          <div className="mt-8 border-t border-white/15 pt-6">
-            <p className="text-lg text-pretty break-keep text-white">{t('empty')}</p>
-            {hasFilters(query) ? (
-              <p className="mt-2">
-                <Link href="/admin/members" prefetch={false} className={`${LINK} -ml-3`}>
-                  {t('filters.clear')}
-                </Link>
-              </p>
-            ) : null}
-          </div>
-        ) : (
-          <>
-            <p className="mt-8 text-base text-white/75">{t('count', { count: total })}</p>
-            <MembersTable rows={rows} admin={viewer.role === 'admin'} />
-            {pages > 1 ? (
-              <nav
-                aria-label={t('pages.label')}
-                className="mt-8 flex items-center justify-between gap-4 border-t border-white/15 pt-4"
-              >
-                <PageLink query={query} page={page - 1} show={page > 1}>
-                  {t('pages.previous')}
-                </PageLink>
-                <p className="text-base text-white/75">
-                  {t('pages.position', { page, total: pages })}
+        {/* The table stays mounted when the list empties, so the answer to the press that emptied it
+            (the last applicant declined, say) is still said. */}
+        {rows.length > 0 ? (
+          <p className="mt-8 text-base text-white/75">{t('count', { count: total })}</p>
+        ) : null}
+        <MembersTable
+          rows={rows}
+          admin={viewer.role === 'admin'}
+          empty={
+            <div className="mt-8 border-t border-white/15 pt-6">
+              <p className="text-lg text-pretty break-keep text-white">{t('empty')}</p>
+              {hasFilters(query) ? (
+                <p className="mt-2">
+                  <Link href="/admin/members" prefetch={false} className={`${LINK} -ml-3`}>
+                    {t('filters.clear')}
+                  </Link>
                 </p>
-                <PageLink query={query} page={page + 1} show={page < pages}>
-                  {t('pages.next')}
-                </PageLink>
-              </nav>
-            ) : null}
-          </>
-        )}
+              ) : null}
+            </div>
+          }
+        />
+        {rows.length > 0 && pages > 1 ? (
+          <nav
+            aria-label={t('pages.label')}
+            className="mt-8 flex items-center justify-between gap-4 border-t border-white/15 pt-4"
+          >
+            <PageLink query={query} page={page - 1} show={page > 1}>
+              {t('pages.previous')}
+            </PageLink>
+            <p className="text-base text-white/75">{t('pages.position', { page, total: pages })}</p>
+            <PageLink query={query} page={page + 1} show={page < pages}>
+              {t('pages.next')}
+            </PageLink>
+          </nav>
+        ) : null}
       </div>
     </AccountLayout>
   );
