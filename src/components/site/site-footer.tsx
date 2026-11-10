@@ -2,27 +2,33 @@ import { getTranslations } from 'next-intl/server';
 import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
+import { FooterAccountLink } from './account-menu';
 import { ApprovedOnly } from './approved-only';
+import { LocaleSwitch } from './locale-switch';
 import { getNavItems } from './site-header';
 
+// Every page ends here (wireframe v1.1, §7). The email address is written out once, in the
+// partnership block at the end of the home; the footer leads there instead of repeating it.
 export async function SiteFooter() {
   const t = await getTranslations('Footer');
   const nav = await getTranslations('Nav');
+  const auth = await getTranslations('Auth.menu');
+  const items = [...getNavItems(), { href: '/join', key: 'join' } as const];
 
   return (
     // Every page ends on the stage colour, so the footer rises out of it into cobalt instead of
-    // starting on a hard edge (the same fade the traction section uses).
+    // starting on a hard edge.
     <footer className="bg-[linear-gradient(180deg,var(--color-stage),var(--color-cobalt)_65%)] text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 pt-24 pb-14 md:grid-cols-[1.4fr_1fr_1fr] md:px-10 md:pt-32">
+      <div className="shell grid gap-10 pt-24 pb-14 md:grid-cols-[1.6fr_1fr_1fr] md:pt-32">
         <div>
           <RiseSymbol className="h-10 w-auto" />
-          <p className="mt-4 font-display text-2xl font-[800]">RISE CREW</p>
-          <p className="mt-2 text-white/85">{t('tagline')}</p>
-          <p className="mt-1 text-sm break-keep text-white/75">{t('supportedBy')}</p>
+          <p className="mt-4 font-display text-2xl font-bold">RISE CREW</p>
+          <p className="mt-2 break-keep text-white/80">{t('supportedBy')}</p>
+          <p className="mt-1 text-sm break-keep text-white/64">{t('address')}</p>
         </div>
         <nav aria-label={nav('footer')}>
           <ul className="flex flex-col gap-2">
-            {[...getNavItems(), { href: '/join', key: 'join' } as const].map((item) => {
+            {items.map((item) => {
               const row = (
                 <li key={item.href}>
                   <Link href={item.href} className="underline-offset-4 hover:underline">
@@ -38,22 +44,32 @@ export async function SiteFooter() {
             })}
           </ul>
         </nav>
-        <div className="text-sm text-white/85">
-          <a href="mailto:risecrew4@gmail.com" className="underline-offset-4 hover:underline">
-            risecrew4@gmail.com
-          </a>
-          <p className="mt-2 break-keep">{t('address')}</p>
-        </div>
+        <ul className="flex flex-col gap-2">
+          <li>
+            <Link
+              href={{ pathname: '/', hash: 'contact' }}
+              className="underline-offset-4 hover:underline"
+            >
+              {t('contact')}
+            </Link>
+          </li>
+          {isAuthEnabled() ? (
+            <li>
+              <FooterAccountLink signIn={auth('signIn')} myPage={auth('myPage')} />
+            </li>
+          ) : null}
+          <li className="-my-2.5">
+            <LocaleSwitch variant="footer" />
+          </li>
+        </ul>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-0 border-t border-white/15 px-5 py-2 text-xs tracking-[0.12em] text-white/75">
-        <p>{t('rights', { year: new Date().getFullYear() })}</p>
-        <p>{t('madeBy')}</p>
+      <div className="shell flex flex-wrap items-center justify-center gap-x-6 border-t border-white/15 py-2 text-[13px] text-white/64">
+        <p>
+          {t('rights', { year: new Date().getFullYear() })} · {t('madeBy')}
+        </p>
         {/* The policy opens together with the accounts. */}
         {isAuthEnabled() && (
-          <Link
-            href="/privacy"
-            className="py-2 text-sm tracking-normal text-white/85 underline-offset-4 hover:underline"
-          >
+          <Link href="/privacy" className="py-2 text-white/80 underline-offset-4 hover:underline">
             {t('privacy')}
           </Link>
         )}

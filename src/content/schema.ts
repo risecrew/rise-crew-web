@@ -145,5 +145,8 @@ export const photoSchema = z.object({
   alt: localizedSchema,
   source: localizedSchema,
   temporary: z.boolean(),
+  // The activity the photo was taken at, when no activity names it as its own photo. The caption
+  // comes from that activity.
+  event: id.optional(),
 });
 export type Photo = z.infer<typeof photoSchema>;

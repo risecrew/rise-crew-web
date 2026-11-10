@@ -27,24 +27,27 @@
   "Nav": {
     "primary": "Main menu",
     "footer": "Site menu",
-    "home": "Home",
     "about": "About",
     "network": "Network",
-    "join": "Join",
+    "join": "How to apply",
     "menu": "Menu",
     "skip": "Skip to content",
-    "switchTo": "한국어",
     "startups": "Startups",
     "activities": "Activities",
-    "notices": "Notices"
+    "notices": "Notices",
+    "apply": "Apply",
+    "applyInfo": "How to apply",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "switchLabel": "한국어로 보기"
   },
   "Footer": {
-    "tagline": "From campus to the world.",
     "supportedBy": "Global startup club under the SKKU ANCHOR Division",
     "address": "Room 50322, Hoam Hall, 25-2 Sungkyunkwan-ro, Jongno-gu, Seoul",
     "rights": "© {year} RISE CREW",
     "madeBy": "Made by the RISE CREW dev team",
-    "privacy": "Privacy policy"
+    "privacy": "Privacy policy",
+    "contact": "Partnerships"
   },
   "Common": {
     "upcoming": "Upcoming",
@@ -73,48 +76,99 @@
     "partner": "Partner with us"
   },
   "Home": {
-    "cover": {
-      "subline": "The official startup club of the SKKU ANCHOR Division."
+    "hero": {
+      "eyebrow": "A global startup club under the SKKU ANCHOR Division",
+      "title": "From campus to the world,\nwe grow founders who execute",
+      "body": "Education and mentoring, commercialization support, overseas expos and IR. {teams} startup teams are growing with us.",
+      "applyInfo": "How to apply",
+      "partner": "Partner with us"
     },
-    "traction": {
-      "title": "RISE CREW in numbers"
-    },
-    "rail": {
-      "label": "RISE CREW's three stages"
-    },
-    "backing": {
-      "title": "Backed by the university and industry",
-      "anchor": "Official startup club of the SKKU ANCHOR Division",
-      "mou": "MOU with Kakao Mobility",
-      "mouDate": "Nov 28, 2025 · signed by the ANCHOR Division",
-      "seed": "Seongchangjae funding for selected teams",
-      "seedValue": "KRW 5M per team",
-      "reported": "In the press"
-    },
-    "route": {
-      "title": "From campus to the world, in three stages",
-      "body": "Build the basics on campus, prove the business at home, then expand abroad."
-    },
-    "campus": {
-      "body": "The 18-session VCC and campus tracks build the fundamentals."
-    },
-    "global": {
-      "title": "We take the stage abroad"
-    },
-    "contest": {
-      "title": "We co-hosted the AI+X Global Startup Competition",
-      "body": "Co-hosted with the Seoul RISE Center, the ANCHOR Division and Kakao Mobility, with university teams from across Asia pitching in English.",
-      "reported": "In the press"
-    },
-    "network": {
-      "title": "{count} mentors on board",
-      "body": "Experts from Kakao Mobility, venture capital, accelerators and faculty support teams from idea to fundraising and global expansion.",
+    "numbers": {
+      "title": "RISE CREW in numbers",
+      "members": "Members",
+      "teams": "Startup teams",
+      "mentors": "Mentors",
       "partners": "Partners",
-      "cta": "See the full network"
+      "unit": {
+        "people": "",
+        "teams": "",
+        "places": ""
+      },
+      "allPartners": "See all {count} partners"
     },
-    "ask": {
-      "title": "Your turn on stage",
-      "body": "Startup teams, solo founders and individuals without a team can all apply."
+    "stages": {
+      "title": "From campus to the world, in three stages",
+      "body": "We build the basics on campus, test the business in Korea, and expand abroad.",
+      "more": "About the program",
+      "detail": "More",
+      "detailFor": "More about the {stage} stage",
+      "campus": {
+        "label": "Campus",
+        "word": "Campus",
+        "goal": "The basics of a startup",
+        "item1": "18 VCC startup sessions",
+        "item2": "1:1 mentoring",
+        "item3": "Team building and seminars"
+      },
+      "domestic": {
+        "label": "Domestic",
+        "word": "Domestic",
+        "goal": "Testing the business",
+        "item1": "Startup roundtable workshops",
+        "item2": "Seongchangjae incubation",
+        "item3": "Incorporation and government programs"
+      },
+      "global": {
+        "label": "Global",
+        "word": "Global",
+        "goal": "Going abroad",
+        "item1": "Overseas expos and fairs",
+        "item2": "Joint programs with universities abroad",
+        "item3": "Global IR and investment"
+      }
+    },
+    "mentors": {
+      "title": "{count} mentors stand behind every stage",
+      "faces": "Mentors",
+      "all": "See all mentors"
+    },
+    "recent": {
+      "title": "Recent activities",
+      "all": "See all activities",
+      "upcoming": "Coming up"
+    },
+    "recruit": {
+      "badge": {
+        "open": "Recruiting",
+        "closed": "Closed"
+      },
+      "title": {
+        "open": "We are recruiting now",
+        "closed": "This round of recruitment has closed"
+      },
+      "body": "Startup teams, solo founders and individuals without a team can all apply.",
+      "who": "Who",
+      "whoValue": "SKKU students. Students from other universities and graduates can join too.",
+      "period": "When"
+    },
+    "contact": {
+      "title": "We are looking for companies and institutions to work with",
+      "company": {
+        "title": "Companies and institutions",
+        "body": "Joint programs, sponsorship, links abroad"
+      },
+      "mentor": {
+        "title": "Mentoring",
+        "body": "Mentoring and talks by working professionals"
+      },
+      "press": {
+        "title": "Press",
+        "body": "Press releases and interview requests"
+      },
+      "copy": "Copy address",
+      "copied": "Copied",
+      "write": "Write an email",
+      "subject": "[Partnership] "
     }
   },
   "About": {
@@ -173,12 +227,6 @@
       "vcc": "Co-developing and running the VCC curriculum",
       "contest": "Co-planning and running a global university startup competition"
     }
-  },
-  "Contact": {
-    "title": "Let's work together",
-    "lead": "Companies, institutions, mentors and press: please reach us by email.",
-    "subject": "[Inquiry] ",
-    "button": "Email us"
   },
   "Join": {
     "title": "Board RISE CREW",

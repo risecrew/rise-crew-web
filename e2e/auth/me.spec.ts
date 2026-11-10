@@ -113,9 +113,9 @@ const COPY = {
 
 // Phones keep the account entries inside the menu panel; on a desktop they sit in the bar.
 async function openMenu(page: Page) {
-  const summaryButton = page.locator('header summary');
+  const summaryButton = page.locator('header button[aria-controls="site-menu"]');
   // (A menu that is already open stays open while the visitor moves within the same page.)
-  const open = (await page.locator('header details[open]').count()) > 0;
+  const open = (await page.locator('#site-menu[open]').count()) > 0;
   if ((await summaryButton.isVisible()) && !open) await summaryButton.click();
 }
 

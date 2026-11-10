@@ -37,7 +37,7 @@ function summary(page: Page) {
 
 // Phones keep the account entries inside the menu panel; on a desktop they sit in the bar.
 async function openMenu(page: Page) {
-  const summaryButton = page.locator('header summary');
+  const summaryButton = page.locator('header button[aria-controls="site-menu"]');
   if (await summaryButton.isVisible()) await summaryButton.click();
 }
 

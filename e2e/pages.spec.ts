@@ -45,9 +45,9 @@ test('an unknown page has a title saying so', async ({ page }) => {
 
 test('following a link from far down a page lands at the top at once', async ({ page }) => {
   await page.goto('/ko');
-  const ask = page.locator('[data-ask]');
-  await ask.scrollIntoViewIfNeeded();
-  await ask.getByRole('link', { name: '모집 안내 보기' }).click();
+  const recruit = page.locator('section[aria-labelledby="recruit-title"]');
+  await recruit.scrollIntoViewIfNeeded();
+  await recruit.getByRole('link', { name: '지원 안내 보기' }).click();
   await page.waitForURL('**/ko/join');
   await page.waitForTimeout(120);
   expect(await page.evaluate(() => scrollY)).toBe(0);
@@ -56,7 +56,7 @@ test('following a link from far down a page lands at the top at once', async ({ 
 test('keyboard focus is visible on lime buttons', async ({ page }) => {
   await page.goto('/ko');
   await page.keyboard.press('Tab');
-  const cta = page.locator('[data-hero]').getByRole('link', { name: '모집 안내 보기' });
+  const cta = page.locator('[data-hero]').getByRole('link', { name: '지원 안내 보기' });
   await cta.focus();
   const outline = await cta.evaluate((el) => getComputedStyle(el).outlineColor);
   expect(outline).toBe('rgb(159, 201, 82)');

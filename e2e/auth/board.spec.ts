@@ -51,7 +51,7 @@ async function addNotice(page: Page, title: string, body = '본문입니다.', p
 // The account links are behind the circle on a wide screen and in the menu panel on a phone.
 async function openAccountLinks(page: Page) {
   await page
-    .locator('header summary')
+    .locator('header button[aria-controls="site-menu"]')
     .or(page.getByRole('button', { name: /계정 메뉴/ }))
     .locator('visible=true')
     .first()
@@ -59,7 +59,7 @@ async function openAccountLinks(page: Page) {
 }
 
 async function openPhoneMenu(page: Page) {
-  const summary = page.locator('header summary');
+  const summary = page.locator('header button[aria-controls="site-menu"]');
   if (await summary.isVisible()) await summary.click();
 }
 

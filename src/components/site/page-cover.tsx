@@ -17,6 +17,7 @@ export function PageCover({ title, lead, photo, children }: Props) {
   return (
     <section
       data-page-cover
+      data-photo-hero={photo ? '' : undefined}
       className={cn(
         'relative isolate flex items-end overflow-hidden bg-stage text-white',
         photo ? 'h-[78svh] min-h-[560px] md:h-[88svh]' : 'min-h-[70svh]',

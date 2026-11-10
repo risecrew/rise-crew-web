@@ -105,14 +105,14 @@ export const partners: Partner[] = [
   {
     id: 'ourbox',
     kind: 'company',
-    name: L('아워박스', 'OURBOX'),
+    name: L('아워박스', 'Ourbox'),
     country: KR,
     logoApproved: false,
   },
   {
     id: 'veron-global',
     kind: 'company',
-    name: koOnly('베론글로벌'),
+    name: L('베론글로벌', 'Veron Global'),
     country: KR,
     logoApproved: false,
   },
@@ -135,14 +135,14 @@ export const partners: Partner[] = [
   {
     id: 'simsan-ventures',
     kind: 'company',
-    name: koOnly('심산벤처스'),
+    name: L('심산벤처스', 'Simsan Ventures'),
     country: KR,
     logoApproved: false,
   },
   {
     id: 'oracle-investment',
     kind: 'company',
-    name: koOnly('오라클인베스트먼트'),
+    name: L('오라클인베스트먼트', 'Oracle Investment'),
     country: KR,
     logoApproved: false,
   },

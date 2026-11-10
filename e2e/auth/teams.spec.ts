@@ -242,7 +242,7 @@ test('the account menu leads a member straight to their team; others get no such
 }) => {
   const open = async (page: Page) => {
     await page
-      .locator('header summary')
+      .locator('header button[aria-controls="site-menu"]')
       .or(page.getByRole('button', { name: /계정 메뉴/ }))
       .locator('visible=true')
       .first()

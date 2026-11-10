@@ -1,91 +1,106 @@
 import { getTranslations } from 'next-intl/server';
-import { ChapterRail } from '@/components/stage/chapter-rail';
-import type { Mentor, Partner, Photo, Press, Program, Stamp, Stat } from '@/content/schema';
+import type { Mentor, Partner, Photo, Recruitment, Stamp, Stat } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
-import type { ApplyCta } from '@/lib/content';
-import { Ask } from './ask';
-import { CampusChapter, DomesticChapter, GlobalChapter, RouteIntro } from './chapters';
+import { isAuthEnabled } from '@/lib/auth/config';
+import { pick } from '@/lib/content';
+import { eventOf, recentEvents, upcomingEvents } from '@/lib/events';
+import { Contact } from './contact';
 import { Hero } from './hero';
-import { Traction } from './traction';
-
-const STAGES = ['campus', 'domestic', 'global'] as const;
+import { Numbers } from './numbers';
+import { Recent } from './recent';
+import { Recruit } from './recruit';
+import { Stages, type StagePhoto } from './stages';
 
 type Props = {
   locale: Locale;
   stats: Stat[];
   stamps: Stamp[];
   photos: Photo[];
-  programs: Program[];
   mentors: Mentor[];
   partners: Partner[];
-  press: Press[];
-  cta: ApplyCta;
+  recruitment: Recruitment;
+  today: Date;
 };
 
-// The home follows RISE CREW's own three stages, Campus → Domestic → Global, with a rail that
-// keeps the reader's place. The direction contract is in
-// .impeccable/surfaces/src-app-locale-page-tsx.md.
+// The home answers a first-time visitor in the order they ask (wireframe v1.1, §8): what this is,
+// whether to trust it, what it does, what came of it, and how to join in. The startup teams
+// section (S4) waits for the teams' own pages to be public.
 export async function Home({
   locale,
   stats,
   stamps,
   photos,
-  programs,
   mentors,
   partners,
-  press,
-  cta,
+  recruitment,
+  today,
 }: Props) {
   const t = await getTranslations('Home');
-  const common = await getTranslations('Common');
-  const stat = (id: string) => stats.find((s) => s.id === id);
+  const nav = await getTranslations('Nav');
+  const value = (id: string) => stats.find((s) => s.id === id);
   const photo = (id: string) => photos.find((p) => p.id === id);
-  const pickStats = (ids: string[]) => ids.map(stat).filter((s): s is Stat => !!s);
-  const workshop = photo('workshop-2026-01');
-  // The opening: the crew itself, holding up its own jersey, a photo used nowhere else. The expo
-  // hall above them is dark, so the white header reads over it.
+  const shot = (id: string): StagePhoto | undefined => {
+    const p = photo(id);
+    return p ? { photo: p, event: eventOf(p, stamps) } : undefined;
+  };
+
+  // The opening: the crew holding up its own jersey at BEYOND Expo.
   const opening = photo('beyond-expo-crew-jersey-2026');
-
-  // Global stops in the order they happened; undated ones last.
-  const stops = stamps
-    .filter((s) => s.stage === 'global' && s.photo && photo(s.photo))
-    .sort((a, b) => (a.date ?? '9999').localeCompare(b.date ?? '9999'))
-    .map((s) => ({ stamp: s, photo: photo(s.photo!)! }));
-
-  const chapters = STAGES.map((id) => ({
-    id,
-    name: common(`stage.${id}.name`),
-    sub: common(`stage.${id}.sub`),
-  }));
+  const teams = value('teams')?.value ?? '';
+  const open = recruitment.status === 'open';
+  const applyLabel = open ? nav('apply') : t('hero.applyInfo');
+  const members = value('members');
 
   return (
     <>
-      <Hero locale={locale} photo={opening} cta={cta} />
-      <Traction
+      <Hero
         locale={locale}
-        stats={pickStats(['members', 'teams', 'mentors'])}
-        photo={workshop}
+        photo={opening}
+        event={opening ? eventOf(opening, stamps) : undefined}
+        teams={teams}
+        applyLabel={applyLabel}
       />
-      <ChapterRail label={t('rail.label')} chapters={chapters}>
-        <RouteIntro />
-        <CampusChapter locale={locale} programs={programs} vcc={stat('vcc-sessions')} />
-        <DomesticChapter
-          locale={locale}
-          photo={workshop}
-          event={stamps.find((s) => s.photo === 'workshop-2026-01')}
-          press={press.find((p) => p.id === 'smart-economy-mou')}
-          mentors={mentors.filter((m) => m.featured)}
-          mentorCount={stat('mentors')?.value ?? ''}
-          partners={partners}
-        />
-        <GlobalChapter
-          locale={locale}
-          stops={stops}
-          contest={pickStats(['contest-countries', 'contest-teams'])}
-          press={press.find((p) => p.id === 'eduplus-aix')}
-        />
-      </ChapterRail>
-      <Ask cta={cta} />
+      <Numbers
+        locale={locale}
+        numbers={[
+          {
+            id: 'members',
+            value: members?.value ?? '',
+            unit: t('numbers.unit.people'),
+            label: t('numbers.members'),
+          },
+          { id: 'teams', value: teams, unit: t('numbers.unit.teams'), label: t('numbers.teams') },
+          {
+            id: 'mentors',
+            value: value('mentors')?.value ?? '',
+            unit: t('numbers.unit.people'),
+            label: t('numbers.mentors'),
+          },
+          {
+            id: 'partners',
+            value: String(partners.length),
+            unit: t('numbers.unit.places'),
+            label: t('numbers.partners'),
+          },
+        ]}
+        asOf={members ? pick(members.basis, locale) : ''}
+        partners={partners}
+      />
+      <Stages
+        locale={locale}
+        photos={{ domestic: shot('workshop-2026-01'), global: shot('techfest-vietnam') }}
+        mentors={mentors}
+        mentorCount={value('mentors')?.value ?? ''}
+        programPage={false}
+      />
+      <Recent
+        locale={locale}
+        events={recentEvents(stamps, photos)}
+        upcoming={upcomingEvents(stamps, today)}
+        archive={isAuthEnabled()}
+      />
+      <Recruit locale={locale} recruitment={recruitment} applyLabel={applyLabel} />
+      <Contact />
     </>
   );
 }

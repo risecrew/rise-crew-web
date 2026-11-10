@@ -90,5 +90,6 @@ export const photos: Photo[] = [
     ),
     source: archive('2026.5 마카오', 'Macau, May 2026'),
     temporary: false,
+    event: 'beyond-expo',
   },
 ];

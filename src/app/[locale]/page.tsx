@@ -5,12 +5,9 @@ import { Home } from '@/components/home/home';
 import { asLocale } from '@/i18n/as-locale';
 import { isAuthEnabled } from '@/lib/auth/config';
 import {
-  applyCta,
   getMentors,
   getPartners,
   getPhotos,
-  getPress,
-  getPrograms,
   getRecruitment,
   getStamps,
   getStats,
@@ -35,17 +32,14 @@ export default async function HomePage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
 
-  const [stats, stamps, photos, programs, mentors, partners, press, recruitment] =
-    await Promise.all([
-      getStats(),
-      getStamps(),
-      getPhotos(),
-      getPrograms(),
-      getMentors(),
-      getPartners(),
-      getPress(),
-      getRecruitment(),
-    ]);
+  const [stats, stamps, photos, mentors, partners, recruitment] = await Promise.all([
+    getStats(),
+    getStamps(),
+    getPhotos(),
+    getMentors(),
+    getPartners(),
+    getRecruitment(),
+  ]);
 
   // After an account is deleted the visitor lands here with `?deleted=1`. The page stays static:
   // the line is added in the browser, by a component that reads the address there.
@@ -59,11 +53,11 @@ export default async function HomePage({ params }: Props) {
         stats={stats}
         stamps={stamps}
         photos={photos}
-        programs={programs}
         mentors={mentors}
         partners={partners}
-        press={press}
-        cta={applyCta(recruitment)}
+        recruitment={recruitment}
+        // The page is rebuilt once a day (revalidate), so "upcoming" is as of that day.
+        today={new Date()}
       />
     </main>
   );

@@ -17,7 +17,7 @@ import { clearMessagesFor, latestCodeFor } from './mailpit';
 
 // Phones keep the account entries inside the menu panel; on a desktop they sit in the bar.
 async function openMenu(page: Page) {
-  const summary = page.locator('header summary');
+  const summary = page.locator('header button[aria-controls="site-menu"]');
   if (await summary.isVisible()) await summary.click();
 }
 

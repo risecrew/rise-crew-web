@@ -1,90 +1,82 @@
 import { getTranslations } from 'next-intl/server';
-import { AskButton } from '@/components/stage/ask-button';
-import { HeroStage } from '@/components/stage/hero-stage';
-import { StagePhoto, TemporaryBadge } from '@/components/stage/stage-photo';
-import type { Photo } from '@/content/schema';
+import Image from 'next/image';
+import { PRIMARY, SECONDARY } from '@/components/site/buttons';
+import type { Photo, Stamp } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
-import type { ApplyCta } from '@/lib/content';
+import { Link } from '@/i18n/navigation';
+import { pick } from '@/lib/content';
+import { formatCaption } from '@/lib/format';
 
-const SLOGAN = [
-  ['R', 'each your vision,'],
-  ['I', 'gnite your idea,'],
-  ['S', 'cale up your impact,'],
-  ['E', 'levate your future.'],
-] as const;
-
+// S1 (wireframe v1.1, §8): who we are, in one screen. The photo holds still; the page scrolls past
+// it like any other section.
 export async function Hero({
   locale,
   photo,
-  cta,
+  event,
+  teams,
+  applyLabel,
 }: {
   locale: Locale;
   photo: Photo | undefined;
-  cta: ApplyCta;
+  event: Stamp | undefined;
+  teams: string;
+  applyLabel: string;
 }) {
-  const t = await getTranslations('Home');
-  const common = await getTranslations('Common');
-  const ctaT = await getTranslations('Cta');
+  const t = await getTranslations('Home.hero');
+  const [first, second] = t('title').split('\n');
 
   return (
-    <HeroStage
-      photo={
-        photo ? (
-          <StagePhoto
-            photo={photo}
-            locale={locale}
-            temporaryLabel={common('temporaryPhoto')}
-            priority
-            hero
-            badge="none"
-          />
-        ) : null
-      }
-      badge={
-        photo?.temporary ? (
-          <TemporaryBadge label={common('temporaryPhoto')} placement="under-header" />
-        ) : null
-      }
+    <section
+      data-hero
+      data-photo-hero={photo ? '' : undefined}
+      aria-labelledby="hero-title"
+      className="relative isolate flex h-[88svh] min-h-[560px] items-end overflow-hidden bg-stage text-white md:h-[min(100svh,880px)]"
     >
-      {/* The slogan and the buttons sit in the content width the header uses, so they line up with
-          it on every screen. */}
-      <div className="absolute inset-x-0 bottom-0 mx-auto flex max-w-7xl flex-col gap-8 px-5 pb-14 md:flex-row md:items-end md:justify-between md:px-10 md:pb-16">
-        <div>
-          <h1 lang="en" className="font-display text-hero text-white">
-            {/* Read as four plain lines; the split below is only how they are drawn. */}
-            {SLOGAN.map(([initial, rest]) => (
-              <span key={initial} className="sr-only">
-                {initial + rest}{' '}
-              </span>
-            ))}
-            {/* The initials stand in a column of their own, each centred in it, so they stack
-                into the word RISE (the narrow I no longer drifts left). They carry the full size
-                at the heaviest weight; the rest of each line steps down to 0.8 of it. The R's ink
-                starts 0.05em inside its box, so the column moves left by that much: the R then
-                stands on the same line as the logo above and the sentence below. */}
-            <span
-              aria-hidden
-              className="-ml-[0.05em] grid grid-cols-[auto_1fr] items-baseline gap-x-[0.14em]"
-            >
-              {SLOGAN.map(([initial, rest]) => (
-                <span key={initial} className="contents">
-                  <span className="justify-self-center font-[1000] text-lime">{initial}</span>
-                  <span className="text-[0.8em] font-[750]">{rest}</span>
-                </span>
-              ))}
-            </span>
-          </h1>
-          <p className="mt-5 max-w-xl text-base break-keep text-white/85 md:text-lg">
-            {t('cover.subline')}
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-6">
-          <a href="#contact" className="font-semibold text-white underline underline-offset-4">
-            {ctaT('partner')}
+      {photo ? (
+        <>
+          <Image
+            src={photo.src}
+            alt={pick(photo.alt, locale)}
+            fill
+            priority
+            sizes="100vw"
+            quality={75}
+            className="-z-10 object-cover"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 -z-10 h-[55%] bg-[linear-gradient(180deg,transparent,rgb(7_9_15/0.85))]"
+          />
+        </>
+      ) : null}
+      <div className="relative shell pb-14 md:pb-20">
+        <p className="text-[15px] font-semibold break-keep text-white/80">{t('eyebrow')}</p>
+        <h1 id="hero-title" className="mt-4 font-display text-hero text-balance break-keep">
+          {first}
+          {second ? (
+            <>
+              <br />
+              {second}
+            </>
+          ) : null}
+        </h1>
+        <p className="mt-5 max-w-[560px] text-lg break-keep text-white/80">
+          {t('body', { teams })}
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/join" className={PRIMARY}>
+            {applyLabel}
+          </Link>
+          <a href="#contact" className={SECONDARY}>
+            {t('partner')}
           </a>
-          <AskButton cta={cta} />
         </div>
       </div>
-    </HeroStage>
+      {photo && event ? (
+        <p className="absolute right-6 bottom-6 hidden text-sm text-white/64 md:block">
+          {formatCaption(event, locale)}
+        </p>
+      ) : null}
+    </section>
   );
 }
