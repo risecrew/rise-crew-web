@@ -40,22 +40,6 @@ export const programs: Program[] = [
     details: [],
   },
   {
-    id: 'tracks',
-    stage: 'campus',
-    name: { ko: 'Learner · Preneur 트랙', en: 'Learner and Preneur tracks' },
-    summary: { ko: 'SKKU SPEC과 협력하는 두 갈래 과정', en: 'Two tracks run with SKKU SPEC' },
-    details: [
-      {
-        ko: '러너: 1학기 필수 과정. 5단계 커리큘럼으로 팀 프로젝트를 진행합니다',
-        en: 'Learner: a required first-semester course with a five-step team project curriculum',
-      },
-      {
-        ko: '프러너: 러너 수료생과 예비·초기 창업가의 자율 창업 활동과 네트워킹을 지원합니다',
-        en: 'Preneur: self-directed venture work and networking for Learner graduates and early founders',
-      },
-    ],
-  },
-  {
     id: 'seongchangjae',
     stage: 'domestic',
     name: { ko: '성창재', en: 'Seongchangjae' },

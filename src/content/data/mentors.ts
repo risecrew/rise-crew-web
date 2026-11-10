@@ -2,7 +2,7 @@ import type { Mentor } from '@/content/schema';
 
 const L = (ko: string, en: string) => ({ ko, en });
 const kakao = L('카카오모빌리티', 'Kakao Mobility');
-const anchor = L('성균관대학교 ANCHOR 사업단', 'SKKU ANCHOR Division');
+const anchor = L('성균관대학교 앵커사업단', 'SKKU ANCHOR Division');
 const simsan = L('심산벤처스', 'Simsan Ventures');
 
 export const mentors: Mentor[] = [

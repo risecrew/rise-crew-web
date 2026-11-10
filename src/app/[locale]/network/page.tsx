@@ -11,7 +11,7 @@ import { localizedAlternates } from '@/lib/metadata';
 
 type Props = { params: Promise<{ locale: string }> };
 
-const KINDS: Partner['kind'][] = ['supporter', 'company', 'university', 'program'];
+const KINDS: Partner['kind'][] = ['supporter', 'university', 'company'];
 const MOU_ITEMS = ['crew', 'vcc', 'contest'] as const;
 const SECTION = 'border-t border-white/10 bg-stage text-white';
 

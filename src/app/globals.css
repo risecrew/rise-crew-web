@@ -21,7 +21,7 @@
   /* The display type scale, largest first. Each step is roughly 0.7 of the one above at full
      width, so two neighbours never look like the same size. Every large heading uses one of
      these; below `subhead` the plain Tailwind steps (2xl and down) take over. */
-  --text-numeral: clamp(3.5rem, 9vw, 7.5rem); /* the counted numbers: 90+, 22+, 33, VCC 18 */
+  --text-numeral: clamp(3.5rem, 9vw, 7.5rem); /* the counted numbers: 90+, 25, 33 */
   --text-numeral--line-height: 0.85;
   --text-display: clamp(2.25rem, 6vw, 5.5rem); /* page and chapter names, the contest numbers */
   --text-display--line-height: 0.92;

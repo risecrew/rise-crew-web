@@ -30,6 +30,8 @@ export const stampSchema = z
   .object({
     id,
     date: isoDate.optional(),
+    // The last day, for something that ran over several days.
+    endDate: isoDate.optional(),
     city: localizedSchema,
     country: z.string().regex(/^[A-Z]{2}$/, 'ISO 3166-1 alpha-2'),
     title: localizedSchema,
@@ -37,6 +39,8 @@ export const stampSchema = z
     stage: stageSchema,
     status: z.enum(['done', 'planned']),
     evidence: z.array(evidenceSchema),
+    // Awards and outcomes. They stay out of the title, so the caption names only the event.
+    results: z.array(localizedSchema).optional(),
     photo: id.optional(),
   })
   .superRefine((stamp, ctx) => {
@@ -79,7 +83,8 @@ export const partnerSchema = z
   .object({
     id,
     name: localizedSchema,
-    kind: z.enum(['supporter', 'company', 'university', 'program']),
+    kind: z.enum(['supporter', 'university', 'company']),
+    country: localizedSchema.optional(),
     url: z.url().optional(),
     logo: z.string().startsWith('/').optional(),
     logoApproved: z.boolean(),

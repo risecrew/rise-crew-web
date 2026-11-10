@@ -2,7 +2,7 @@
   "Meta": {
     "home": {
       "title": "RISE CREW | 성균관대학교 창업 동아리",
-      "description": "성균관대학교 ANCHOR 사업단 공식 창업 동아리 RISE CREW. 캠퍼스에서 세계로, 실행하는 창업가를 키웁니다."
+      "description": "성균관대학교 앵커사업단 산하 글로벌 창업 동아리 RISE CREW. 캠퍼스에서 세계로, 실행하는 창업가를 키웁니다."
     },
     "about": {
       "title": "소개 | RISE CREW",
@@ -40,7 +40,7 @@
   },
   "Footer": {
     "tagline": "캠퍼스에서 세계로.",
-    "supportedBy": "성균관대학교 ANCHOR 사업단 공식 창업 동아리",
+    "supportedBy": "성균관대학교 앵커사업단 산하 글로벌 창업 동아리",
     "address": "서울 종로구 성균관로 25-2 호암관 50322호",
     "rights": "© {year} RISE CREW",
     "madeBy": "Made by RISE CREW 개발팀",
@@ -119,7 +119,7 @@
   },
   "About": {
     "title": "아이디어를 실행으로, 캠퍼스를 세계로",
-    "lead": "RISE CREW는 성균관대학교 ANCHOR 사업단과 함께하는 공식 창업 동아리입니다. 교육, 실습, 글로벌 경험으로 실행력을 갖춘 창업 인재를 키웁니다.",
+    "lead": "성균관대학교 앵커사업단 산하 글로벌 창업 동아리입니다. 교육, 실습, 글로벌 경험으로 실행력을 갖춘 창업 인재를 키웁니다.",
     "rise": {
       "title": "이름에 담은 네 가지 약속",
       "r": "Reach · 비전에 도달한다",
@@ -129,8 +129,8 @@
       "born": "Born to Global: 사업자 등록과 동시에 해외 시장을 겨냥하는 창업을 목표로 합니다."
     },
     "supporter": {
-      "title": "성균관대학교 ANCHOR 사업단",
-      "body": "ANCHOR 사업단은 RISE CREW를 지원하는 기관입니다. 서울시와 교육부의 RISE(지역혁신중심 대학지원체계) 사업에 참여하는 성균관대학교 사업단으로, 2025년 6월부터 2030년 2월까지 운영됩니다.",
+      "title": "앵커사업단과 함께합니다",
+      "body": "성균관대학교 앵커사업단은 RISE CREW를 지원하는 기관입니다. 서울시와 교육부의 RISE(지역혁신중심 대학지원체계) 사업에 참여하는 성균관대학교 사업단으로, 2025년 6월부터 2030년 2월까지 운영됩니다.",
       "kpiFunding": "창업팀 누적 펀딩 유치 24억 원",
       "kpiGlobal": "Born to Global 사업자 등록 창업팀 10개",
       "kpiLabel": "사업단 5개년 목표"
@@ -163,13 +163,12 @@
       "kind": {
         "supporter": "지원 기관",
         "company": "기업",
-        "university": "대학",
-        "program": "협력 프로그램"
+        "university": "대학"
       }
     },
     "mou": {
       "title": "카카오모빌리티 업무협약",
-      "date": "2025년 11월 28일 · 성균관대학교 ANCHOR 사업단 체결",
+      "date": "2025.11.28 · 앵커사업단 체결",
       "crew": "RISE CREW와 성창재 창업팀 멘토링·성장 지원",
       "vcc": "VCC 커리큘럼 공동 개발과 운영",
       "contest": "글로벌 대학생 창업경진대회 공동 기획과 운영"
@@ -803,10 +802,10 @@
     }
   },
   "Teams": {
-    "metaTitle": "창업팀",
+    "metaTitle": "창업팀 | RISE CREW",
     "metaDescription": "RISE CREW의 창업팀과 그들이 직접 올리는 소식.",
     "title": "창업팀",
-    "lead": "RISE CREW에서 실제로 무언가를 만들고 있는 팀들이에요. 팀이 직접 소개를 쓰고 소식을 올려요.",
+    "lead": "RISE CREW에서 활동 중인 창업팀입니다. 각 팀이 직접 소개를 쓰고 소식을 올립니다.",
     "filters": {
       "label": "거르기",
       "field": "분야",
@@ -816,8 +815,8 @@
     },
     "cohort": "{cohort}기",
     "total": "{count}개 팀",
-    "empty": "아직 소개할 팀이 없어요.",
-    "emptyFiltered": "조건에 맞는 팀이 없어요.",
+    "empty": "아직 소개할 팀이 없습니다.",
+    "emptyFiltered": "조건에 맞는 팀이 없습니다.",
     "fields": {
       "ai-software": "AI·소프트웨어",
       "edutech": "에듀테크",
@@ -916,7 +915,8 @@
       "removeCover": "지금 표지 사진 빼기"
     },
     "emptyPage": "이 쪽에는 팀이 없어요.",
-    "lockedApplying": "가입자 전용 글이 {count}개 있어요. 가입이 승인되면 볼 수 있어요."
+    "lockedApplying": "가입자 전용 글이 {count}개 있어요. 가입이 승인되면 볼 수 있어요.",
+    "metaTeamTitle": "{name} | RISE CREW 창업팀"
   },
   "Error": {
     "title": "잠시 문제가 생겼어요",
@@ -928,10 +928,10 @@
     "pinned": "고정",
     "edited": "{date} 수정",
     "activities": {
-      "metaTitle": "활동",
+      "metaTitle": "활동 | RISE CREW",
       "title": "활동",
-      "lead": "RISE CREW가 캠퍼스와 세계에서 해 온 일들입니다.",
-      "empty": "아직 올라온 활동이 없어요."
+      "lead": "RISE CREW가 캠퍼스와 세계에서 해 온 일을 기록합니다.",
+      "empty": "아직 올라온 활동이 없습니다."
     },
     "notices": {
       "metaTitle": "공지사항",

@@ -2,7 +2,7 @@
   "Meta": {
     "home": {
       "title": "RISE CREW | Sungkyunkwan University startup club",
-      "description": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We grow founders who execute, from campus to the world."
+      "description": "RISE CREW is a global startup club under the SKKU ANCHOR Division. We grow founders who execute, from campus to the world."
     },
     "about": {
       "title": "About | RISE CREW",
@@ -40,7 +40,7 @@
   },
   "Footer": {
     "tagline": "From campus to the world.",
-    "supportedBy": "Official startup club of the SKKU ANCHOR Division",
+    "supportedBy": "Global startup club under the SKKU ANCHOR Division",
     "address": "Room 50322, Hoam Hall, 25-2 Sungkyunkwan-ro, Jongno-gu, Seoul",
     "rights": "© {year} RISE CREW",
     "madeBy": "Made by the RISE CREW dev team",
@@ -119,7 +119,7 @@
   },
   "About": {
     "title": "Ideas into action, campus into the world",
-    "lead": "RISE CREW is the official startup club of the SKKU ANCHOR Division. We grow founders who can execute through education, practice and global experience.",
+    "lead": "A global startup club under the SKKU ANCHOR Division. We grow founders who can execute through education, practice and global experience.",
     "rise": {
       "title": "Four promises in our name",
       "r": "Reach your vision",
@@ -129,7 +129,7 @@
       "born": "Born to Global: we aim for ventures that target overseas markets from the day they register."
     },
     "supporter": {
-      "title": "SKKU ANCHOR Division",
+      "title": "Backed by the SKKU ANCHOR Division",
       "body": "The ANCHOR Division supports RISE CREW. It is Sungkyunkwan University's division in the Seoul RISE (Regional Innovation System & Education) program, running from June 2025 to February 2030.",
       "kpiFunding": "KRW 2.4 billion in cumulative startup funding",
       "kpiGlobal": "10 registered Born to Global startups",
@@ -163,13 +163,12 @@
       "kind": {
         "supporter": "Supporter",
         "company": "Company",
-        "university": "University",
-        "program": "Partner program"
+        "university": "University"
       }
     },
     "mou": {
       "title": "Partnership with Kakao Mobility",
-      "date": "November 28, 2025 · signed by the SKKU ANCHOR Division",
+      "date": "Nov 28, 2025 · signed by the SKKU ANCHOR Division",
       "crew": "Mentoring and growth support for RISE CREW and Seongchangjae teams",
       "vcc": "Co-developing and running the VCC curriculum",
       "contest": "Co-planning and running a global university startup competition"
@@ -803,7 +802,7 @@
     }
   },
   "Teams": {
-    "metaTitle": "Startups",
+    "metaTitle": "Startups | RISE CREW",
     "metaDescription": "The startup teams of RISE CREW, and the updates they post themselves.",
     "title": "Startups",
     "lead": "The teams building something real at RISE CREW. They write their own pages and post their own updates.",
@@ -916,7 +915,8 @@
       "removeCover": "Remove the current cover photo"
     },
     "emptyPage": "No teams on this page.",
-    "lockedApplying": "{count, plural, one {# post is} other {# posts are}} for members. You can read them once your application is approved."
+    "lockedApplying": "{count, plural, one {# post is} other {# posts are}} for members. You can read them once your application is approved.",
+    "metaTeamTitle": "{name} | RISE CREW Startups"
   },
   "Error": {
     "title": "Something went wrong",
@@ -928,7 +928,7 @@
     "pinned": "Pinned",
     "edited": "Edited {date}",
     "activities": {
-      "metaTitle": "Activities",
+      "metaTitle": "Activities | RISE CREW",
       "title": "Activities",
       "lead": "What RISE CREW has been doing, on campus and around the world.",
       "empty": "No activities yet."

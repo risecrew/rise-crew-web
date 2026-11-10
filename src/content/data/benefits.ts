@@ -21,10 +21,7 @@ export const benefits: Benefit[] = [
   },
   {
     id: 'programs',
-    title: L(
-      'ANCHOR 사업단 국내외 프로그램 우선 참여',
-      'Priority access to ANCHOR Division programs',
-    ),
+    title: L('앵커사업단 국내외 프로그램 우선 참여', 'Priority access to ANCHOR Division programs'),
     body: L(
       '사업단이 주관하는 국내외 프로그램에 우선 참여할 수 있습니다.',
       'Get priority access to domestic and global programs run by the ANCHOR Division.',
@@ -42,14 +39,6 @@ export const benefits: Benefit[] = [
     id: 'competitions',
     title: L('국내외 창업경진대회 참가 지원', 'Startup competitions'),
     body: L('준비 과정부터 출전 비용까지 지원합니다.', 'Support from preparation to entry costs.'),
-  },
-  {
-    id: 'internships',
-    title: L('스타트업 인턴십', 'Startup internships'),
-    body: L(
-      '유망 스타트업에서 인턴으로 일하며 현장 경험과 네트워크를 쌓습니다.',
-      'Intern at promising startups to gain field experience and a network.',
-    ),
   },
   {
     id: 'government',
