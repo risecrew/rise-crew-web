@@ -25,6 +25,9 @@ export async function Stages({
 }) {
   const t = await getTranslations('Home.stages');
   const m = await getTranslations('Home.mentors');
+  const shown = mentors.slice(0, 7);
+  // Everyone else, named on the page or not: the total is the club's own count.
+  const more = Math.max(0, (Number.parseInt(mentorCount, 10) || mentors.length) - shown.length);
 
   return (
     <section aria-labelledby="stages-title" className="section-y text-white">
@@ -101,28 +104,39 @@ export async function Stages({
           })}
         </ol>
 
-        <div className="mt-10 flex flex-col gap-6 border-t border-white/10 pt-10 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
-            <p className="font-display text-subhead break-keep">
-              {m('title', { count: mentorCount })}
-            </p>
-            <ul className="flex -space-x-2" aria-label={m('faces')}>
-              {mentors.slice(0, 7).map((mentor) => (
-                <li key={mentor.id}>
-                  <Face mentor={mentor} locale={locale} />
-                </li>
-              ))}
-              {mentors.length > 7 ? (
-                <li
-                  aria-hidden
-                  className="flex size-11 items-center justify-center rounded-full border-2 border-stage bg-cobalt text-sm font-semibold"
-                >
-                  +
-                </li>
-              ) : null}
-            </ul>
+        {/* The mentors behind every stage: a panel under the cobalt light, the first seven faces and
+            how many more there are. */}
+        <div className="relative isolate mt-10 overflow-hidden rounded-2xl border border-white/10 p-6 md:p-8">
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_120%_at_0%_50%,rgb(0_62_145/0.7),transparent_70%),rgb(255_255_255/0.03)]"
+          />
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="font-display text-subhead break-keep">
+                {m('title', { count: mentorCount })}
+              </p>
+              <p className="mt-2 text-base break-keep text-white/80">{m('body')}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-5">
+              <ul className="flex -space-x-3" aria-label={m('faces')}>
+                {shown.map((mentor) => (
+                  <li key={mentor.id}>
+                    <Face mentor={mentor} locale={locale} />
+                  </li>
+                ))}
+                {more > 0 ? (
+                  <li
+                    aria-hidden
+                    className="flex size-12 items-center justify-center rounded-full border-2 border-stage bg-lime text-sm font-bold text-cobalt"
+                  >
+                    +{more}
+                  </li>
+                ) : null}
+              </ul>
+              <TextLink href={{ pathname: '/network', hash: 'mentors' }}>{m('all')}</TextLink>
+            </div>
           </div>
-          <TextLink href={{ pathname: '/network', hash: 'mentors' }}>{m('all')}</TextLink>
         </div>
       </div>
     </section>
@@ -136,15 +150,15 @@ function Face({ mentor, locale }: { mentor: Mentor; locale: Locale }) {
     <Image
       src={mentor.photo}
       alt={name}
-      width={44}
-      height={44}
-      className="size-11 rounded-full border-2 border-stage object-cover"
+      width={48}
+      height={48}
+      className="size-12 rounded-full border-2 border-stage object-cover"
     />
   ) : (
     <span
       role="img"
       aria-label={name}
-      className="flex size-11 items-center justify-center rounded-full border-2 border-stage bg-white/15 text-sm font-semibold"
+      className="flex size-12 items-center justify-center rounded-full border-2 border-stage bg-cobalt text-base font-semibold"
     >
       {Array.from(name)[0]}
     </span>

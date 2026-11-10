@@ -26,8 +26,9 @@ export async function Recent({
   const common = await getTranslations('Common');
   const [first, ...rest] = events.slice(0, 5);
 
+  // Right after the stages, so it needs no space of its own above it.
   return (
-    <section aria-labelledby="recent-title" className="section-y text-white">
+    <section aria-labelledby="recent-title" className="pb-[72px] text-white md:pb-24 xl:pb-[120px]">
       <div className="shell">
         <div className="flex items-end justify-between gap-6">
           <h2 id="recent-title" className="font-display text-headline break-keep">

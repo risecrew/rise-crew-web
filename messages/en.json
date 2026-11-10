@@ -129,7 +129,8 @@
     "mentors": {
       "title": "{count} mentors stand behind every stage",
       "faces": "Mentors",
-      "all": "See all mentors"
+      "all": "See all mentors",
+      "body": "Working professionals from Kakao Mobility, VCs, accelerators and faculty, from idea to fundraising and going abroad."
     },
     "recent": {
       "title": "Recent activities",
