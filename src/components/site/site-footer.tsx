@@ -3,7 +3,6 @@ import { RiseSymbol } from '@/components/brand/rise-symbol';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { FooterAccountLink } from './account-menu';
-import { ApprovedOnly } from './approved-only';
 import { LocaleSwitch } from './locale-switch';
 import { getNavItems } from './site-header';
 
@@ -28,20 +27,13 @@ export async function SiteFooter() {
         </div>
         <nav aria-label={nav('footer')}>
           <ul className="flex flex-col gap-2">
-            {items.map((item) => {
-              const row = (
-                <li key={item.href}>
-                  <Link href={item.href} className="underline-offset-4 hover:underline">
-                    {nav(item.key)}
-                  </Link>
-                </li>
-              );
-              return 'approvedOnly' in item ? (
-                <ApprovedOnly key={item.href}>{row}</ApprovedOnly>
-              ) : (
-                row
-              );
-            })}
+            {items.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="underline-offset-4 hover:underline">
+                  {nav(item.key)}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
         <ul className="flex flex-col gap-2">

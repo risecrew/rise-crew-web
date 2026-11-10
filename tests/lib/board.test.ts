@@ -1,21 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  activitySchema,
-  BOARD_LIMITS,
-  cleanFileName,
-  isActivityDate,
-  noticeFileContentType,
-  noticeFileProblem,
-  noticeSchema,
-  readAttachments,
-} from '@/lib/board/forms';
-import {
-  activityTimeline,
-  formatFileSize,
-  isUploadedPhoto,
-  localized,
-  showsFallback,
-} from '@/lib/board/text';
+import { activitySchema, BOARD_LIMITS, isActivityDate } from '@/lib/board/forms';
+import { activityTimeline, isUploadedPhoto, localized, showsFallback } from '@/lib/board/text';
 
 const activity = {
   date: '2026-11-06',
@@ -79,24 +64,6 @@ describe('activitySchema', () => {
   });
 });
 
-describe('noticeSchema', () => {
-  const notice = { title_ko: '공지', title_en: '', body_ko: '본문', body_en: '', is_pinned: true };
-  it('needs a Korean title and body', () => {
-    expect(noticeSchema.safeParse(notice).success).toBe(true);
-    expect(noticeSchema.safeParse({ ...notice, body_ko: ' ' }).success).toBe(false);
-  });
-  it('counts a line break as one character', () => {
-    const body = `${'가'.repeat(BOARD_LIMITS.noticeBody - 2)}\r\n가`;
-    expect(noticeSchema.safeParse({ ...notice, body_ko: body }).success).toBe(true);
-  });
-  it('refuses a body over the limit', () => {
-    const body = '가'.repeat(BOARD_LIMITS.noticeBody + 1);
-    expect(noticeSchema.safeParse({ ...notice, body_ko: body }).error?.issues[0]?.message).toBe(
-      'tooLong',
-    );
-  });
-});
-
 describe('isUploadedPhoto', () => {
   it('tells an uploaded file from a photo that ships with the site', () => {
     expect(isUploadedPhoto('7e5c0000-0000-4000-8000-00000000b001.jpg')).toBe(true);
@@ -129,41 +96,5 @@ describe('activityTimeline', () => {
       evidence: [],
     });
     expect(events[0]).not.toHaveProperty('date', null);
-  });
-});
-
-describe('notice attachments', () => {
-  it('knows a file by its ending, whatever the browser calls it', () => {
-    expect(noticeFileProblem({ name: '모집 안내.HWP', size: 100 })).toBeNull();
-    expect(noticeFileProblem({ name: '지원서.docx', size: 100 })).toBeNull();
-    expect(noticeFileContentType('지원서.hwp')).toBe('application/x-hwp');
-  });
-  it('refuses a page, a program or an archive, even under a double ending', () => {
-    for (const name of ['a.html', 'a.svg', 'a.exe', 'a.zip', 'a.pdf.html', 'noending']) {
-      expect(noticeFileProblem({ name, size: 100 })).toBe('badType');
-    }
-  });
-  it('refuses a file over the limit', () => {
-    expect(noticeFileProblem({ name: 'a.pdf', size: BOARD_LIMITS.noticeFileBytes + 1 })).toBe(
-      'tooLarge',
-    );
-  });
-  it('reads attachments back, and an unreadable value as none', () => {
-    const file = { path: '7e5c0000-0000-4000-8000-00000000b001.pdf', name: '안내.pdf', size: 10 };
-    expect(readAttachments([file])).toEqual([file]);
-    expect(readAttachments('nonsense')).toEqual([]);
-    expect(readAttachments([{ path: 'https://example.test/a.pdf', name: 'a', size: 1 }])).toEqual(
-      [],
-    );
-  });
-  it('keeps a long file name to the limit with its ending, and without folders', () => {
-    const name = cleanFileName(`../${'가'.repeat(300)}.pdf`);
-    expect(name.length).toBeLessThanOrEqual(BOARD_LIMITS.noticeFileName);
-    expect(name.endsWith('.pdf')).toBe(true);
-    expect(name).not.toContain('/');
-  });
-  it('says a size in the unit a person would', () => {
-    expect(formatFileSize(900)).toBe('1 KB');
-    expect(formatFileSize(2.5 * 1024 * 1024)).toBe('2.5 MB');
   });
 });

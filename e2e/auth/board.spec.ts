@@ -2,10 +2,9 @@ import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { collectConsoleErrors, expectAccessible, expectNoHorizontalScroll } from '../helpers';
 import { adminClient, createOnboardedAccount, deleteAccount, signIn } from './helpers';
 
-// What operators publish and everyone reads: activities and notices. Fake data on the local stack.
+// What operators publish and everyone reads: activities. Fake data on the local stack.
 const OPERATOR = 'operator@example.test';
 const MEMBER = 'member@example.test';
-const APPROVED = 'guest@example.test';
 
 // The smallest JPEG a browser will decode, so the upload and shrink path runs for real.
 const JPEG = Buffer.from(
@@ -39,15 +38,6 @@ async function addActivity(
   await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
 }
 
-async function addNotice(page: Page, title: string, body = '본문입니다.', pinned = false) {
-  await page.goto('/ko/admin/notices/new');
-  await page.getByLabel('제목', { exact: true }).fill(title);
-  await page.getByLabel('본문', { exact: true }).fill(body);
-  if (pinned) await page.getByLabel('맨 위에 고정').check();
-  await page.getByRole('button', { name: '저장' }).click();
-  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
-}
-
 // The account links are behind the circle on a wide screen and in the menu panel on a phone.
 async function openAccountLinks(page: Page) {
   await page
@@ -56,22 +46,6 @@ async function openAccountLinks(page: Page) {
     .locator('visible=true')
     .first()
     .click();
-}
-
-async function openPhoneMenu(page: Page) {
-  const summary = page.locator('header button[aria-controls="site-menu"]');
-  if (await summary.isVisible()) await summary.click();
-}
-
-// The account shows once the browser has read the session; only then does the menu say who sees what.
-async function expectSignedInHeader(page: Page) {
-  await expect(
-    page
-      .getByRole('button', { name: /계정 메뉴/ })
-      .or(page.locator('header a[href="/ko/me"]'))
-      .locator('visible=true')
-      .first(),
-  ).toBeVisible();
 }
 
 async function photoOf(title: string): Promise<string | null> {
@@ -232,135 +206,6 @@ test('activities moved from the code can be edited and keep their photo', async 
   );
 });
 
-test('a notice goes up, stays pinned on top, can be changed, and can be deleted', async ({
-  page,
-  browser,
-  baseURL,
-}, testInfo) => {
-  const id = unique(testInfo);
-  const pinned = `고정 공지 ${id}`;
-  const plain = `일반 공지 ${id}`;
-  await signIn(page, OPERATOR, baseURL!);
-  await addNotice(page, pinned, '고정 본문 https://example.test/a', true);
-  await addNotice(page, plain, '줄 하나\n줄 둘');
-
-  const visitor = await (await browser.newContext()).newPage();
-  await signIn(visitor, APPROVED, baseURL!);
-  await visitor.goto('/ko/notices');
-  const rows = visitor.locator('[data-notice]');
-  const texts = await rows.allInnerTexts();
-  const [first, second] = [pinned, plain].map((title) =>
-    texts.findIndex((text) => text.includes(title)),
-  );
-  expect(first).toBeGreaterThanOrEqual(0);
-  expect(second).toBeGreaterThan(first);
-  await expect(rows.filter({ hasText: pinned })).toContainText('고정');
-  await expectAccessible(visitor);
-
-  await rows.filter({ hasText: pinned }).getByRole('link').click();
-  await expect(visitor.getByRole('heading', { name: pinned })).toBeVisible();
-  await expect(visitor.getByRole('link', { name: 'https://example.test/a' })).toHaveAttribute(
-    'rel',
-    /nofollow/,
-  );
-
-  await visitor.goto(visitor.url().replace('/ko/', '/en/'));
-  await expect(visitor.getByRole('heading', { name: pinned })).toHaveAttribute('lang', 'ko');
-  const noticeUrl = visitor.url();
-
-  await page.getByRole('link', { name: new RegExp(pinned) }).click();
-  await page.getByLabel('제목', { exact: true }).fill(`${pinned} 수정`);
-  await page.getByRole('button', { name: '저장' }).click();
-  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
-  await visitor.goto(noticeUrl);
-  await expect(visitor.getByRole('heading', { name: `${pinned} 수정` })).toBeVisible();
-
-  await page.getByRole('link', { name: new RegExp(pinned) }).click();
-  await page.getByRole('button', { name: '지우기' }).click();
-  await page.getByRole('button', { name: '지우기' }).click();
-  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
-  expect((await visitor.request.get(noticeUrl)).status()).toBe(404);
-  await visitor.context().close();
-  await adminClient().from('notices').delete().eq('title_ko', plain);
-});
-
-test('a notice over the length limit is refused with what was typed left in place', async ({
-  page,
-  baseURL,
-}) => {
-  await signIn(page, OPERATOR, baseURL!);
-  await page.goto('/ko/admin/notices/new');
-  await page.getByLabel('제목', { exact: true }).fill('긴 공지');
-  await page.getByLabel('본문', { exact: true }).fill('가'.repeat(5001));
-  await page.getByRole('button', { name: '저장' }).click();
-  await expect(page.getByText('글자 수가 너무 많아요.')).toBeVisible();
-  await expect(page.getByLabel('제목', { exact: true })).toHaveValue('긴 공지');
-});
-
-test('a notice address that does not exist is a 404', async ({ browser, baseURL }) => {
-  const page = await (await browser.newContext()).newPage();
-  await signIn(page, APPROVED, baseURL!);
-  for (const id of ['00000000-0000-4000-8000-000000000000', 'not-a-uuid']) {
-    expect((await page.request.get(`/ko/notices/${id}`)).status()).toBe(404);
-  }
-  await page.context().close();
-});
-
-test('notices do not exist for anyone not approved, and are in the menu for those who are', async ({
-  browser,
-  baseURL,
-}, testInfo) => {
-  const title = `회원 공지 ${unique(testInfo)}`;
-  const email = `applying-${unique(testInfo)}@example.test`;
-  await createOnboardedAccount(email, { role: 'applicant' });
-  const operator = await (await browser.newContext()).newPage();
-  await signIn(operator, OPERATOR, baseURL!);
-  await addNotice(operator, title);
-  const { data } = await adminClient().from('notices').select('id').eq('title_ko', title).single();
-  const paths = ['/ko/notices', '/en/notices', `/ko/notices/${data!.id}`];
-
-  // Signed out.
-  const anonymous = await (await browser.newContext()).newPage();
-  for (const path of paths) expect((await anonymous.request.get(path)).status()).toBe(404);
-  await anonymous.goto('/ko');
-  await openPhoneMenu(anonymous);
-  await expect(
-    anonymous.locator('header').getByRole('link', { name: '로그인' }).first(),
-  ).toBeVisible();
-  await expect(anonymous.locator('a[href="/ko/notices"]')).toHaveCount(0);
-
-  // Applied, not approved.
-  const applying = await (await browser.newContext()).newPage();
-  await signIn(applying, email, baseURL!);
-  for (const path of paths) expect((await applying.request.get(path)).status()).toBe(404);
-  await applying.goto('/ko');
-  await openPhoneMenu(applying);
-  await expectSignedInHeader(applying);
-  await expect(applying.locator('a[href="/ko/notices"]')).toHaveCount(0);
-  await applying.goto('/ko/me');
-  await expect(applying.locator('[data-applying]')).toBeVisible();
-
-  // Approved.
-  const approved = await (await browser.newContext()).newPage();
-  await signIn(approved, APPROVED, baseURL!);
-  await approved.goto('/ko');
-  await openPhoneMenu(approved);
-  await expect(
-    approved.locator('a[href="/ko/notices"]').filter({ visible: true }).first(),
-  ).toBeVisible();
-  await approved.goto('/ko/notices');
-  await expect(approved.locator('[data-notice]', { hasText: title })).toBeVisible();
-  await approved.goto(`/ko/notices/${data!.id}`);
-  await expect(approved.getByRole('heading', { name: title })).toBeVisible();
-
-  // Activities stay open to everyone.
-  expect((await anonymous.request.get('/ko/activities')).status()).toBe(200);
-
-  await deleteAccount(email);
-  await adminClient().from('notices').delete().eq('title_ko', title);
-  for (const page of [operator, anonymous, applying, approved]) await page.context().close();
-});
-
 test('an operator approves one applicant and declines another, who is then deleted', async ({
   browser,
   baseURL,
@@ -432,23 +277,18 @@ test('an operator approves one applicant and declines another, who is then delet
   await page.context().close();
 });
 
-test('the account menu leads operators to both screens', async ({ page, baseURL }) => {
+test('the account menu leads operators to the activities screen', async ({ page, baseURL }) => {
   await signIn(page, OPERATOR, baseURL!);
   await page.goto('/ko');
   await openAccountLinks(page);
   await page.getByRole('link', { name: '활동 관리' }).first().click();
   await expect(page.getByRole('heading', { name: '활동 관리' })).toBeVisible();
   await expectAccessible(page);
-  await page.goto('/ko');
-  await openAccountLinks(page);
-  await page.getByRole('link', { name: '공지 관리' }).first().click();
-  await expect(page.getByRole('heading', { name: '공지 관리' })).toBeVisible();
-  await expectAccessible(page);
 });
 
 test('nobody else reaches the screens or can write', async ({ page, baseURL }) => {
   await signIn(page, MEMBER, baseURL!);
-  for (const path of ['activities', 'activities/new', 'notices', 'notices/new']) {
+  for (const path of ['activities', 'activities/new']) {
     await page.goto(`/ko/admin/${path}`);
     await expect(page.getByRole('heading', { name: /관리|올리기|쓰기/ })).toHaveCount(0);
   }
@@ -464,9 +304,9 @@ test('someone demoted mid-form is refused, and the photo does not stay behind', 
   const email = `demoted-${unique(testInfo)}@example.test`;
   const id = await createOnboardedAccount(email, { role: 'operator' });
   await signIn(page, email, baseURL!);
-  await page.goto('/ko/admin/notices/new');
-  await page.getByLabel('제목', { exact: true }).fill('강등 공지');
-  await page.getByLabel('본문', { exact: true }).fill('본문');
+  await page.goto('/ko/admin/activities/new');
+  await page.getByLabel('제목', { exact: true }).fill('강등 활동');
+  await page.getByLabel('도시', { exact: true }).fill('서울');
   const { error } = await adminClient()
     .from('user_roles')
     .update({ role: 'member' })
@@ -474,102 +314,9 @@ test('someone demoted mid-form is refused, and the photo does not stay behind', 
   if (error) throw error;
   await page.getByRole('button', { name: '저장' }).click();
   await expect(page.getByRole('alert').getByText(/권한이 없어요/)).toBeVisible();
-  const { data } = await adminClient().from('notices').select('id').eq('title_ko', '강등 공지');
+  const { data } = await adminClient().from('activities').select('id').eq('title_ko', '강등 활동');
   expect(data).toEqual([]);
   await deleteAccount(email);
-});
-
-async function noticeFilesExist(paths: string[]): Promise<boolean[]> {
-  const { data, error } = await adminClient()
-    .storage.from('notice-files')
-    .list('', { limit: 1000 });
-  if (error) throw error;
-  const names = new Set(data.map((file) => file.name));
-  return paths.map((path) => names.has(path));
-}
-
-test('a notice carries photos and files, which download under their name and go when they are removed', async ({
-  page,
-  browser,
-  baseURL,
-}, testInfo) => {
-  const title = `첨부 공지 ${unique(testInfo)}`;
-  await signIn(page, OPERATOR, baseURL!);
-  await page.goto('/ko/admin/notices/new');
-  await expect(page.getByText(/개인정보가 든 파일은 올리지 마세요/)).toBeVisible();
-  await page.getByLabel('제목', { exact: true }).fill(title);
-  await page.getByLabel('본문', { exact: true }).fill('본문입니다.');
-
-  // A page is refused where the file was picked, and nothing is added.
-  await page.getByLabel(/첨부 파일/).setInputFiles({
-    name: 'evil.html',
-    mimeType: 'text/html',
-    buffer: Buffer.from('<script>alert(1)</script>'),
-  });
-  await expect(page.getByText(/올릴 수 없는 형식/)).toBeVisible();
-
-  await page.getByLabel(/^사진/).setInputFiles({
-    name: 'photo.jpg',
-    mimeType: 'image/jpeg',
-    buffer: JPEG,
-  });
-  await page.getByLabel(/첨부 파일/).setInputFiles([
-    { name: '모집 안내.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 test') },
-    // Browsers often send a Hangul file with no type at all.
-    { name: '지원서.hwp', mimeType: '', buffer: Buffer.from('hwp test') },
-  ]);
-  await page.getByRole('button', { name: '저장' }).click();
-  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
-
-  const { data, error } = await adminClient()
-    .from('notices')
-    .select('id, photo_paths, attachments')
-    .eq('title_ko', title)
-    .single();
-  if (error) throw error;
-  const files = data.attachments as { path: string; name: string }[];
-  expect(files.map((file) => file.name)).toEqual(['모집 안내.pdf', '지원서.hwp']);
-  expect(data.photo_paths).toHaveLength(1);
-
-  const visitor = await (await browser.newContext()).newPage();
-  await signIn(visitor, APPROVED, baseURL!);
-  await visitor.goto(`/ko/notices/${data.id}`);
-  await expect(visitor.getByRole('img', { name: `${title} 사진 1` })).toBeVisible();
-  const link = visitor.getByRole('link', { name: /모집 안내\.pdf/ });
-  const response = await visitor.request.get((await link.getAttribute('href'))!);
-  expect(response.status()).toBe(200);
-  expect(response.headers()['content-disposition']).toContain('attachment');
-
-  // Without the short-lived address the file does not open, and the bucket does not list it.
-  const { data: publicUrl } = adminClient()
-    .storage.from('notice-files')
-    .getPublicUrl(files[0].path);
-  expect((await visitor.request.get(publicUrl.publicUrl)).status()).toBeGreaterThanOrEqual(400);
-  await expectAccessible(visitor);
-  await expectNoHorizontalScroll(visitor);
-
-  // The list says there is something attached.
-  await visitor.goto('/ko/notices');
-  await expect(visitor.locator('[data-notice]', { hasText: title })).toContainText('첨부');
-
-  // Removing one file on the edit screen removes it from Storage, and keeps the rest.
-  await page.goto(`/ko/admin/notices/${data.id}`);
-  await page.getByRole('button', { name: '모집 안내.pdf 빼기' }).click();
-  await page.getByRole('button', { name: '저장' }).click();
-  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
-  expect(await noticeFilesExist([files[0].path, files[1].path, data.photo_paths[0]])).toEqual([
-    false,
-    true,
-    true,
-  ]);
-
-  // Deleting the notice takes the rest with it.
-  await page.goto(`/ko/admin/notices/${data.id}`);
-  await page.getByRole('button', { name: '지우기' }).click();
-  await page.getByRole('button', { name: '지우기' }).click();
-  await expect(page).toHaveURL(/\/ko\/admin\/notices$/);
-  expect(await noticeFilesExist([files[1].path, data.photo_paths[0]])).toEqual([false, false]);
-  await visitor.context().close();
 });
 
 test('an activity without a photo shows the club mark instead of a word', async ({ page }) => {
@@ -634,13 +381,4 @@ test('removing the photo also cancels one just picked', async ({ page, baseURL }
   expect(await photoOf(title)).toBeNull();
   expect(await fileExists(first)).toBe(false);
   await cleanUpActivity(title);
-});
-
-test('a refused notice keeps the pin', async ({ page, baseURL }) => {
-  await signIn(page, OPERATOR, baseURL!);
-  await page.goto('/ko/admin/notices/new');
-  await page.getByLabel('맨 위에 고정').check();
-  await page.getByRole('button', { name: '저장' }).click();
-  await expect(page.getByText('꼭 입력해 주세요.').first()).toBeVisible();
-  await expect(page.getByLabel('맨 위에 고정')).toBeChecked();
 });

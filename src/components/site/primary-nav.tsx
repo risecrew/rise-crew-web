@@ -2,9 +2,8 @@
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { ApprovedOnly } from './approved-only';
 
-export type NavItem = { href: string; label: string; approvedOnly: boolean };
+export type NavItem = { href: string; label: string };
 
 // Whether a menu item is the page the visitor is on, or a page under it.
 export function isCurrent(pathname: string, href: string): boolean {
@@ -18,7 +17,7 @@ export function PrimaryNav({ items, label }: { items: NavItem[]; label: string }
       <ul className="flex items-center gap-8">
         {items.map((item) => {
           const current = isCurrent(pathname, item.href);
-          const row = (
+          return (
             <li key={item.href}>
               <Link
                 href={item.href}
@@ -34,7 +33,6 @@ export function PrimaryNav({ items, label }: { items: NavItem[]; label: string }
               </Link>
             </li>
           );
-          return item.approvedOnly ? <ApprovedOnly key={item.href}>{row}</ApprovedOnly> : row;
         })}
       </ul>
     </nav>

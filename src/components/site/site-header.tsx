@@ -20,8 +20,6 @@ export function getNavItems() {
       ? ([
           { href: '/startups', key: 'startups' },
           { href: '/activities', key: 'activities' },
-          // Approved accounts only: see ApprovedOnly.
-          { href: '/notices', key: 'notices', approvedOnly: true },
         ] as const)
       : []),
     { href: '/network', key: 'network' },
@@ -54,7 +52,6 @@ async function getAccountLabels() {
     members: t('members'),
     teams: t('teams'),
     activities: t('activities'),
-    notices: t('notices'),
     signOut: t('signOut'),
   };
 }
@@ -64,7 +61,6 @@ export async function SiteHeader() {
   const items = getNavItems().map((item) => ({
     href: item.href,
     label: t(item.key),
-    approvedOnly: 'approvedOnly' in item,
   }));
   const applyLabel = await getApplyLabel();
 

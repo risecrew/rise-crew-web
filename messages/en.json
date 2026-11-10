@@ -38,7 +38,6 @@
     "skip": "Skip to content",
     "startups": "Startups",
     "activities": "Activities",
-    "notices": "Notices",
     "apply": "Apply",
     "applyInfo": "How to apply",
     "openMenu": "Open menu",
@@ -75,11 +74,6 @@
       }
     },
     "temporaryPhoto": "Temporary photo"
-  },
-  "Cta": {
-    "apply": "Apply",
-    "notice": "See recruitment",
-    "partner": "Partner with us"
   },
   "Home": {
     "hero": {
@@ -457,8 +451,7 @@
       "members": "Members",
       "teams": "Teams",
       "signOut": "Sign out",
-      "activities": "Manage activities",
-      "notices": "Manage notices"
+      "activities": "Manage activities"
     },
     "login": {
       "title": "Sign in",
@@ -629,7 +622,7 @@
       },
       "deleted": "Your account has been deleted. Thanks for being part of RISE CREW.",
       "changePassword": "Change password",
-      "applying": "We've received your application. Once an operator approves it, you can read notices and posts for members."
+      "applying": "We've received your application. Once an operator approves it, you can read posts for members."
     },
     "switch": {
       "label": "Sign in or sign up",
@@ -854,31 +847,6 @@
       "planned": "Has not happened yet",
       "plannedHint": "Shows as \"Upcoming\". Turn it off once the event is over.",
       "deleteQuestion": "Delete this activity? This cannot be undone."
-    },
-    "notices": {
-      "title": "Manage notices",
-      "new": "Write a notice",
-      "edit": "Edit notice",
-      "toPage": "View the notices page",
-      "empty": "No notices yet.",
-      "titleKo": "Title (Korean)",
-      "titleEn": "Title (English, optional)",
-      "bodyKo": "Body (Korean)",
-      "bodyEn": "Body (English, optional)",
-      "pinned": "Pin to the top",
-      "deleteQuestion": "Delete this notice? This cannot be undone.",
-      "photos": "Photos (optional, up to {count})",
-      "files": "Files (optional, up to {count})",
-      "filesHint": "PDF, Hangul, Word, Excel and PowerPoint files, up to 10MB each.",
-      "publicWarning": "Only approved accounts can see the photos and files you attach. Even so, never attach anything with personal details, such as a list of applicants or contacts.",
-      "remove": "Remove",
-      "removeLabel": "Remove {name}",
-      "removePhoto": "Remove photo {number}",
-      "photoAlt": "Attached photo {number}",
-      "tooManyPhotos": "You can attach up to {count} photos.",
-      "tooManyFiles": "You can attach up to {count} files.",
-      "fileTooLarge": "{name} is over 10MB.",
-      "fileBadType": "{name} isn't a type that can be attached."
     }
   },
   "Teams": {
@@ -1005,24 +973,12 @@
     "home": "Go home"
   },
   "Board": {
-    "pinned": "Pinned",
-    "edited": "Edited {date}",
     "activities": {
       "metaTitle": "Activities | RISE CREW",
       "title": "Activities",
       "lead": "What RISE CREW has been doing, on campus and around the world.",
       "empty": "No activities yet."
-    },
-    "notices": {
-      "metaTitle": "Notices",
-      "title": "Notices",
-      "lead": "Recruitment and event announcements.",
-      "empty": "No notices yet.",
-      "toList": "Back to notices"
-    },
-    "files": "Files",
-    "hasFiles": "Files",
-    "photoAlt": "{title}, photo {number}"
+    }
   },
   "CtaBand": {
     "title": "Join RISE CREW",

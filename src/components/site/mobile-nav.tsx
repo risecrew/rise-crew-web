@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CloseIcon, MenuIcon } from '@/components/icons';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { ApprovedOnly } from './approved-only';
 import { LocaleSwitch } from './locale-switch';
 import { isCurrent, type NavItem } from './primary-nav';
 
@@ -89,7 +88,7 @@ export function MobileNav({
             <ul>
               {items.map((item) => {
                 const current = isCurrent(pathname, item.href);
-                const row = (
+                return (
                   <li key={item.href}>
                     <Link
                       href={item.href}
@@ -104,7 +103,6 @@ export function MobileNav({
                     </Link>
                   </li>
                 );
-                return item.approvedOnly ? <ApprovedOnly key={item.href}>{row}</ApprovedOnly> : row;
               })}
             </ul>
           </nav>
