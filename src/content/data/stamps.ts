@@ -29,7 +29,7 @@ export const stamps: Stamp[] = [
     evidence: [brochure],
   },
   {
-    // TODO(운영진 확인): whether this was a VCC session, and its official name.
+    // Not a VCC session (organizers, 2026-11-10).
     id: 'seminar-2025',
     date: '2025-11-19',
     city: seoul,

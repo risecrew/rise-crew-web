@@ -21,6 +21,8 @@ export const partners: Partner[] = [
   {
     id: 'seoul-anchor-center',
     kind: 'supporter',
+    // The Seoul RISE program is now called ANCHOR; no English name for the renamed center is
+    // published yet (the former one was the Seoul RISE Center). TODO(운영진 확인)
     name: koOnly('서울앵커센터'),
     country: KR,
     logoApproved: false,
@@ -119,12 +121,18 @@ export const partners: Partner[] = [
   {
     id: 'one-degree-labs',
     kind: 'company',
-    name: koOnly('원디그리랩스'),
+    name: L('원디그리랩스', 'One Degree Labs'),
     country: KR,
     logoApproved: false,
   },
-  // TODO(운영진 확인): the country.
-  { id: 'outsome', kind: 'company', name: L('아웃썸', 'Outsome'), logoApproved: false },
+  // Offices in Songdo, Incheon and Delaware, USA (outsome.co).
+  {
+    id: 'outsome',
+    kind: 'company',
+    name: L('아웃썸', 'Outsome'),
+    country: L('한국·미국', 'Korea and the US'),
+    logoApproved: false,
+  },
   {
     id: 'nextrans',
     kind: 'company',
