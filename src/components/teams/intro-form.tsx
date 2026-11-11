@@ -9,7 +9,18 @@ import { Link } from '@/i18n/navigation';
 import { TEAM_LIMITS, TEAM_LINK_KINDS, checkPhoto, type TeamLink } from '@/lib/teams/forms';
 import { removeTeamImage, uploadTeamImage, type UploadError } from '@/lib/teams/upload';
 import { FieldNotice } from './field-notice';
-import { AREA, FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from './form-parts';
+import {
+  AREA,
+  FIELD,
+  LABEL,
+  MESSAGE,
+  OUTLINE,
+  PRIMARY,
+  ROW,
+  SELECT,
+  TEXT_BUTTON,
+} from './form-parts';
+import { SelectChevron } from './select-chevron';
 
 type Props = {
   team: {
@@ -239,24 +250,27 @@ export function IntroForm({ team }: Props) {
               <div className="grid gap-2 sm:grid-cols-[10rem_1fr]">
                 <label className="block">
                   <span className={LABEL}>{t('linkKind')}</span>
-                  <select
-                    name="link_kind"
-                    value={link.kind}
-                    onChange={(event) =>
-                      setLinks((all) =>
-                        all.map((item) =>
-                          item.key === link.key ? { ...item, kind: event.target.value } : item,
-                        ),
-                      )
-                    }
-                    className={FIELD}
-                  >
-                    {TEAM_LINK_KINDS.map((kind) => (
-                      <option key={kind} value={kind} className="text-black">
-                        {kinds(kind)}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="relative mt-2 block">
+                    <select
+                      name="link_kind"
+                      value={link.kind}
+                      onChange={(event) =>
+                        setLinks((all) =>
+                          all.map((item) =>
+                            item.key === link.key ? { ...item, kind: event.target.value } : item,
+                          ),
+                        )
+                      }
+                      className={SELECT}
+                    >
+                      {TEAM_LINK_KINDS.map((kind) => (
+                        <option key={kind} value={kind}>
+                          {kinds(kind)}
+                        </option>
+                      ))}
+                    </select>
+                    <SelectChevron />
+                  </span>
                 </label>
                 <label className="block">
                   <span className={LABEL}>{t('linkUrl')}</span>

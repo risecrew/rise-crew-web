@@ -13,3 +13,7 @@ export const OUTLINE =
 export const TEXT_BUTTON =
   'inline-flex min-h-11 cursor-pointer items-center px-3 text-base text-white underline underline-offset-4';
 export const TITLE = 'font-display text-hero text-balance break-keep';
+// A select drawn like the other pills: the browser's own control is hidden and a chevron
+// (SelectChevron) sits in its place, so the box is the same height as the fields beside it.
+export const SELECT =
+  'w-full cursor-pointer appearance-none rounded-full border border-white/50 bg-white/5 py-3.5 pr-12 pl-5 text-base text-white [color-scheme:dark] aria-invalid:border-white';
