@@ -105,7 +105,10 @@ test('a refused team keeps what was typed, and two teams can share a name', asyn
   await page.goto('/ko/admin/teams/new');
   await expect(page.getByLabel('주소')).toHaveCount(0);
   await page.getByLabel('팀 이름').fill(`같은 이름 ${id}`);
-  await page.getByLabel('기수').fill('abc');
+  // The cohort takes digits only; a number the database refuses still gets a message.
+  await page.getByLabel('기수').fill('2기');
+  await expect(page.getByLabel('기수')).toHaveValue('2');
+  await page.getByLabel('기수').fill('0');
   await page.getByRole('button', { name: '만들기' }).click();
   await expect(page.getByText('이 값은 쓸 수 없어요.')).toBeVisible();
   await expect(page.getByLabel('팀 이름')).toHaveValue(`같은 이름 ${id}`);

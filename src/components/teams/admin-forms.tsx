@@ -13,7 +13,8 @@ import {
 import { useCurrentLocale } from '@/i18n/use-current-locale';
 import { TEAM_FIELDS } from '@/lib/teams/fields';
 import { TEAM_LIMITS } from '@/lib/teams/forms';
-import { FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from './form-parts';
+import { FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, SELECT, TEXT_BUTTON } from './form-parts';
+import { SelectChevron } from './select-chevron';
 
 type Team = {
   id: string;
@@ -89,19 +90,22 @@ export function TeamSettingsForm({ team }: { team?: Team }) {
           <label htmlFor="team-field" className={LABEL}>
             {t('field')}
           </label>
-          <select
-            id="team-field"
-            name="field"
-            value={field}
-            onChange={(event) => setField(event.target.value)}
-            className={FIELD}
-          >
-            {TEAM_FIELDS.map((option) => (
-              <option key={option} value={option} className="text-black">
-                {fieldNames(option)}
-              </option>
-            ))}
-          </select>
+          <div className="relative mt-2">
+            <select
+              id="team-field"
+              name="field"
+              value={field}
+              onChange={(event) => setField(event.target.value)}
+              className={SELECT}
+            >
+              {TEAM_FIELDS.map((option) => (
+                <option key={option} value={option}>
+                  {fieldNames(option)}
+                </option>
+              ))}
+            </select>
+            <SelectChevron />
+          </div>
         </div>
         <div>
           <label htmlFor="team-cohort" className={LABEL}>
@@ -111,8 +115,12 @@ export function TeamSettingsForm({ team }: { team?: Team }) {
             id="team-cohort"
             name="cohort"
             inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            autoComplete="off"
             value={cohort}
-            onChange={(event) => setCohort(event.target.value)}
+            // Digits only: the cohort is a number and the page adds "기" itself.
+            onChange={(event) => setCohort(event.target.value.replace(/\D/g, ''))}
             aria-invalid={message('cohort') ? true : undefined}
             className={FIELD}
           />
