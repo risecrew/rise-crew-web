@@ -45,11 +45,11 @@ export async function Numbers({
             <div
               key={n.id}
               className={cn(
-                'flex flex-col',
-                // A thin line between neighbours, so the first of each row starts on the column's
-                // edge: every second one on a phone, all but the first from a tablet up.
-                index % 2 === 1 && 'border-l border-white/15 pl-5',
-                index > 0 && 'md:border-l md:border-white/15 md:pl-8',
+                // Each number sits in the middle of its own column, with a thin line between
+                // neighbours: every second one on a phone, all but the first from a tablet up.
+                'flex flex-col items-center text-center',
+                index % 2 === 1 && 'border-l border-white/15',
+                index > 0 && 'md:border-l md:border-white/15',
               )}
             >
               <dt className="order-2 mt-2 text-[15px] text-white/80">{n.label}</dt>
@@ -57,7 +57,6 @@ export async function Numbers({
             </div>
           ))}
         </dl>
-        <p className="mt-8 text-sm text-white/64">{asOf}</p>
         {logos.length > 0 ? (
           <ul className="section-gap grid grid-cols-3 gap-6 md:grid-cols-6">
             {logos.map((p) => (
@@ -71,10 +70,12 @@ export async function Numbers({
             ))}
           </ul>
         ) : null}
-        <div className="mt-8">
+        {/* The way to every partner on the left, the date the numbers hold for on the right. */}
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <TextLink href={{ pathname: '/network', hash: 'partners' }}>
             {t('allPartners', { count: partners.length })}
           </TextLink>
+          <p className="text-sm text-white/64">{asOf}</p>
         </div>
       </div>
     </section>

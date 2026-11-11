@@ -74,7 +74,16 @@ export default async function AboutPage({ params }: Props) {
             <h2 id="rise-title" className="font-display text-headline text-balance break-keep">
               {t('rise.title')}
             </h2>
-            <p className="mt-4 text-lg break-keep text-white/80">{t('rise.born')}</p>
+            <p className="mt-4 text-lg break-keep text-white/80">
+              {/* "Born to Global" on its own line, what it means under it. */}
+              {t('rise.born')
+                .split(/(?<=:)\s+/)
+                .map((part, index) => (
+                  <span key={index} className="block">
+                    {part}
+                  </span>
+                ))}
+            </p>
           </div>
           <ol className="grid gap-x-8 sm:grid-cols-2">
             {rise.map((line) => (
@@ -151,7 +160,7 @@ export default async function AboutPage({ params }: Props) {
                   key={stamp.id}
                   className="relative py-4 pl-6 before:absolute before:top-6 before:-left-[5px] before:size-2.5 before:rounded-full before:bg-lime md:pt-6 md:pr-4 md:pl-0 md:before:-top-[5px] md:before:left-0"
                 >
-                  <p className="font-mono text-sm text-white/64">
+                  <p className="text-sm text-white/64 tabular-nums">
                     {stamp.date ? formatDateRange(stamp.date, stamp.endDate, locale) : null}
                   </p>
                   <p className="mt-1 font-semibold break-keep">{pick(stamp.title, locale)}</p>

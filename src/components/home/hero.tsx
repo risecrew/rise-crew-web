@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { PRIMARY, SECONDARY } from '@/components/site/buttons';
+import { Sentences } from '@/components/site/sentences';
 import type { Photo, Stamp } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
@@ -43,15 +44,23 @@ export async function Hero({
             quality={75}
             className="-z-10 object-cover"
           />
+          {/* Dark at the top so the header reads over any photo, and from the middle down to the
+              stage colour itself, so the words read and the photo ends with no seam. */}
           <div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 -z-10 h-[55%] bg-[linear-gradient(180deg,transparent,rgb(7_9_15/0.85))]"
+            className="absolute inset-x-0 top-0 -z-10 h-40 bg-[linear-gradient(180deg,rgb(7_9_15/0.75),transparent)]"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 -z-10 h-[75%] bg-[linear-gradient(180deg,transparent,rgb(7_9_15/0.7)_45%,var(--color-stage))]"
           />
         </>
       ) : null}
       <div className="relative shell pb-14 md:pb-20">
-        <p className="text-[15px] font-semibold break-keep text-white/80">{t('eyebrow')}</p>
-        <h1 id="hero-title" className="mt-4 font-display text-hero text-balance break-keep">
+        <p className="text-base font-semibold break-keep text-white/90 md:text-xl">
+          {t('eyebrow')}
+        </p>
+        <h1 id="hero-title" className="mt-3 font-display text-hero text-balance break-keep">
           {first}
           {second ? (
             <>
@@ -60,8 +69,9 @@ export async function Hero({
             </>
           ) : null}
         </h1>
-        <p className="mt-5 max-w-[560px] text-lg break-keep text-white/80">
-          {t('body', { teams })}
+        {/* One sentence to a line, so neither breaks in the middle. */}
+        <p className="mt-5 text-base break-keep text-white/80 md:text-lg">
+          <Sentences text={t('body', { teams })} />
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/join" className={PRIMARY}>

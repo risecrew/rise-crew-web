@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Bullet } from '@/components/site/bullet';
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { StageTabs } from '@/components/program/stage-tabs';
@@ -79,7 +80,7 @@ export default async function ProgramPage({ params }: Props) {
             <div className="shell grid gap-12 lg:grid-cols-[5fr_7fr]">
               <div>
                 <p className="text-[13px] font-semibold text-lime">
-                  <span className="font-mono">{String(index + 1).padStart(2, '0')}</span>{' '}
+                  <span className="tabular-nums">{String(index + 1).padStart(2, '0')}</span>{' '}
                   {home(`${stage}.label`)}
                 </p>
                 <h2
@@ -138,7 +139,8 @@ export default async function ProgramPage({ params }: Props) {
                       {program.details.length > 0 ? (
                         <ul className="mt-3 grid gap-1.5 text-base break-keep text-white/80">
                           {program.details.map((detail) => (
-                            <li key={detail.en} className="border-l border-white/25 pl-3">
+                            <li key={detail.en} className="flex gap-2.5">
+                              <Bullet />
                               {pick(detail, locale)}
                             </li>
                           ))}

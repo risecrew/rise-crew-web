@@ -74,8 +74,8 @@ test('the list shows published teams only, and the menu links to it', async ({ p
   await expect(page.getByRole('link', { name: new RegExp(`열린 팀 ${stamp}`) })).toBeVisible();
   await expect(page.getByRole('link', { name: new RegExp(`다른 팀 ${stamp}`) })).toBeVisible();
   await expect(page.getByText(`닫힌 팀 ${stamp}`)).toHaveCount(0);
-  // The phone menu is closed, so look in the footer, which has the same items on every screen.
-  await expect(page.locator('footer a[href="/ko/startups"]')).toHaveText('창업팀');
+  // The header's own menu is in the page on every screen (hidden on a phone until it opens).
+  await expect(page.locator('header a[href="/ko/startups"]').first()).toHaveText('창업팀');
 });
 
 test('a field filter narrows the list and stays in the address', async ({ page }) => {

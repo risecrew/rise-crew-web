@@ -4,39 +4,27 @@ import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { FooterAccountLink } from './account-menu';
 import { LocaleSwitch } from './locale-switch';
-import { getNavItems } from './site-header';
 
 // Every page ends here (wireframe v1.1, §7). The email address is written out once, in the
 // partnership block at the end of the home; the footer leads there instead of repeating it.
 export async function SiteFooter() {
   const t = await getTranslations('Footer');
-  const nav = await getTranslations('Nav');
   const auth = await getTranslations('Auth.menu');
-  const items = [...getNavItems(), { href: '/join', key: 'join' } as const];
 
   return (
     // Every page ends on the stage colour, so the footer rises out of it into cobalt instead of
     // starting on a hard edge.
     <footer className="bg-[linear-gradient(180deg,var(--color-stage),var(--color-cobalt)_65%)] text-white">
-      <div className="shell grid gap-10 pt-24 pb-14 md:grid-cols-[1.6fr_1fr_1fr] md:pt-32">
+      {/* The header already lists every page, so the footer keeps only what it does not: the
+          partnership block, the account and the language, side by side. */}
+      <div className="shell flex flex-col gap-8 pt-24 pb-14 md:flex-row md:items-end md:justify-between md:pt-32">
         <div>
           <RiseSymbol className="h-10 w-auto" />
           <p className="mt-4 font-display text-2xl font-bold">RISE CREW</p>
           <p className="mt-2 break-keep text-white/80">{t('supportedBy')}</p>
           <p className="mt-1 text-sm break-keep text-white/64">{t('address')}</p>
         </div>
-        <nav aria-label={nav('footer')}>
-          <ul className="flex flex-col gap-2">
-            {items.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="underline-offset-4 hover:underline">
-                  {nav(item.key)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <li>
             <Link
               href={{ pathname: '/', hash: 'contact' }}

@@ -214,7 +214,7 @@ export default async function PrivacyPage({ params }: Props) {
             <p>{t('version.body')}</p>
             <Rows>
               <Row label={t('version.label')}>
-                <time dateTime={PRIVACY_POLICY_VERSION} className="font-mono text-white">
+                <time dateTime={PRIVACY_POLICY_VERSION} className="text-white tabular-nums">
                   {PRIVACY_POLICY_VERSION}
                 </time>
               </Row>

@@ -4,14 +4,7 @@ import { DeletedNotice } from '@/components/home/deleted-notice';
 import { Home } from '@/components/home/home';
 import { asLocale } from '@/i18n/as-locale';
 import { isAuthEnabled } from '@/lib/auth/config';
-import {
-  getMentors,
-  getPartners,
-  getPhotos,
-  getRecruitment,
-  getStamps,
-  getStats,
-} from '@/lib/content';
+import { getPartners, getPhotos, getRecruitment, getStamps, getStats } from '@/lib/content';
 import { localizedAlternates } from '@/lib/metadata';
 
 export const revalidate = 86400;
@@ -32,11 +25,10 @@ export default async function HomePage({ params }: Props) {
   const locale = asLocale((await params).locale);
   setRequestLocale(locale);
 
-  const [stats, stamps, photos, mentors, partners, recruitment] = await Promise.all([
+  const [stats, stamps, photos, partners, recruitment] = await Promise.all([
     getStats(),
     getStamps(),
     getPhotos(),
-    getMentors(),
     getPartners(),
     getRecruitment(),
   ]);
@@ -53,7 +45,6 @@ export default async function HomePage({ params }: Props) {
         stats={stats}
         stamps={stamps}
         photos={photos}
-        mentors={mentors}
         partners={partners}
         recruitment={recruitment}
         // The page is rebuilt once a day (revalidate), so "upcoming" is as of that day.

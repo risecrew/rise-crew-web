@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Gallery } from '@/components/board/gallery';
-import { ArrowRightIcon } from '@/components/icons';
+import { ArrowLeftIcon, ArrowRightIcon } from '@/components/icons';
 import { asLocale } from '@/i18n/as-locale';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
@@ -92,7 +92,7 @@ export default async function ActivityPage({ params }: Props) {
         <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-base text-white/80">
           <span lang={lang(activity.city_en)}>{city}</span>
           <span aria-hidden>·</span>
-          <time dateTime={activity.date ?? undefined} className="font-mono text-[15px]">
+          <time dateTime={activity.date ?? undefined} className="text-[15px] tabular-nums">
             {date ?? common('dateTbc')}
           </time>
           {state === 'done' ? null : (
@@ -209,6 +209,7 @@ function Neighbour({
       className={`group flex min-h-11 flex-col gap-1 ${end ? 'sm:items-end sm:text-right' : ''}`}
     >
       <span className="inline-flex items-center gap-1.5 text-sm text-white/64">
+        {end ? null : <ArrowLeftIcon />}
         {label}
         {end ? <ArrowRightIcon /> : null}
       </span>

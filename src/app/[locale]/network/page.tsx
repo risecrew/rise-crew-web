@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import type { Metadata } from 'next';
+import { Bullet } from '@/components/site/bullet';
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CtaBand } from '@/components/site/cta-band';
@@ -117,7 +118,8 @@ export default async function NetworkPage({ params }: Props) {
             <p className="mt-1 text-sm text-white/64">{t('mou.date')}</p>
             <ul className="mt-5 grid gap-2 text-base break-keep text-white/80">
               {MOU_ITEMS.map((key) => (
-                <li key={key} className="border-l border-white/25 pl-3">
+                <li key={key} className="flex gap-2.5">
+                  <Bullet />
                   {t(`mou.${key}`)}
                 </li>
               ))}

@@ -30,7 +30,6 @@
   },
   "Nav": {
     "primary": "Main menu",
-    "footer": "Site menu",
     "about": "About",
     "network": "Network",
     "join": "How to apply",
@@ -128,7 +127,6 @@
     },
     "mentors": {
       "title": "{count} mentors stand behind every stage",
-      "faces": "Mentors",
       "all": "See all mentors",
       "body": "Working professionals from Kakao Mobility, VCs, accelerators and faculty, from idea to fundraising and going abroad."
     },
@@ -139,8 +137,7 @@
     },
     "recruit": {
       "badge": {
-        "open": "Recruiting",
-        "closed": "Closed"
+        "open": "Recruiting"
       },
       "title": {
         "open": "We are recruiting now",

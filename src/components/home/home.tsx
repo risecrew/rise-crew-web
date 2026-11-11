@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import type { Mentor, Partner, Photo, Recruitment, Stamp, Stat } from '@/content/schema';
+import type { Partner, Photo, Recruitment, Stamp, Stat } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { pick } from '@/lib/content';
@@ -16,7 +16,6 @@ type Props = {
   stats: Stat[];
   stamps: Stamp[];
   photos: Photo[];
-  mentors: Mentor[];
   partners: Partner[];
   recruitment: Recruitment;
   today: Date;
@@ -25,16 +24,7 @@ type Props = {
 // The home answers a first-time visitor in the order they ask (wireframe v1.1, §8): what this is,
 // whether to trust it, what it does, what came of it, and how to join in. The startup teams
 // section (S4) waits for the teams' own pages to be public.
-export async function Home({
-  locale,
-  stats,
-  stamps,
-  photos,
-  mentors,
-  partners,
-  recruitment,
-  today,
-}: Props) {
+export async function Home({ locale, stats, stamps, photos, partners, recruitment, today }: Props) {
   const t = await getTranslations('Home');
   const nav = await getTranslations('Nav');
   const value = (id: string) => stats.find((s) => s.id === id);
@@ -88,7 +78,6 @@ export async function Home({
           domestic: shot('workshop-2026-01'),
           global: shot('techfest-vietnam'),
         }}
-        mentors={mentors}
         mentorCount={value('mentors')?.value ?? ''}
       />
       <Recent

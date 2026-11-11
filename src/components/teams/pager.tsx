@@ -32,7 +32,7 @@ export function Pager({
           {t('previous')}
         </Link>
       ) : null}
-      <span className="px-3 font-mono text-sm text-white/60">
+      <span className="px-3 text-sm text-white/60 tabular-nums">
         {t('status', { page, pages: Math.max(page, pages) })}
       </span>
       {page < pages ? (

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { Photo } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { pick } from '@/lib/content';
+import { Sentences } from './sentences';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -39,9 +40,11 @@ export function PageCover({ title, eyebrow, lead, photo, children }: Props) {
             quality={75}
             className="-z-10 object-cover"
           />
+          {/* As on the home: dark under the header, and down to the stage colour itself behind the
+              words, so the photo ends with no seam. */}
           <div
             aria-hidden
-            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(7_9_15/0.35),rgb(7_9_15/0.88))]"
+            className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(7_9_15/0.75),rgb(7_9_15/0.35)_30%,rgb(7_9_15/0.75)_65%,var(--color-stage))]"
           />
         </>
       ) : (
@@ -53,7 +56,11 @@ export function PageCover({ title, eyebrow, lead, photo, children }: Props) {
       <div className="relative shell w-full">
         {eyebrow ? <p className="mb-3 text-[15px] font-semibold text-white/80">{eyebrow}</p> : null}
         <h1 className="max-w-4xl font-display text-display text-balance break-keep">{title}</h1>
-        {lead ? <p className="mt-5 max-w-2xl text-lg break-keep text-white/80">{lead}</p> : null}
+        {lead ? (
+          <p className="mt-5 text-base break-keep text-white/80 md:text-lg">
+            <Sentences text={lead} />
+          </p>
+        ) : null}
         {children}
       </div>
     </section>

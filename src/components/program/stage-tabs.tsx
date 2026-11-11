@@ -35,20 +35,20 @@ export function StageTabs({
       aria-label={label}
       className="sticky top-14 z-40 border-y border-white/10 bg-stage/92 backdrop-blur-md md:top-[72px]"
     >
-      <ul className="shell flex [scrollbar-width:none] gap-2 overflow-x-auto py-3">
+      <ul className="shell flex [scrollbar-width:none] gap-2 overflow-x-auto py-2.5 md:py-3">
         {stages.map((stage, index) => (
           <li key={stage.id} className="shrink-0">
             <a
               href={`#${stage.id}`}
               aria-current={current === stage.id ? 'true' : undefined}
               className={cn(
-                'inline-flex h-11 items-center gap-2 rounded-full px-4 text-[15px] font-semibold transition-colors duration-150',
+                'inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold transition-colors duration-150 md:h-11 md:gap-2 md:px-4 md:text-[15px]',
                 current === stage.id
                   ? 'bg-lime text-cobalt'
                   : 'border border-white/20 text-white/80 hover:text-white',
               )}
             >
-              <span className="font-mono">{String(index + 1).padStart(2, '0')}</span>
+              <span className="tabular-nums">{String(index + 1).padStart(2, '0')}</span>
               {stage.label}
             </a>
           </li>

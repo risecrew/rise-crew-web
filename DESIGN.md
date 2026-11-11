@@ -20,31 +20,31 @@ colors:
 typography:
   hero:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(2.375rem, 5vw, 4rem)"
+    fontSize: "clamp(2rem, 4.4vw, 3.5rem)"
     fontWeight: 700
     lineHeight: 1.15
-    letterSpacing: "-0.01em"
+    letterSpacing: "-0.03em"
   display:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(2rem, 4vw, 3rem)"
+    fontSize: "clamp(1.75rem, 4vw, 3rem)"
     fontWeight: 700
     lineHeight: 1.2
-    letterSpacing: "-0.01em"
+    letterSpacing: "-0.03em"
   headline:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(1.625rem, 3vw, 2.25rem)"
+    fontSize: "clamp(1.4375rem, 3vw, 2.25rem)"
     fontWeight: 700
     lineHeight: 1.3
-    letterSpacing: "-0.01em"
+    letterSpacing: "-0.03em"
   subhead:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(1.1875rem, 1.6vw, 1.375rem)"
+    fontSize: "clamp(1.125rem, 1.6vw, 1.375rem)"
     fontWeight: 600
     lineHeight: 1.4
-    letterSpacing: "-0.01em"
+    letterSpacing: "-0.03em"
   numeral:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
-    fontSize: "clamp(2.5rem, 4.5vw, 3.5rem)"
+    fontSize: "clamp(2.125rem, 4.5vw, 3.5rem)"
     fontWeight: 700
     lineHeight: 1.1
   title:
@@ -73,7 +73,7 @@ typography:
     fontWeight: 600
     letterSpacing: "0.2em"
   data:
-    fontFamily: "var(--font-jetbrains), ui-monospace, monospace"
+    fontFamily: "'Pretendard Variable', Pretendard, system-ui, -apple-system, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
     fontFeature: "\"tnum\" 1"
@@ -173,23 +173,23 @@ components:
 밀도는 낮고 크기 대비는 예전보다 차분하다. 큰 글자는 홈 첫 화면 제목(최대 64px) 하나이고, 안쪽 페이지 제목은 최대 48px, 섹션 제목은 36px이다. 한 섹션에는 한 종류의 정보만 두고, 같은 종류는 같은 모양의 카드(10% 흰 테두리, 3% 흰 바탕, 16px 모서리)나 15% 흰 가로선 목록으로 정리한다. 그림자는 없고, 깊이는 사진, 어둡게 까는 그라데이션, 코발트 빛 번짐으로만 만든다.
 
 움직임은 짧고 한 번뿐이다. 스크롤을 붙잡는 연출(고정된 첫 화면, 고정 갤러리)과 숫자가 올라가는 연출은 없다. `prefers-reduced-motion`이면 움직임을 모두 끈다.
-**Character:** Wanted Sans의 850~900 굵기가 무대 위 거대한 글자를 맡고, Pretendard가 한국어 본문을 단정하게 받친다. 두 서체 모두 한글과 라틴을 함께 다루므로 국문과 영문 페이지가 같은 무게로 보인다. JetBrains Mono는 날짜와 번호에만 쓰여 "기록된 사실"의 표시가 된다.
+**Character:** Wanted Sans의 850~900 굵기가 무대 위 거대한 글자를 맡고, Pretendard가 한국어 본문을 단정하게 받친다. 두 서체 모두 한글과 라틴을 함께 다루므로 국문과 영문 페이지가 같은 무게로 보인다. 날짜와 번호도 본문과 같은 서체에 고정폭 숫자(tabular-nums)로 쓴다. 고정폭 서체(JetBrains Mono)는 인증번호 입력칸에만 남는다.
 
 **Loading:** Wanted Sans Variable과 Pretendard Variable은 사이트가 직접 호스팅한다. 공식 npm 패키지(`pretendard`, `wanted-sans`)의 동적 부분집합(unicode-range로 나눈 작은 woff2) 파일을 `pnpm fonts:vendor`로 `public/fonts/<패키지>-<버전>/`에 복사하고, `src/lib/fonts.ts`의 CSS로 불러온다. 폴더 이름에 버전이 있어 1년 캐시(immutable)를 건다(`next.config.ts`). 외부 CDN은 쓰지 않는다. JetBrains Mono는 `next/font/google`로 빌드 때 내려받아 `--font-jetbrains` 변수로 연결한다.
 
 ### Hierarchy
-큰 글자는 아래 다섯 단계만 쓴다(와이어프레임 v1.1 §5.2, 휴대폰 → 데스크톱). 값은 `globals.css`의 `--text-*` 토큰에 있고, 화면 코드에 `text-[clamp(...)]` 같은 임의 크기를 새로 쓰지 않는다. 그 아래는 Tailwind 기본 단계를 쓴다. 한글 큰 글자는 자간 -0.01em이고, 대문자 변환과 넓은 자간은 영문 라벨에만 쓴다.
+큰 글자는 아래 다섯 단계만 쓴다(와이어프레임 v1.1 §5.2, 휴대폰 → 데스크톱). 값은 `globals.css`의 `--text-*` 토큰에 있고, 화면 코드에 `text-[clamp(...)]` 같은 임의 크기를 새로 쓰지 않는다. 그 아래는 Tailwind 기본 단계를 쓴다. 한글 큰 글자는 자간 `--tracking-heading`(-0.03em), 본문은 `--tracking-body`(-0.015em)이고, 대문자 변환과 넓은 자간은 영문 라벨에만 쓴다.
 
-- **Hero** (700, 38 → 64px, 1.15): 홈 첫 화면 제목 한 곳만.
-- **Display** (700, 32 → 48px, 1.2): 안쪽 페이지의 h1. 페이지마다 하나. 계정 화면 제목도 이 단계 근처를 쓴다.
-- **Headline** (700, 26 → 36px, 1.3, `text-wrap: balance`): 섹션 제목(h2).
-- **Subhead** (600, 19 → 22px, 1.4): 카드와 항목 제목(h3).
-- **Numeral** (700, 40 → 56px, 1.1): 통계 숫자에만. 단위(명·팀·곳)는 숫자 옆에 작게 붙고, 라벨은 숫자 아래 15px다. 숫자는 처음부터 최종값이다.
-- **Body Lead** (400, 17 → 18px, 1.7): 섹션 설명. 80% 흰색.
+- **Hero** (700, 32 → 56px, 1.15): 홈 첫 화면 제목 한 곳만.
+- **Display** (700, 28 → 48px, 1.2): 안쪽 페이지의 h1. 페이지마다 하나. 계정 화면 제목도 이 단계 근처를 쓴다.
+- **Headline** (700, 23 → 36px, 1.3, `text-wrap: balance`): 섹션 제목(h2).
+- **Subhead** (600, 18 → 22px, 1.4): 카드와 항목 제목(h3).
+- **Numeral** (700, 34 → 56px, 1.1): 통계 숫자에만. 단위(명·팀·곳)는 숫자 옆에 작게 붙고, 라벨은 숫자 아래 15px다. 숫자는 처음부터 최종값이다.
+- **Body Lead** (400, 16 → 18px, 1.7): 섹션 설명. 80% 흰색.
 - **Body** (400, 16px, 1.7): 본문 최소 크기.
 - **Caption** (400, 14px, 1.5): 사진 캡션, 날짜·장소. 64% 흰색.
 - **Label** (600, 13px, 1.4): 태그, 배지, 아이브로.
-- **Data** (JetBrains Mono): 날짜와 단계 번호(01~03).
+- **Data** (본문 서체, 고정폭 숫자): 날짜와 단계 번호(01~03).
 
 어두운 바탕 위 흰 글자의 투명도는 100 / 80 / 64%만 쓴다(헤더 메뉴의 72%는 예외).
 
@@ -313,7 +313,7 @@ components:
 - **Do** 사진이 없는 장면에는 코발트 방사형 조명을 비춘다.
 - **Do** 임시 사진에는 반드시 "임시 사진" 표시를 단다.
 - **Do** 움직임은 짧게 한 번만 쓰고, 움직임 꺼짐에서는 모두 끈다. 숫자는 세지 않고 처음부터 최종값이다.
-- **Do** 날짜와 번호는 JetBrains Mono와 고정폭 숫자로 쓴다.
+- **Do** 날짜와 번호는 본문 서체의 고정폭 숫자로 쓴다. 목록 머리표는 작은 라임 점(`Bullet`) 하나로 통일한다.
 - **Do** 계정 화면은 코발트 조명을 위에서 비추고, 내용을 가운데 한 줄로 세운다.
 - **Do** 계정 화면의 본문에는 라임 알약을 많아야 하나만 두고, 그 화면이 하려는 일(로그인, 가입하기, 재설정 링크 받기, 비밀번호 정하기, 가입 완료, 정보 수정, 회원으로)에만 쓴다. 나머지는 흰 테두리 알약이나 밑줄 글자 버튼이다.
 - **Do** 오류는 칸 테두리를 100% 흰색으로 올리고 칸 아래에 흰 문장으로 이유를 쓴다. 위험한 행동(탈퇴, 차단)도 라임이 아니라 Outline 알약이다.

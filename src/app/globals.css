@@ -22,23 +22,25 @@
      step and every large heading uses one of these; body text uses the plain Tailwind steps.
      hero: the home's opening title only. display: an inner page's h1. headline: section titles (h2).
      subhead: card and item titles (h3). numeral: the numbers in a stats row only. */
-  --text-hero: clamp(2.375rem, 5vw, 4rem); /* 38 → 64 */
+  --text-hero: clamp(2rem, 4.4vw, 3.5rem); /* 32 → 56 */
   --text-hero--line-height: 1.15;
-  --text-hero--letter-spacing: -0.01em;
+  --text-hero--letter-spacing: var(--tracking-heading);
   --text-hero--font-weight: 700;
-  --text-display: clamp(2rem, 4vw, 3rem); /* 32 → 48 */
+  --text-display: clamp(1.75rem, 4vw, 3rem); /* 28 → 48 */
   --text-display--line-height: 1.2;
-  --text-display--letter-spacing: -0.01em;
+  --text-display--letter-spacing: var(--tracking-heading);
   --text-display--font-weight: 700;
-  --text-headline: clamp(1.625rem, 3vw, 2.25rem); /* 26 → 36 */
+  --text-headline: clamp(1.4375rem, 3vw, 2.25rem); /* 23 → 36 */
   --text-headline--line-height: 1.3;
-  --text-headline--letter-spacing: -0.01em;
+  --text-headline--letter-spacing: var(--tracking-heading);
   --text-headline--font-weight: 700;
-  --text-subhead: clamp(1.1875rem, 1.6vw, 1.375rem); /* 19 → 22 */
+  --text-subhead: clamp(1.125rem, 1.6vw, 1.375rem); /* 18 → 22 */
   --text-subhead--line-height: 1.4;
-  --text-subhead--letter-spacing: -0.01em;
+  --text-subhead--letter-spacing: var(--tracking-heading);
   --text-subhead--font-weight: 600;
-  --text-numeral: clamp(2.5rem, 4.5vw, 3.5rem); /* 40 → 56 */
+  --text-numeral: clamp(2.125rem, 4.5vw, 3.5rem); /* 34 → 56 */
+  /* Lead paragraphs (text-lg) at body size on a phone, 18px from a tablet up. */
+  --text-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
   --text-numeral--line-height: 1.1;
   --text-numeral--font-weight: 700;
 
@@ -55,6 +57,15 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Korean set a little tighter than the fonts' default, headings tighter than running text. */
+:root {
+  --tracking-heading: -0.03em;
+  --tracking-body: -0.015em;
+}
+body {
+  letter-spacing: var(--tracking-body);
 }
 
 /* A section's space above and below, and from its title to what follows (wireframe v1.1, §5.1). */
