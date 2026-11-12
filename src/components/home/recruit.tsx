@@ -18,6 +18,7 @@ export async function Recruit({
   applyLabel: string;
 }) {
   const t = await getTranslations('Home.recruit');
+  const notice = await getTranslations('NextNotice');
   const open = recruitment.status === 'open';
   const rows = [
     { label: t('who'), value: t('whoValue') },
@@ -27,8 +28,8 @@ export async function Recruit({
 
   return (
     <section aria-labelledby="recruit-title" className="bg-cobalt/25 section-y text-white">
-      {/* Two halves of one weight: the state and the way to the join page on the left, the facts
-          (who can apply, and when and where the next round is announced) on the right. */}
+      {/* Two halves of one weight: the state, when the next round opens and the way to the join page
+          on the left; who can apply and where the next round is announced on the right. */}
       <div className="shell grid gap-10 md:grid-cols-2 md:gap-16">
         <div>
           {/* Open recruiting gets a lime mark; a closed one says so in the title alone. */}
@@ -40,7 +41,11 @@ export async function Recruit({
           <h2 id="recruit-title" className="font-display text-headline text-balance break-keep">
             {open ? t('title.open') : t('title.closed')}
           </h2>
-          {!open && !recruitment.nextNotice ? (
+          {recruitment.nextNotice ? (
+            <p className="mt-4 text-lg font-semibold break-keep text-white">
+              {pick(recruitment.nextNotice.when, locale)}
+            </p>
+          ) : !open ? (
             <p className="mt-4 text-lg break-keep text-white/80">{t('closedBody')}</p>
           ) : null}
           <div className="mt-8">
@@ -58,9 +63,9 @@ export async function Recruit({
           ))}
           {recruitment.nextNotice ? (
             <div>
-              <dt className="text-[13px] font-semibold text-white/64">{t('next')}</dt>
+              <dt className="text-[13px] font-semibold text-white/64">{notice('via')}</dt>
               <dd className="mt-2">
-                <NextNotice notice={recruitment.nextNotice} locale={locale} />
+                <NextNotice notice={recruitment.nextNotice} locale={locale} channelsOnly />
               </dd>
             </div>
           ) : null}

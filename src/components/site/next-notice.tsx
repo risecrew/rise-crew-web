@@ -8,13 +8,26 @@ const INSTAGRAM = /@([a-z0-9._]+)/i;
 
 // When the next intake opens, where it will be announced, and a closing line, each on its own
 // line rather than one long sentence. An Instagram handle links to the account.
-export async function NextNotice({ notice, locale }: { notice: Notice; locale: Locale }) {
+// `channelsOnly` leaves out when and the heading, for a layout that shows them elsewhere.
+export async function NextNotice({
+  notice,
+  locale,
+  channelsOnly = false,
+}: {
+  notice: Notice;
+  locale: Locale;
+  channelsOnly?: boolean;
+}) {
   const t = await getTranslations('NextNotice');
   return (
     <div className="break-keep">
-      <p className="text-lg font-semibold text-white">{pick(notice.when, locale)}</p>
-      <p className="mt-4 text-sm font-semibold text-white/64">{t('via')}</p>
-      <ul className="mt-2 grid gap-1.5 text-base text-white/80">
+      {channelsOnly ? null : (
+        <>
+          <p className="text-lg font-semibold text-white">{pick(notice.when, locale)}</p>
+          <p className="mt-4 text-sm font-semibold text-white/64">{t('via')}</p>
+        </>
+      )}
+      <ul className={`${channelsOnly ? '' : 'mt-2'}grid gap-1.5 text-base text-white/80`}>
         {notice.channels.map((channel) => {
           const text = pick(channel, locale);
           const handle = INSTAGRAM.exec(text)?.[1];
