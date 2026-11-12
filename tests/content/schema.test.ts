@@ -7,6 +7,7 @@ import {
   stampSchema,
   statSchema,
 } from '@/content/schema';
+import { shownLogo } from '@/lib/content';
 
 const L = (ko: string, en: string) => ({ ko, en });
 
@@ -98,13 +99,25 @@ describe('stampSchema', () => {
 });
 
 describe('partnerSchema', () => {
-  it('rejects a logo that is not approved', () => {
+  it('keeps a logo file before it is approved, and shows it only once it is', () => {
+    const waiting = partnerSchema.parse({
+      id: 'kakao',
+      name: L('카카오모빌리티', 'Kakao Mobility'),
+      kind: 'company',
+      logo: '/images/partners/kakao.svg',
+      logoApproved: false,
+    });
+    expect(shownLogo(waiting)).toBeNull();
+    expect(shownLogo({ ...waiting, logoApproved: true })).toBe('/images/partners/kakao.svg');
+  });
+
+  it('rejects a logo outside the partners folder', () => {
     const r = partnerSchema.safeParse({
       id: 'kakao',
       name: L('카카오모빌리티', 'Kakao Mobility'),
       kind: 'company',
-      logo: '/partners/kakao.svg',
-      logoApproved: false,
+      logo: 'https://example.com/kakao.svg',
+      logoApproved: true,
     });
     expect(r.success).toBe(false);
   });

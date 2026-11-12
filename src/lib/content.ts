@@ -25,6 +25,7 @@ import {
   stampSchema,
   statSchema,
   type Localized,
+  type Partner,
   type Stamp,
   type TimelineEvent,
 } from '@/content/schema';
@@ -86,6 +87,10 @@ export async function getPrograms() {
 }
 export async function getMentors() {
   return [...data.mentors].sort((a, b) => Number(b.featured) - Number(a.featured));
+}
+// A partner's logo, only once the organizers have approved showing it; otherwise its name is shown.
+export function shownLogo(partner: Partner): string | null {
+  return partner.logo && partner.logoApproved ? partner.logo : null;
 }
 export async function getPartners() {
   return data.partners;

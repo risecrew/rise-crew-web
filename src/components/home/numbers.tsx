@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { TextLink } from '@/components/site/text-link';
 import type { Partner } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
-import { pick } from '@/lib/content';
+import { pick, shownLogo } from '@/lib/content';
 import { cn } from '@/lib/utils';
 
 export type HomeNumber = { id: string; shown: React.ReactNode; label: string };
@@ -23,7 +23,12 @@ export async function Numbers({
 }) {
   const t = await getTranslations('Home.numbers');
   // Only partners with an approved logo file go on the band; names alone are for the network page.
-  const logos = partners.filter((p) => p.logo && p.logoApproved).slice(0, 12);
+  const logos = partners
+    .flatMap((p) => {
+      const logo = shownLogo(p);
+      return logo ? [{ ...p, logo }] : [];
+    })
+    .slice(0, 12);
 
   return (
     // The numbers stand under the cobalt stage light, so they read as their own moment after the
@@ -60,11 +65,16 @@ export async function Numbers({
         {logos.length > 0 ? (
           <ul className="section-gap grid grid-cols-3 gap-6 md:grid-cols-6">
             {logos.map((p) => (
-              <li key={p.id} className="flex h-16 items-center justify-center">
+              // Logos are made for white paper, many in dark ink, so each sits on a light card: grey
+              // at rest, its own colours on hover.
+              <li
+                key={p.id}
+                className="flex h-16 items-center justify-center rounded-lg bg-white px-3"
+              >
                 <img
                   src={p.logo}
                   alt={pick(p.name, locale)}
-                  className="h-10 w-auto opacity-80 grayscale transition-[filter,opacity] duration-200 hover:opacity-100 hover:grayscale-0"
+                  className="max-h-9 w-auto max-w-full object-contain grayscale transition-[filter] duration-200 hover:grayscale-0"
                 />
               </li>
             ))}
