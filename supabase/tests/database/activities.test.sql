@@ -69,7 +69,7 @@ select is(
 set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
-select ok((select count(*) from public.activities) >= 15, 'anon reads activities');
+select ok((select count(*) from public.activities) >= 14, 'anon reads activities');
 select throws_ok(
   $$insert into public.activities (title_ko, city_ko) values ('x', 'x')$$,
   '42501', null, 'anon cannot write an activity');

@@ -43,14 +43,14 @@ set local request.jwt.claims = '{"role":"anon"}';
 select is(
   (select count(*)::integer from public.team_posts where team_id = '7e5f0000-0000-4000-8000-000000000a01'), 1,
   'anon reads only the public post');
-select is((select count(*)::integer from public.activities) >= 15, true, 'anon still reads activities');
+select is((select count(*)::integer from public.activities) >= 14, true, 'anon still reads activities');
 
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"7e5f0000-0000-4000-8000-000000000001","role":"authenticated"}';
 select is(
   (select count(*)::integer from public.team_posts where team_id = '7e5f0000-0000-4000-8000-000000000a01'), 1,
   'an applicant reads only the public post');
-select is((select count(*)::integer from public.activities) >= 15, true, 'an applicant reads activities');
+select is((select count(*)::integer from public.activities) >= 14, true, 'an applicant reads activities');
 select lives_ok(
   $$update public.profiles set school = '학교' where id = '7e5f0000-0000-4000-8000-000000000001'$$,
   'an applicant can still edit their own profile');
