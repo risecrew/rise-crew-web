@@ -10,13 +10,15 @@ const KR = L('한국', 'Korea');
 // order the organizers listed them. The logo files a teammate gathered are in place, but
 // none is approved for showing yet, so the home's logo band stays hidden and the network page shows
 // the names. Four came from the partners' own sites (2026-11). Kakao Mobility's is its CI from Kakao's own press
-// release. TODO(운영진 확인): approval, and the ANCHOR Project Group's logo.
+// release. The ANCHOR Project Group's is the one
+// on its booth at the 2026 university-industry expo (uicexpo.org). TODO(운영진 확인): approval.
 export const partners: Partner[] = [
   {
     id: 'anchor',
     kind: 'supporter',
     name: L('성균관대학교 앵커사업단', 'Seoul ANCHOR Project Group'),
     country: KR,
+    logo: '/images/partners/anchor.png',
     logoApproved: false,
   },
   {
