@@ -141,9 +141,10 @@
       },
       "title": {
         "open": "We are recruiting now",
-        "closed": "This round of recruitment has closed"
+        "closed": "We are getting the next round ready"
       },
       "body": "Startup teams, solo founders and individuals without a team can all apply.",
+      "closedBody": "We will post the next intake dates on the join page once they are set.",
       "who": "Who",
       "whoValue": "SKKU students. Students from other universities and graduates can join too.",
       "period": "When"
@@ -875,12 +876,12 @@
       "field": "Field",
       "cohort": "Cohort",
       "all": "All",
-      "clear": "Clear filters"
+      "clear": "Show all"
     },
     "cohort": "Cohort {cohort}",
     "total": "{count, plural, one {# team} other {# teams}}",
     "empty": "No teams to show yet.",
-    "emptyFiltered": "No teams match these filters.",
+    "emptyFiltered": "No teams in this field or cohort yet.",
     "fields": {
       "ai-software": "AI & software",
       "edutech": "Edtech",
@@ -1017,7 +1018,7 @@
   "Program": {
     "eyebrow": "Program",
     "title": "From campus to the world, in three stages",
-    "lead": "VCC talks, 1:1 mentoring and the club room support every stage.",
+    "lead": "At every stage, you get VCC talks, 1:1 mentoring from expert mentors and the club room.",
     "tabs": "Stages",
     "campus": {
       "body": "Turn an idea into a business, form the team to run it, and build a working prototype (MVP)."
@@ -1028,7 +1029,7 @@
     "global": {
       "body": "Take the model and the funding proven in Korea to markets abroad."
     },
-    "lately": "Lately in this stage",
+    "lately": "Recent activities",
     "cta": "Want to take part?"
   }
 }

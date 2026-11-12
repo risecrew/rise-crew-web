@@ -34,8 +34,8 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
     return p ? { photo: p, event: eventOf(p, stamps) } : undefined;
   };
 
-  // The opening: the crew holding up its own jersey at BEYOND Expo.
-  const opening = photo('beyond-expo-crew-jersey-2026');
+  // The opening: the whole crew and its mentors in one room.
+  const opening = photo('crew-lecture-hall');
   const teams = value('teams')?.value ?? '';
   const open = recruitment.status === 'open';
   const applyLabel = open ? nav('apply') : nav('applyInfoLong');

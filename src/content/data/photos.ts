@@ -104,4 +104,16 @@ export const photos: Photo[] = [
     temporary: false,
     event: 'beyond-expo',
   },
+  {
+    id: 'crew-lecture-hall',
+    src: '/images/activities/crew-lecture-hall.jpg',
+    width: 2000,
+    height: 1500,
+    alt: L(
+      '계단식 강의실에서 주먹을 들어 올리고 함께 사진을 찍은 RISE CREW 멤버들과 멘토들',
+      'RISE CREW members and mentors raising their fists together in a lecture hall',
+    ),
+    source: L('RISE CREW 활동 사진', 'RISE CREW photo archive'),
+    temporary: false,
+  },
 ];

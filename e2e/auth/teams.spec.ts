@@ -107,8 +107,8 @@ test('a team row shows its cover when it has one, and none otherwise', async ({ 
 
 test('a filter nothing matches says so', async ({ page }) => {
   await page.goto('/ko/startups?cohort=9999&field=healthcare');
-  await expect(page.getByText('조건에 맞는 팀이 없습니다.')).toBeVisible();
-  await page.getByRole('link', { name: '거르기 지우기' }).click();
+  await expect(page.getByText('선택한 분야·기수에 해당하는 팀이 아직 없습니다.')).toBeVisible();
+  await page.getByRole('link', { name: '전체 보기' }).click();
   await expect(page).toHaveURL(/\/ko\/startups$/);
 });
 
