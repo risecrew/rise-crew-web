@@ -13,13 +13,14 @@ const confirmed = {
   kind: 'document',
   label: { ko: '운영진 확인 (2026.11)', en: 'Confirmed by the organizers (Nov 2026)' },
 } as const;
-const seoul = { ko: '서울', en: 'Seoul' };
+// Every place reads city, country (the organizers, 2026-11).
+const seoul = { ko: '서울, 한국', en: 'Seoul, Korea' };
 
 export const stamps: Stamp[] = [
   {
     id: 'cohort-1',
     milestone: true,
-    date: '2025',
+    date: '2025-10',
     city: seoul,
     country: 'KR',
     title: { ko: 'RISE CREW 1기 출범', en: 'RISE CREW cohort 1 launched' },
@@ -63,7 +64,7 @@ export const stamps: Stamp[] = [
   {
     id: 'kakao-workshop',
     date: '2026-01-23',
-    city: { ko: '시흥', en: 'Siheung' },
+    city: { ko: '시흥, 한국', en: 'Siheung, Korea' },
     country: 'KR',
     endDate: '2026-01-24',
     // TODO(운영진 확인): the official name and the award names.
@@ -72,8 +73,8 @@ export const stamps: Stamp[] = [
       en: 'Kakao Mobility × RISE CREW roundtable mentoring workshop',
     },
     results: [
-      { ko: '최우수상 안전상점', en: 'Top prize: Safety Shop' },
-      { ko: '우수상 MORTON·곁은', en: 'Prizes: MORTON and Gyeoteun' },
+      { ko: '최우수상 안전상점', en: 'Top prize: Safetyshop' },
+      { ko: '우수상 MORTON·곁은', en: 'Prizes: MORTON and KYOT' },
     ],
     label: { ko: '멘토링 워크숍', en: 'Mentoring workshop' },
     stage: 'domestic',
@@ -97,8 +98,8 @@ export const stamps: Stamp[] = [
     city: seoul,
     country: 'KR',
     title: {
-      ko: 'AI+X 글로벌 창업경진대회 공동 주최',
-      en: 'Co-hosted AI+X Global Startup Competition',
+      ko: '제1회 AI+X 글로벌 창업경진대회 공동 주최',
+      en: 'Co-hosted the 1st AI+X Global Startup Competition',
     },
     results: [{ ko: '아시아 5개국 15팀 본선', en: '15 finalist teams from 5 Asian countries' }],
     label: { ko: 'AI+X 경진대회', en: 'AI+X Competition' },
@@ -124,10 +125,10 @@ export const stamps: Stamp[] = [
   {
     id: 'sushi-tech',
     date: '2026-04',
-    city: { ko: '도쿄', en: 'Tokyo' },
+    city: { ko: '도쿄, 일본', en: 'Tokyo, Japan' },
     country: 'JP',
-    title: { ko: 'Sushi Tech Tokyo 2026', en: 'Sushi Tech Tokyo 2026' },
-    label: { ko: 'Sushi Tech Tokyo', en: 'Sushi Tech Tokyo' },
+    title: { ko: 'SusHi Tech Tokyo 2026', en: 'SusHi Tech Tokyo 2026' },
+    label: { ko: 'SusHi Tech Tokyo', en: 'SusHi Tech Tokyo' },
     stage: 'global',
     photo: 'sushi-tech-tokyo-2026',
     status: 'done',
@@ -136,7 +137,7 @@ export const stamps: Stamp[] = [
   {
     id: 'beyond-expo',
     date: '2026-05',
-    city: { ko: '마카오', en: 'Macau' },
+    city: { ko: '마카오, 중국', en: 'Macau, China' },
     country: 'MO',
     title: { ko: 'BEYOND Expo 2026', en: 'BEYOND Expo 2026' },
     label: { ko: 'BEYOND Expo', en: 'BEYOND Expo' },
@@ -152,8 +153,8 @@ export const stamps: Stamp[] = [
     city: { ko: '하노이, 베트남', en: 'Hanoi, Vietnam' },
     endDate: '2025-12-14',
     country: 'VN',
-    title: { ko: 'SKKU × FTU TECHFEST 전시', en: 'SKKU × FTU TECHFEST exhibition' },
-    label: { ko: 'TECHFEST', en: 'TECHFEST' },
+    title: { ko: 'TECHFEST Vietnam 2025', en: 'TECHFEST Vietnam 2025' },
+    label: { ko: 'TECHFEST Vietnam', en: 'TECHFEST Vietnam' },
     stage: 'global',
     photo: 'techfest-vietnam',
     status: 'done',
@@ -176,24 +177,13 @@ export const stamps: Stamp[] = [
     ],
   },
   {
-    id: 'london-ir',
-    date: '2026-07',
-    city: { ko: '런던', en: 'London' },
-    country: 'GB',
-    title: { ko: '글로벌 IR과 pre-SEED 투자 유치', en: 'Global IR and pre-seed fundraising' },
-    label: { ko: '글로벌 IR', en: 'Global IR' },
-    stage: 'global',
-    status: 'done',
-    evidence: [confirmed],
-  },
-  {
     id: 'roundtable-2',
     date: '2026-08-28',
-    city: { ko: '수원', en: 'Suwon' },
+    city: { ko: '수원, 한국', en: 'Suwon, Korea' },
     country: 'KR',
     endDate: '2026-08-29',
     title: {
-      ko: '2회 SKKU 창업팀 라운드테이블 워크숍',
+      ko: '제2회 SKKU 창업팀 라운드테이블 워크숍',
       en: '2nd SKKU startup team roundtable workshop',
     },
     label: { ko: '라운드테이블 2차', en: 'Roundtable 2' },
@@ -211,10 +201,10 @@ export const stamps: Stamp[] = [
     id: 'kuala-lumpur-ir',
     milestone: true,
     date: '2026-10',
-    city: { ko: '쿠알라룸푸르', en: 'Kuala Lumpur' },
+    city: { ko: '쿠알라룸푸르, 말레이시아', en: 'Kuala Lumpur, Malaysia' },
     country: 'MY',
-    title: { ko: '글로벌 IR과 SEED 투자 유치', en: 'Global IR and seed fundraising' },
-    label: { ko: 'SEED IR', en: 'Seed IR' },
+    title: { ko: '글로벌 IR과 시드 투자 유치', en: 'Global IR and seed fundraising' },
+    label: { ko: '시드 IR', en: 'Seed IR' },
     stage: 'global',
     status: 'done',
     evidence: [confirmed],
@@ -222,24 +212,13 @@ export const stamps: Stamp[] = [
   {
     id: 'hangzhou',
     date: '2026-10',
-    city: { ko: '항저우', en: 'Hangzhou' },
+    city: { ko: '항저우, 중국', en: 'Hangzhou, China' },
     country: 'CN',
     title: { ko: '크리에이터 왕홍 프로그램', en: 'Creator (wanghong) program' },
     label: { ko: '왕홍 프로그램', en: 'Wanghong program' },
     stage: 'global',
     status: 'done',
     evidence: [confirmed],
-  },
-  {
-    id: 'showcase',
-    date: '2026-11',
-    city: seoul,
-    country: 'KR',
-    title: { ko: '창업팀 투자연계 SHOW CASE', en: 'Investor SHOW CASE for startup teams' },
-    label: { ko: 'SHOW CASE', en: 'Showcase' },
-    stage: 'domestic',
-    status: 'planned',
-    evidence: [],
   },
   {
     id: 'aix-contest-2',

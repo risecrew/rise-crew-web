@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('the old contact address leads to the home', async ({ page }) => {
   await page.goto('/ko/contact');
   await expect(page).toHaveURL(/\/ko$/);
-  await expect(page.locator('#contact')).toContainText('함께할 기업과 기관을 찾습니다');
+  await expect(page.locator('#contact')).toContainText('RISE CREW와 함께할 분을 찾습니다');
   await expect(page.locator('header a[href="/ko/contact"]')).toHaveCount(0);
 });
 
@@ -13,7 +13,10 @@ test('join shows the status, who can apply, six benefits and one answer at a tim
   await page.goto('/en/join');
   await expect(page.locator('h1')).toHaveText('Apply to RISE CREW');
   await expect(page.getByText('Closed', { exact: true })).toBeVisible();
-  await expect(page.locator('table tbody tr')).toHaveCount(2);
+  const who = page.locator('section[aria-labelledby="who-title"]');
+  await expect(who).toContainText('Humanities and Social Sciences Campus');
+  await expect(who).toContainText('Startup team');
+  await expect(who).not.toContainText('Solo founder');
   await expect(page.locator('[data-benefit]')).toHaveCount(6);
   await expect(page.locator('section[aria-labelledby="benefits-title"]')).not.toContainText(
     'internship',

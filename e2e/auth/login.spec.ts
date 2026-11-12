@@ -50,7 +50,7 @@ const COPY = {
     signupTab: '회원가입',
     switchLabel: '로그인 또는 회원가입',
     signupHint: '이메일을 확인한 뒤 비밀번호를 정해요',
-    google: '구글로 계속하기',
+    google: 'Google로 계속하기',
     or: '또는',
     emailLabel: '이메일',
     submit: '로그인',
@@ -468,7 +468,7 @@ test.describe('a forgotten password', () => {
       expect(before.error).toBeNull();
 
       await page.goto('/ko/login');
-      await page.getByRole('link', { name: '비밀번호를 잊었어요' }).click();
+      await page.getByRole('link', { name: '비밀번호를 잊으셨나요?' }).click();
       await expect(page).toHaveURL(/\/ko\/forgot-password$/);
       await page.getByLabel('이메일').fill(email);
       await page.getByRole('button', { name: '인증번호 받기' }).click();
@@ -607,7 +607,7 @@ test('the Google button starts the sign-in with a way back to this site', async 
   await page.goto('/ko/login?next=%2Fko%2Fabout');
   // Google is not set up on the local stack, so only the request that starts the flow is checked.
   const started = page.waitForRequest((request) => request.url().includes('/auth/v1/authorize'));
-  await page.getByRole('button', { name: '구글로 계속하기' }).click();
+  await page.getByRole('button', { name: 'Google로 계속하기' }).click();
 
   const url = new URL((await started).url());
   expect(url.searchParams.get('provider')).toBe('google');

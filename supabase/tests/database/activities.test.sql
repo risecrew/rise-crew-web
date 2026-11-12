@@ -54,13 +54,13 @@ select results_eq(
 select is(
   (select count(*)::integer from public.activities
     where created_at = (select min(created_at) from public.activities)),
-  15, 'the 15 activities moved over');
+  13, 'the 15 activities moved over, less the London IR and the showcase that never happened');
 select is(
-  (select count(*)::integer from public.activities where is_planned), 2,
-  'the two planned events stay planned');
+  (select count(*)::integer from public.activities where is_planned), 1,
+  'the one planned event left stays planned');
 select is(
-  (select date from public.activities where title_ko = 'SKKU × FTU TECHFEST 전시'),
-  '2025-12-12', 'TECHFEST has its date');
+  (select date from public.activities where title_ko = 'TECHFEST Vietnam 2025'),
+  '2025-12-12', 'TECHFEST Vietnam has its date and its official name');
 select is(
   (select photo from public.activities where title_ko = '2025 세미나'),
   '/images/activities/seminar-2025-11.jpg', 'the 2025 seminar is there with its photo');
@@ -69,7 +69,7 @@ select is(
 set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
-select ok((select count(*) from public.activities) >= 15, 'anon reads activities');
+select ok((select count(*) from public.activities) >= 14, 'anon reads activities');
 select throws_ok(
   $$insert into public.activities (title_ko, city_ko) values ('x', 'x')$$,
   '42501', null, 'anon cannot write an activity');

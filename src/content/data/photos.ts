@@ -25,7 +25,7 @@ export const photos: Photo[] = [
     width: 2400,
     height: 1600,
     alt: L(
-      '카카오모빌리티 × RISE CREW 창업아이템 라운드테이블 멘토링 워크숍 단체 사진',
+      '카카오모빌리티 × RISE CREW 라운드테이블 멘토링 워크숍 단체 사진',
       'Group photo at the Kakao Mobility × RISE CREW roundtable mentoring workshop',
     ),
     source: archive('2026.1.24', 'Jan 24, 2026'),
@@ -37,8 +37,8 @@ export const photos: Photo[] = [
     width: 1440,
     height: 1080,
     alt: L(
-      'Sushi Tech Tokyo 2026 간판 앞 RISE CREW 단체 사진',
-      'RISE CREW in front of the Sushi Tech Tokyo 2026 sign',
+      'SusHi Tech Tokyo 2026 간판 앞 RISE CREW 단체 사진',
+      'RISE CREW in front of the SusHi Tech Tokyo 2026 sign',
     ),
     source: archive('2026.4', 'Apr 2026'),
     temporary: false,
@@ -85,7 +85,7 @@ export const photos: Photo[] = [
     width: 2400,
     height: 1600,
     alt: L(
-      '2회 SKKU 창업팀 라운드테이블 워크숍 수상팀과 참가자 단체 사진',
+      '제2회 SKKU 창업팀 라운드테이블 워크숍 수상팀과 참가자 단체 사진',
       'Award winners and participants at the 2nd SKKU startup team roundtable workshop',
     ),
     source: archive('2026.8.29', 'Aug 29, 2026'),
@@ -105,15 +105,16 @@ export const photos: Photo[] = [
     event: 'beyond-expo',
   },
   {
-    id: 'crew-lecture-hall',
-    src: '/images/activities/crew-lecture-hall.jpg',
-    width: 2000,
-    height: 1500,
+    id: 'roundtable-2026-08-group',
+    src: '/images/activities/roundtable-2026-08-group.jpg',
+    width: 3200,
+    height: 2133,
     alt: L(
-      '계단식 강의실에서 주먹을 들어 올리고 함께 사진을 찍은 RISE CREW 멤버들과 멘토들',
-      'RISE CREW members and mentors raising their fists together in a lecture hall',
+      'RISE CREW 바람막이를 입고 무대 앞에서 주먹을 들어 올린 제2회 SKKU 창업팀 라운드테이블 워크숍 참가자와 멘토들',
+      'Participants and mentors in RISE CREW jackets raising their fists in front of the stage at the 2nd SKKU startup team roundtable workshop',
     ),
-    source: L('RISE CREW 활동 사진', 'RISE CREW photo archive'),
+    source: archive('2026.8.28~29', 'Aug 28–29, 2026'),
     temporary: false,
+    event: 'roundtable-2',
   },
 ];

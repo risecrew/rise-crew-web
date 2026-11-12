@@ -27,7 +27,7 @@ test('the menu marks the page the visitor is on', async ({ page, isMobile }) => 
 
 test('language switch keeps the current page', async ({ page }) => {
   await page.goto('/ko/about');
-  await page.locator('header').getByRole('link', { name: 'English로 보기' }).click();
+  await page.locator('header').getByRole('link', { name: '영어로 보기' }).click();
   await expect(page).toHaveURL(/\/en\/about$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });

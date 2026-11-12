@@ -2,8 +2,17 @@ import type { Recruitment } from '@/content/schema';
 
 export const recruitment: Recruitment = {
   status: 'closed',
+  // The organizers' notice for cohort 3 (2026-11).
   nextNotice: {
-    ko: '다음 정기 모집 일정은 확정되면 지원 안내 페이지와 이메일로 안내합니다. 창업팀은 수시로도 모집합니다.',
-    en: 'We will announce the next intake on the join page and by email. Startup teams can also apply on a rolling basis.',
+    when: {
+      ko: '3기 정기 모집은 2027년 상반기에 진행됩니다.',
+      en: 'Cohort 3 recruits in the first half of 2027.',
+    },
+    channels: [
+      { ko: '성균관대학교 공지사항', en: 'The SKKU notice board' },
+      { ko: 'RISE CREW 공식 웹사이트', en: 'The RISE CREW website' },
+      { ko: '인스타그램 @skku_anchor', en: 'Instagram @skku_anchor' },
+    ],
+    closing: { ko: '많은 관심 부탁드립니다!', en: 'We hope to see you there!' },
   },
 };

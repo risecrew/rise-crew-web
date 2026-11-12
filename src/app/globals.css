@@ -26,6 +26,11 @@
   --text-hero--line-height: 1.15;
   --text-hero--letter-spacing: var(--tracking-heading);
   --text-hero--font-weight: 700;
+  /* wordmark: the club's name alone as the home's opening title, set large because it is short. */
+  --text-wordmark: clamp(3.5rem, 11vw, 7.5rem); /* 56 → 120 */
+  --text-wordmark--line-height: 0.95;
+  --text-wordmark--letter-spacing: -0.04em;
+  --text-wordmark--font-weight: 800;
   --text-display: clamp(1.75rem, 4vw, 3rem); /* 28 → 48 */
   --text-display--line-height: 1.2;
   --text-display--letter-spacing: var(--tracking-heading);

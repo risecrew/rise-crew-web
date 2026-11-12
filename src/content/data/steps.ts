@@ -4,7 +4,7 @@ export const steps: GrowthStep[] = [
   {
     id: 'idea',
     order: 1,
-    name: { ko: 'Idea & Team Build', en: 'Idea & Team Build' },
+    name: { ko: 'Idea & Team Building', en: 'Idea & Team Building' },
     summary: {
       ko: '아이디어를 사업 아이템으로 구체화하고 실행할 창업팀을 꾸립니다.',
       en: 'Shape the idea into a business and form a team that can execute it.',

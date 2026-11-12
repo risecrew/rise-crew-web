@@ -20,8 +20,8 @@ export const programs: Program[] = [
       ),
       L('CEO 트랙: 기업가정신과 리더십', 'CEO track: entrepreneurship and leadership'),
       L(
-        'SCALE UP 트랙: 정부지원사업 이해와 성장 전략',
-        'Scale-up track: government programs and growth strategy',
+        'Scale Up 트랙: 정부지원사업 이해와 성장 전략',
+        'Scale Up track: government programs and growth strategy',
       ),
       L(
         'VC 트랙: 투자자 관점의 사업성 분석',
@@ -45,13 +45,14 @@ export const programs: Program[] = [
     details: [],
   },
   {
-    // TODO(운영진 확인): how this runs.
-    id: 'team-building',
+    // Teams join already formed, so there is no team building (the organizers, 2026-11).
+    // TODO(운영진 확인): how often the seminars run.
+    id: 'seminars',
     stage: 'campus',
-    name: L('팀 빌딩과 정기 세미나', 'Team building and seminars'),
+    name: L('정기 세미나', 'Regular seminars'),
     summary: L(
-      '다양한 전공의 팀원과 팀을 꾸리고, 정기 세미나로 최신 흐름을 익힙니다.',
-      'Form a team across majors and keep up with regular trend seminars.',
+      '정기 세미나로 최신 창업 흐름을 익힙니다.',
+      'Keep up with startup trends at regular seminars.',
     ),
     details: [],
   },
@@ -97,11 +98,7 @@ export const programs: Program[] = [
         '예비창업패키지 등 정부지원사업 공모 지원',
         'Applications to government startup programs such as the Pre-Startup Package',
       ),
-      L(
-        'VC 하우스 입주 프로그램 연계 (마루360, 프론트원)',
-        'Links to VC house programs (MARU360, Front1)',
-      ),
-      L('IR 피칭과 pre-SEED 투자 연계', 'IR pitching and pre-seed investment links'),
+      L('IR 피칭과 프리시드 투자 연계', 'IR pitching and pre-seed investment links'),
     ],
   },
   {
@@ -111,8 +108,8 @@ export const programs: Program[] = [
     summary: L('해외 무대에서 팀의 제품을 직접 선보입니다.', 'Teams show their products abroad.'),
     details: [
       L(
-        'FTU TECHFEST, Sushi Tech Tokyo, BEYOND Expo',
-        'FTU TECHFEST, Sushi Tech Tokyo, BEYOND Expo',
+        'TECHFEST Vietnam, SusHi Tech Tokyo, BEYOND Expo',
+        'TECHFEST Vietnam, SusHi Tech Tokyo, BEYOND Expo',
       ),
     ],
   },
@@ -121,7 +118,7 @@ export const programs: Program[] = [
     stage: 'global',
     name: L('해외 대학 공동 프로그램', 'Joint programs with universities abroad'),
     summary: L(
-      '해외 대학과 함께 짧고 굵은 공동 프로그램을 엽니다.',
+      '해외 대학과 함께 단기 집중 프로그램을 운영합니다.',
       'Short, intensive programs run with universities abroad.',
     ),
     details: [
@@ -135,14 +132,7 @@ export const programs: Program[] = [
     summary: L('해외 투자자 앞에서 투자 유치에 나섭니다.', 'Teams pitch to investors abroad.'),
     details: [
       L('아시아 IR 투어', 'Asia IR tours'),
-      L('런던·쿠알라룸푸르 투자 유치', 'Fundraising in London and Kuala Lumpur'),
+      L('쿠알라룸푸르 투자 유치', 'Fundraising in Kuala Lumpur'),
     ],
-  },
-  {
-    id: 'patents',
-    stage: 'global',
-    name: L('해외 특허 지원', 'International patent support'),
-    summary: L('해외 진출에 필요한 특허 출원을 돕습니다.', 'Help with filing patents abroad.'),
-    details: [],
   },
 ];

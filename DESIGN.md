@@ -18,6 +18,12 @@ colors:
   ink: "#13203a"
   ink-soft: "#46546d"
 typography:
+  wordmark:
+    fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
+    fontSize: "clamp(3.5rem, 11vw, 7.5rem)"
+    fontWeight: 800
+    lineHeight: 0.95
+    letterSpacing: "-0.04em"
   hero:
     fontFamily: "'Wanted Sans Variable', 'Pretendard Variable', system-ui, sans-serif"
     fontSize: "clamp(2rem, 4.4vw, 3.5rem)"
@@ -180,7 +186,8 @@ components:
 ### Hierarchy
 큰 글자는 아래 다섯 단계만 쓴다(와이어프레임 v1.1 §5.2, 휴대폰 → 데스크톱). 값은 `globals.css`의 `--text-*` 토큰에 있고, 화면 코드에 `text-[clamp(...)]` 같은 임의 크기를 새로 쓰지 않는다. 그 아래는 Tailwind 기본 단계를 쓴다. 한글 큰 글자는 자간 `--tracking-heading`(-0.03em), 본문은 `--tracking-body`(-0.015em)이고, 대문자 변환과 넓은 자간은 영문 라벨에만 쓴다.
 
-- **Hero** (700, 32 → 56px, 1.15): 홈 첫 화면 제목 한 곳만.
+- **Wordmark** (800, 56 → 120px, 0.95, -4%): 홈 첫 화면 제목 "RISE CREW" 한 곳만. 위에는 라임색 짧은 선과 라임색 소개 한 줄(휴대폰에서는 선 없이 15px), 아래 설명은 두 줄이고 창업팀 수만 라임색 굵은 글씨다.
+- **Hero** (700, 32 → 56px, 1.15): 팀 페이지의 팀 이름.
 - **Display** (700, 28 → 48px, 1.2): 안쪽 페이지의 h1. 페이지마다 하나. 계정 화면 제목도 이 단계 근처를 쓴다.
 - **Headline** (700, 23 → 36px, 1.3, `text-wrap: balance`): 섹션 제목(h2).
 - **Subhead** (600, 18 → 22px, 1.4): 카드와 항목 제목(h3).

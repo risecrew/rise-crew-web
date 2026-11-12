@@ -3,8 +3,15 @@ import { Link } from '@/i18n/navigation';
 import { PRIMARY, SECONDARY } from './buttons';
 import { getApplyButtonLabel } from './site-header';
 
-// The closing band of the about, program and network pages (wireframe v1.1, §9 A6).
-export async function CtaBand({ title }: { title?: string }) {
+// The closing band of the about, program and network pages (wireframe v1.1, §9 A6). The network
+// page speaks to mentors and partners, not applicants, so it offers the partnership link alone.
+export async function CtaBand({
+  title,
+  partnerOnly = false,
+}: {
+  title?: string;
+  partnerOnly?: boolean;
+}) {
   const t = await getTranslations('CtaBand');
   const apply = await getApplyButtonLabel();
   return (
@@ -14,10 +21,15 @@ export async function CtaBand({ title }: { title?: string }) {
           {title ?? t('title')}
         </h2>
         <div className="flex flex-wrap gap-3">
-          <Link href="/join" className={PRIMARY}>
-            {apply}
-          </Link>
-          <Link href={{ pathname: '/', hash: 'contact' }} className={SECONDARY}>
+          {partnerOnly ? null : (
+            <Link href="/join" className={PRIMARY}>
+              {apply}
+            </Link>
+          )}
+          <Link
+            href={{ pathname: '/', hash: 'contact' }}
+            className={partnerOnly ? PRIMARY : SECONDARY}
+          >
             {t('partner')}
           </Link>
         </div>

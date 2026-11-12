@@ -7,9 +7,9 @@ test('the home opens on who we are, over a real photo that holds still', async (
   await page.goto('/ko');
   const hero = page.locator('[data-hero]');
   await expect(hero).toContainText('성균관대학교 앵커사업단 산하 글로벌 창업 동아리');
-  await expect(page.locator('h1')).toHaveText(/캠퍼스에서 세계로,\s*실행하는 창업가를 키웁니다/);
+  await expect(page.locator('h1')).toHaveText('RISE CREW');
   await expect(hero).toContainText('25개 창업팀');
-  await expect(hero.locator('img')).toHaveAttribute('alt', /주먹을 들어 올리고/);
+  await expect(hero.locator('img')).toHaveAttribute('alt', /라운드테이블 워크숍 참가자와 멘토들/);
   await expect(hero.locator('img')).toHaveAttribute('sizes', '100vw');
   // No scroll-held stage: the hero is one screen at most.
   const height = await hero.evaluate((el) => el.getBoundingClientRect().height);
@@ -25,7 +25,7 @@ test('the numbers are plain text with one date for all of them', async ({ page }
   await page.goto('/ko');
   const numbers = page.locator('section[aria-labelledby="numbers-title"]');
   for (const [value, label] of [
-    ['90+', '멤버'],
+    ['90명+', '멤버'],
     ['25', '창업팀'],
     ['33', '멘토'],
     ['25', '협력 기관'],
@@ -57,7 +57,7 @@ test('recent activities: names and "place · date", no awards in the name', asyn
   const recent = page.locator('section[aria-labelledby="recent-title"]');
   await expect(recent.locator('article')).toHaveCount(5);
   await expect(recent.locator('article').first()).toContainText(
-    '2회 SKKU 창업팀 라운드테이블 워크숍',
+    '제2회 SKKU 창업팀 라운드테이블 워크숍',
   );
   await expect(recent).toContainText('싱가포르 · 2025.12.22–12.26');
   await expect(recent).not.toContainText('최우수상');
@@ -68,7 +68,7 @@ test('the partnership block writes the address out once, with copy and mail', as
   await page.goto('/ko');
   const contact = page.locator('#contact');
   await expect(contact.getByRole('heading', { level: 2 })).toHaveText(
-    '함께할 기업과 기관을 찾습니다',
+    'RISE CREW와 함께할 분을 찾습니다',
   );
   await expect(contact.getByRole('heading', { level: 3 })).toHaveText([
     '기업·기관 협력',
@@ -76,7 +76,7 @@ test('the partnership block writes the address out once, with copy and mail', as
     '언론·취재',
   ]);
   await expect(contact.getByText('risecrew4@gmail.com')).toBeVisible();
-  await expect(contact.getByRole('button', { name: '주소 복사' })).toBeVisible();
+  await expect(contact.getByRole('button', { name: '메일 주소 복사' })).toBeVisible();
   await expect(contact.getByRole('link', { name: '메일 쓰기' })).toHaveAttribute(
     'href',
     /^mailto:risecrew4@gmail\.com\?subject=/,
@@ -100,11 +100,13 @@ test('the numbers count up once as they scroll in, and a screen reader hears eac
     .locator('dd');
   const digits = members.locator('[aria-hidden] > span').last();
   // Below the fold, the number waits at zero.
-  await expect(digits).toHaveText('0+');
+  await expect(digits).toHaveText('0');
   await members.scrollIntoViewIfNeeded();
-  await expect(digits).toHaveText('90+');
+  await expect(digits).toHaveText('90');
+  // Korean puts the plus after the unit: 90명+.
+  await expect(members).toContainText('명+');
   // The counting digits are hidden from screen readers; the final value is read once.
-  await expect(members.locator('.sr-only')).toHaveText('90+');
+  await expect(members.locator('.sr-only')).toHaveText('90');
 });
 
 test('with reduced motion the numbers never count', async ({ page }) => {
@@ -114,5 +116,5 @@ test('with reduced motion the numbers never count', async ({ page }) => {
     .locator('section[aria-labelledby="numbers-title"] dl > div', { hasText: '멤버' })
     .locator('dd [aria-hidden] > span')
     .last();
-  await expect(digits).toHaveText('90+');
+  await expect(digits).toHaveText('90');
 });

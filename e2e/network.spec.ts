@@ -5,7 +5,7 @@ test('network lists the named mentors, 25 partners by group and the agreement', 
 }) => {
   await page.goto('/en/network');
   await expect(page.locator('[data-mentor]')).toHaveCount(19);
-  await expect(page.getByText('19 of our 33 mentors agreed to be named here.')).toBeVisible();
+  await expect(page.getByText('Meet 19 featured mentors out of our 33.')).toBeVisible();
   const partners = page.locator('#partners');
   await expect(partners.locator('li')).toHaveCount(25);
   await expect(partners.getByRole('heading', { level: 3 })).toHaveText([
