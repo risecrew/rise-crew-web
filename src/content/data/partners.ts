@@ -7,9 +7,10 @@ const L = (ko: string, en: string) => ({ ko, en });
 const KR = L('한국', 'Korea');
 
 // The 25 partners (wireframe v1.1, §13): supporters, then universities, then companies, each in the
-// order the organizers listed them. The logo files a teammate gathered (2026-11) are in place, but
+// order the organizers listed them. The logo files a teammate gathered are in place, but
 // none is approved for showing yet, so the home's logo band stays hidden and the network page shows
-// the names. TODO(운영진 확인): approval, and logos for the six without one.
+// the names. Four came from the partners' own sites (2026-11). TODO(운영진 확인): approval, and
+// logos for the ANCHOR Project Group and Kakao Mobility.
 export const partners: Partner[] = [
   {
     id: 'anchor',
@@ -24,6 +25,7 @@ export const partners: Partner[] = [
     // The city's center, formerly the Seoul RISE Center; the program is now called ANCHOR.
     name: L('서울앵커센터', 'Seoul ANCHOR Center'),
     country: KR,
+    logo: '/images/partners/seoul-anchor-center.svg',
     logoApproved: false,
   },
   {
@@ -85,8 +87,9 @@ export const partners: Partner[] = [
   {
     id: 'yonsei',
     kind: 'university',
-    name: L('연세대학교 창업지원단', 'Yonsei University Startup Support Center'),
+    name: L('연세대학교 창업지원단', 'Yonsei Enterprise Support Foundation'),
     country: KR,
+    logo: '/images/partners/yonsei.png',
     logoApproved: false,
   },
   {
@@ -101,6 +104,7 @@ export const partners: Partner[] = [
     kind: 'company',
     name: L('다래전략사업화센터', 'Darae Strategic Commercialization Center'),
     country: KR,
+    logo: '/images/partners/darae.png',
     logoApproved: false,
   },
   {
@@ -157,14 +161,15 @@ export const partners: Partner[] = [
     kind: 'company',
     name: L('심산벤처스', 'Simsan Ventures'),
     country: KR,
+    logo: '/images/partners/simsan-ventures.png',
     logoApproved: false,
   },
   {
-    id: 'oracle-investment',
+    id: 'oracle-venture-investment',
     kind: 'company',
-    name: L('오라클인베스트먼트', 'Oracle Investment'),
+    name: L('오라클벤처투자', 'Oracle Venture Investment'),
     country: KR,
-    logo: '/images/partners/oracle-investment.png',
+    logo: '/images/partners/oracle-venture-investment.png',
     logoApproved: false,
   },
   {
