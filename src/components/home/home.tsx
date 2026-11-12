@@ -62,9 +62,11 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
           id: n.id,
           label: t(`numbers.${n.id}`),
           // The unit is smaller than the number, next to it.
+          // "90+" reads "90명+" in Korean: the plus follows the unit, so it is passed apart.
           shown: t.rich(`numbers.unit.${n.kind}`, {
-            value: n.value,
-            num: () => <CountUp value={n.value} />,
+            value: n.value.replace(/\+$/, ''),
+            plus: n.value.endsWith('+') ? '+' : '',
+            num: () => <CountUp value={n.value.replace(/\+$/, '')} />,
             unit: (chunks) => (
               <span className="ml-1 text-xl font-semibold text-lime">{chunks}</span>
             ),

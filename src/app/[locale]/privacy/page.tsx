@@ -1,4 +1,4 @@
-// Draft from a standard template; must be approved by operators and the ANCHOR Division before the switch is turned on.
+// Draft from a standard template; must be approved by operators and the Seoul ANCHOR Project Group before the switch is turned on.
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';

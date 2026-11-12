@@ -38,13 +38,10 @@ export async function Recruit({
           <h2 id="recruit-title" className="font-display text-headline text-balance break-keep">
             {open ? t('title.open') : t('title.closed')}
           </h2>
-          {/* Open: who can apply. Closed: when the next round is announced, never "anyone can
-              apply" under a closed title. */}
-          <p className="mt-4 text-lg break-keep text-white/80">
-            {open ? t('body') : (notice ?? t('closedBody'))}
-          </p>
-          {open && notice ? (
-            <p className="mt-3 text-base break-keep text-white/64">{notice}</p>
+          {/* Who can apply is in the list beside; under the title, only when the next round is
+              announced. */}
+          {notice || !open ? (
+            <p className="mt-4 text-lg break-keep text-white/80">{notice ?? t('closedBody')}</p>
           ) : null}
           <div className="mt-8">
             <Link href="/join" className={PRIMARY}>

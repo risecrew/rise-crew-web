@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 type Props = { params: Promise<{ locale: string }> };
 
 const SECTION = 'section-y border-t border-white/10 text-white';
-const KINDS = ['team', 'solo', 'individual'] as const;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = asLocale((await params).locale);
@@ -96,50 +95,18 @@ export default async function JoinPage({ params }: Props) {
           <h2 id="who-title" className="font-display text-headline">
             {t('who.title')}
           </h2>
-          {/* A phone scrolls the table sideways; the keyboard can too. */}
-          <div
-            role="region"
-            aria-labelledby="who-title"
-            tabIndex={0}
-            className="section-gap overflow-x-auto"
-          >
-            <table className="w-full min-w-[520px] border-collapse text-left text-base">
-              <thead>
-                <tr className="border-b border-white/15 text-sm text-white/64">
-                  <th scope="col" className="py-3 pr-6 font-semibold">
-                    {t('who.columns.who')}
-                  </th>
-                  <th scope="col" className="py-3 pr-6 font-semibold">
-                    {t('who.columns.join')}
-                  </th>
-                  <th scope="col" className="py-3 font-semibold">
-                    {t('who.columns.benefits')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {(['skku', 'others'] as const).map((row) => (
-                  <tr key={row} className="border-b border-white/10">
-                    <th scope="row" className="py-4 pr-6 font-semibold break-keep">
-                      {t(`who.${row}.who`)}
-                    </th>
-                    <td className="py-4 pr-6">{t(`who.${row}.join`)}</td>
-                    <td className="py-4 break-keep text-white/80">{t(`who.${row}.benefits`)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <ul className="mt-6 flex flex-wrap gap-2" aria-label={t('who.kinds')}>
-            {KINDS.map((kind) => (
-              <li
-                key={kind}
-                className="rounded-full border border-white/20 px-3 py-1 text-[13px] font-semibold"
-              >
-                {t(`who.kind.${kind}`)}
-              </li>
-            ))}
-          </ul>
+          {/* Who may apply, and in what form: SKKU Humanities and Social Sciences Campus students, as
+              a startup team (the organizers, 2026-11). */}
+          <dl className="section-gap grid gap-4 border-t border-white/15 pt-6 text-base">
+            <div>
+              <dt className="text-[13px] font-semibold text-white/64">{t('who.whoLabel')}</dt>
+              <dd className="mt-1 break-keep">{t('who.whoValue')}</dd>
+            </div>
+            <div>
+              <dt className="text-[13px] font-semibold text-white/64">{t('who.kinds')}</dt>
+              <dd className="mt-1 break-keep">{t('who.kind.team')}</dd>
+            </div>
+          </dl>
           {/* TODO(운영진 확인): the selection steps and the activity details (period, meetings, required
               sessions, completion, fee) go here once confirmed (wireframe v1.1, §14 J4–J5). */}
         </div>
@@ -193,7 +160,9 @@ export default async function JoinPage({ params }: Props) {
           <FaqHash />
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-base break-keep text-white/80">
-              {t('ask')} <span className="font-semibold text-white select-all">{EMAIL}</span>
+              {t.rich('ask', {
+                email: () => <span className="font-semibold text-white select-all">{EMAIL}</span>,
+              })}
             </p>
             <CopyButton text={EMAIL} label={t('copy')} done={t('copied')} />
           </div>

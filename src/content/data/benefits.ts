@@ -21,10 +21,10 @@ export const benefits: Benefit[] = [
   },
   {
     id: 'programs',
-    title: L('앵커사업단 국내외 프로그램 우선 참여', 'Priority access to ANCHOR Division programs'),
+    title: L('앵커사업단 국내외 프로그램 우선 참여', 'Priority access to Seoul ANCHOR Project Group programs'),
     body: L(
       '사업단이 주관하는 국내외 프로그램에 우선 참여할 수 있습니다.',
-      'Get priority access to domestic and global programs run by the ANCHOR Division.',
+      'Get priority access to domestic and global programs run by the Seoul ANCHOR Project Group.',
     ),
   },
   {

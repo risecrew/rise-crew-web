@@ -3,7 +3,6 @@ import type { Partner } from '@/content/schema';
 const L = (ko: string, en: string) => ({ ko, en });
 // A name with no confirmed English form is shown in Korean on the English pages too, as names are
 // (wireframe v1.1, §19). TODO(운영진 확인): the English name.
-const koOnly = (ko: string) => L(ko, ko);
 
 const KR = L('한국', 'Korea');
 
@@ -14,16 +13,15 @@ export const partners: Partner[] = [
   {
     id: 'anchor',
     kind: 'supporter',
-    name: L('성균관대학교 앵커사업단', 'SKKU ANCHOR Division'),
+    name: L('성균관대학교 앵커사업단', 'Seoul ANCHOR Project Group'),
     country: KR,
     logoApproved: false,
   },
   {
     id: 'seoul-anchor-center',
     kind: 'supporter',
-    // The Seoul RISE program is now called ANCHOR; no English name for the renamed center is
-    // published yet (the former one was the Seoul RISE Center). TODO(운영진 확인)
-    name: koOnly('서울앵커센터'),
+    // The city's center, formerly the Seoul RISE Center; the program is now called ANCHOR.
+    name: L('서울앵커센터', 'Seoul ANCHOR Center'),
     country: KR,
     logoApproved: false,
   },

@@ -2,7 +2,7 @@ import type { Mentor } from '@/content/schema';
 
 const L = (ko: string, en: string) => ({ ko, en });
 const kakao = L('카카오모빌리티', 'Kakao Mobility');
-const anchor = L('성균관대학교 앵커사업단', 'SKKU ANCHOR Division');
+const anchor = L('성균관대학교 앵커사업단', 'Seoul ANCHOR Project Group');
 const simsan = L('심산벤처스', 'Simsan Ventures');
 
 export const mentors: Mentor[] = [
@@ -103,7 +103,7 @@ export const mentors: Mentor[] = [
     id: 'kim-seho',
     featured: false,
     name: L('김세호', 'Kim Seho'),
-    org: L('미디어제네레이션', 'Media Generation'),
+    org: L('미디어제너레이션', 'Media Generation'),
     role: L(
       '대표 · 피엠솔루션·인터레스트·아이벤처스 공동창업자',
       'CEO · Co-founder of PM Solution, Interest and iVentures',
@@ -186,7 +186,7 @@ export const mentors: Mentor[] = [
     role: L('대표 · 투자 유치, 투자 강의', 'CEO · Fundraising and investment lecturer'),
     expertise: [
       L('창업투자론', 'Startup investment'),
-      L('BM 피봇', 'Business model pivots'),
+      L('BM 피벗', 'Business model pivots'),
       L('IR 덱', 'IR decks'),
       L('글로벌 진출', 'Global expansion'),
     ],

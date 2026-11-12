@@ -197,11 +197,11 @@ test('activities moved from the code can be edited and keep their photo', async 
 }) => {
   await signIn(page, OPERATOR, baseURL!);
   await page.goto('/ko/admin/activities');
-  await page.getByRole('link', { name: /Sushi Tech Tokyo 2026/ }).click();
+  await page.getByRole('link', { name: /SusHi Tech Tokyo 2026/ }).click();
   await expect(page.getByRole('img', { name: '지금 사진' })).toBeVisible();
   await page.getByRole('button', { name: '저장' }).click();
   await expect(page).toHaveURL(/\/ko\/admin\/activities$/);
-  expect(await photoOf('Sushi Tech Tokyo 2026')).toBe(
+  expect(await photoOf('SusHi Tech Tokyo 2026')).toBe(
     '/images/activities/sushi-tech-tokyo-2026.jpg',
   );
 });
@@ -321,7 +321,7 @@ test('someone demoted mid-form is refused, and the photo does not stay behind', 
 
 test('an activity without a photo shows the club mark instead of a word', async ({ page }) => {
   await page.goto('/ko/activities');
-  const card = page.locator('[data-activity]', { hasText: '글로벌 IR과 pre-SEED 투자 유치' });
+  const card = page.locator('[data-activity]', { hasText: '글로벌 IR과 시드 투자 유치' });
   await expect(card.locator('[data-activity-mark] svg')).toBeVisible();
   await expect(card.locator('[data-activity-mark]')).toHaveText('');
   // The same shape as a photo, so a row of cards stays level.
@@ -399,7 +399,7 @@ test('each activity has a page: name, place and dates, results, and the ones aro
   );
   await expect(page).toHaveTitle(/라운드테이블 멘토링 워크숍 \| RISE CREW 활동/);
   await expect(page.locator('figcaption')).toHaveText(
-    '카카오모빌리티 × RISE CREW 라운드테이블 멘토링 워크숍 · 시흥 · 2026.01.23–01.24',
+    '카카오모빌리티 × RISE CREW 라운드테이블 멘토링 워크숍 · 시흥, 한국 · 2026.01.23–01.24',
   );
   await expect(page.locator('section[aria-labelledby="results-title"] li')).toHaveText([
     '최우수상 안전상점',

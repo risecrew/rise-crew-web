@@ -138,7 +138,7 @@ export default async function NetworkPage({ params }: Props) {
         </div>
       </section>
 
-      <CtaBand title={t('cta')} />
+      <CtaBand title={t('cta')} partnerOnly />
     </main>
   );
 }
