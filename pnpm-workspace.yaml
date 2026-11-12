@@ -8,3 +8,6 @@ minimumReleaseAgeExclude:
   - next-intl-swc-plugin-extractor@4.14.9
   - next-intl@4.14.9
   - use-intl@4.14.9
+overrides:
+  # Dev only (vitest): Vite 8.3.0-8.3.2 have dev-server advisories (GHSA, 2026-10).
+  vite: ^8.3.3
