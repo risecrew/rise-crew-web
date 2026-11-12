@@ -1,7 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { PRIMARY, SECONDARY } from '@/components/site/buttons';
-import { Sentences } from '@/components/site/sentences';
 import type { Photo, Stamp } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
@@ -57,10 +56,13 @@ export async function Hero({
         </>
       ) : null}
       <div className="relative shell pb-14 md:pb-20">
-        <p className="text-base font-semibold break-keep text-white/90 md:text-xl">
+        {/* The club line in lime behind a short rule, the name large, the team count in lime: the
+            three things a first visitor should take away. */}
+        <p className="flex items-center gap-3 text-[15px] font-semibold break-keep text-lime sm:text-base md:text-xl">
+          <span aria-hidden className="hidden h-0.5 w-8 shrink-0 bg-lime sm:block md:w-10" />
           {t('eyebrow')}
         </p>
-        <h1 id="hero-title" className="mt-3 font-display text-hero text-balance break-keep">
+        <h1 id="hero-title" className="mt-4 font-display text-wordmark text-balance break-keep">
           {first}
           {second ? (
             <>
@@ -70,8 +72,14 @@ export async function Hero({
           ) : null}
         </h1>
         {/* One sentence to a line, so neither breaks in the middle. */}
-        <p className="mt-5 text-base break-keep text-white/80 md:text-lg">
-          <Sentences text={t('body', { teams })} />
+        <p className="mt-6 text-base break-keep text-white/80 md:text-lg">
+          <span className="block">{t('body')}</span>
+          <span className="block">
+            {t.rich('teams', {
+              teams,
+              em: (chunks) => <strong className="font-semibold text-lime">{chunks}</strong>,
+            })}
+          </span>
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/join" className={PRIMARY}>

@@ -4,6 +4,7 @@ import { EMAIL } from '@/components/home/contact';
 import { PlusIcon } from '@/components/icons';
 import { PRIMARY } from '@/components/site/buttons';
 import { CopyButton } from '@/components/site/copy-button';
+import { NextNotice } from '@/components/site/next-notice';
 import { FaqHash } from '@/components/site/faq-hash';
 import { PageCover } from '@/components/site/page-cover';
 import { asLocale } from '@/i18n/as-locale';
@@ -62,13 +63,17 @@ export default async function JoinPage({ params }: Props) {
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-white/64">{t('status.period')}</dt>
-              <dd className="mt-1 text-base break-keep">
-                {open
-                  ? pick(recruitment.period, locale)
-                  : recruitment.nextNotice
-                    ? pick(recruitment.nextNotice, locale)
-                    : t('status.next')}
+              <dt className="text-sm text-white/64">
+                {open ? t('status.period') : t('status.nextLabel')}
+              </dt>
+              <dd className="mt-2 text-base break-keep">
+                {open ? (
+                  pick(recruitment.period, locale)
+                ) : recruitment.nextNotice ? (
+                  <NextNotice notice={recruitment.nextNotice} locale={locale} />
+                ) : (
+                  t('status.next')
+                )}
               </dd>
             </div>
             {open ? (

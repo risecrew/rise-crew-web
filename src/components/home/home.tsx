@@ -35,8 +35,8 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
     return p ? { photo: p, event: eventOf(p, stamps) } : undefined;
   };
 
-  // The opening: the whole crew and its mentors in one room.
-  const opening = photo('crew-lecture-hall');
+  // The opening: the crew and its mentors in their jackets at the second roundtable workshop.
+  const opening = photo('roundtable-2026-08-group');
   const teams = value('teams')?.value ?? '';
   const open = recruitment.status === 'open';
   const applyLabel = open ? nav('apply') : nav('applyInfoLong');

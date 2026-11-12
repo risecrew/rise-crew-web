@@ -78,7 +78,8 @@
     "hero": {
       "eyebrow": "A global startup club under the Seoul ANCHOR Project Group",
       "title": "RISE CREW",
-      "body": "Education and mentoring, commercialization support, overseas expos and IR. {teams} startup teams are growing with us.",
+      "body": "Education and mentoring, commercialization support, overseas expos and IR.",
+      "teams": "<em>{teams} startup teams</em> are growing with us.",
       "partner": "Partnerships"
     },
     "numbers": {
@@ -236,7 +237,8 @@
       "closed": "Closed",
       "period": "Recruitment period",
       "next": "We will announce the next intake once it is set.",
-      "apply": "Apply"
+      "apply": "Apply",
+      "nextLabel": "Next intake"
     },
     "who": {
       "title": "Who can apply",
@@ -1015,5 +1017,8 @@
     },
     "lately": "Recent activities in this stage",
     "cta": "Want to take part?"
+  },
+  "NextNotice": {
+    "via": "Details will be posted on"
   }
 }

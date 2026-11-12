@@ -130,14 +130,22 @@ export type Faq = z.infer<typeof faqSchema>;
 export const benefitSchema = z.object({ id, title: localizedSchema, body: localizedSchema });
 export type Benefit = z.infer<typeof benefitSchema>;
 
+// When the next intake opens, where it will be announced, and a closing line.
+export const nextNoticeSchema = z.object({
+  when: localizedSchema,
+  channels: z.array(localizedSchema).min(1),
+  closing: localizedSchema,
+});
+export type NextNotice = z.infer<typeof nextNoticeSchema>;
+
 export const recruitmentSchema = z.discriminatedUnion('status', [
   z.object({
     status: z.literal('open'),
     period: localizedSchema,
     applyUrl: z.url(),
-    nextNotice: localizedSchema.optional(),
+    nextNotice: nextNoticeSchema.optional(),
   }),
-  z.object({ status: z.literal('closed'), nextNotice: localizedSchema }),
+  z.object({ status: z.literal('closed'), nextNotice: nextNoticeSchema }),
 ]);
 export type Recruitment = z.infer<typeof recruitmentSchema>;
 

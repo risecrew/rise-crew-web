@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { PRIMARY } from '@/components/site/buttons';
 import type { Recruitment } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
+import { NextNotice } from '@/components/site/next-notice';
 import { Link } from '@/i18n/navigation';
 import { pick } from '@/lib/content';
 
@@ -23,7 +24,6 @@ export async function Recruit({
     ...(open ? [{ label: t('period'), value: pick(recruitment.period, locale) }] : []),
     // TODO(운영진 확인): the selection steps, once confirmed (wireframe v1.1, §8 6-3).
   ];
-  const notice = recruitment.nextNotice ? pick(recruitment.nextNotice, locale) : null;
 
   return (
     <section aria-labelledby="recruit-title" className="bg-cobalt/25 section-y text-white">
@@ -38,10 +38,14 @@ export async function Recruit({
           <h2 id="recruit-title" className="font-display text-headline text-balance break-keep">
             {open ? t('title.open') : t('title.closed')}
           </h2>
-          {/* Who can apply is in the list beside; under the title, only when the next round is
-              announced. */}
-          {notice || !open ? (
-            <p className="mt-4 text-lg break-keep text-white/80">{notice ?? t('closedBody')}</p>
+          {/* Who can apply is in the list beside; under the title, when the next round opens and
+              where it will be announced. */}
+          {recruitment.nextNotice ? (
+            <div className="mt-5">
+              <NextNotice notice={recruitment.nextNotice} locale={locale} />
+            </div>
+          ) : !open ? (
+            <p className="mt-4 text-lg break-keep text-white/80">{t('closedBody')}</p>
           ) : null}
           <div className="mt-8">
             <Link href="/join" className={PRIMARY}>

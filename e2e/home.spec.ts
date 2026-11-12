@@ -9,7 +9,7 @@ test('the home opens on who we are, over a real photo that holds still', async (
   await expect(hero).toContainText('성균관대학교 앵커사업단 산하 글로벌 창업 동아리');
   await expect(page.locator('h1')).toHaveText('RISE CREW');
   await expect(hero).toContainText('25개 창업팀');
-  await expect(hero.locator('img')).toHaveAttribute('alt', /주먹을 들어 올리고/);
+  await expect(hero.locator('img')).toHaveAttribute('alt', /라운드테이블 워크숍 참가자와 멘토들/);
   await expect(hero.locator('img')).toHaveAttribute('sizes', '100vw');
   // No scroll-held stage: the hero is one screen at most.
   const height = await hero.evaluate((el) => el.getBoundingClientRect().height);
