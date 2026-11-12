@@ -27,7 +27,9 @@ export async function Recruit({
 
   return (
     <section aria-labelledby="recruit-title" className="bg-cobalt/25 section-y text-white">
-      <div className="shell grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start">
+      {/* Two halves of one weight: the state and the way to the join page on the left, the facts
+          (who can apply, and when and where the next round is announced) on the right. */}
+      <div className="shell grid gap-10 md:grid-cols-2 md:gap-16">
         <div>
           {/* Open recruiting gets a lime mark; a closed one says so in the title alone. */}
           {open ? (
@@ -38,13 +40,7 @@ export async function Recruit({
           <h2 id="recruit-title" className="font-display text-headline text-balance break-keep">
             {open ? t('title.open') : t('title.closed')}
           </h2>
-          {/* Who can apply is in the list beside; under the title, when the next round opens and
-              where it will be announced. */}
-          {recruitment.nextNotice ? (
-            <div className="mt-5">
-              <NextNotice notice={recruitment.nextNotice} locale={locale} />
-            </div>
-          ) : !open ? (
+          {!open && !recruitment.nextNotice ? (
             <p className="mt-4 text-lg break-keep text-white/80">{t('closedBody')}</p>
           ) : null}
           <div className="mt-8">
@@ -53,13 +49,21 @@ export async function Recruit({
             </Link>
           </div>
         </div>
-        <dl className="grid gap-4 border-t border-white/15 pt-6 md:border-t-0 md:border-l md:pt-0 md:pl-10">
+        <dl className="grid content-start gap-8 border-t border-white/15 pt-8 md:border-t-0 md:border-l md:pt-0 md:pl-12">
           {rows.map((row) => (
             <div key={row.label}>
               <dt className="text-[13px] font-semibold text-white/64">{row.label}</dt>
               <dd className="mt-1 text-base break-keep">{row.value}</dd>
             </div>
           ))}
+          {recruitment.nextNotice ? (
+            <div>
+              <dt className="text-[13px] font-semibold text-white/64">{t('next')}</dt>
+              <dd className="mt-2">
+                <NextNotice notice={recruitment.nextNotice} locale={locale} />
+              </dd>
+            </div>
+          ) : null}
         </dl>
       </div>
     </section>

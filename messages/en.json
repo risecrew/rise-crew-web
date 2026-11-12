@@ -147,7 +147,8 @@
       "closedBody": "We will post the next intake dates on the join page once they are set.",
       "who": "Who",
       "whoValue": "Undergraduate and graduate students at the SKKU Humanities and Social Sciences Campus",
-      "period": "When"
+      "period": "When",
+      "next": "Next intake"
     },
     "contact": {
       "title": "Work with RISE CREW",
