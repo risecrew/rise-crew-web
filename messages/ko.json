@@ -30,7 +30,6 @@
   },
   "Nav": {
     "primary": "주 메뉴",
-    "footer": "사이트 메뉴",
     "about": "소개",
     "network": "네트워크",
     "join": "지원 안내",
@@ -89,9 +88,9 @@
       "mentors": "멘토",
       "partners": "협력 기관",
       "unit": {
-        "people": "{value}<unit>명</unit>",
-        "teams": "{value}<unit>팀</unit>",
-        "places": "{value}<unit>곳</unit>"
+        "people": "<num>{value}</num><unit>명</unit>",
+        "teams": "<num>{value}</num><unit>팀</unit>",
+        "places": "<num>{value}</num><unit>곳</unit>"
       },
       "allPartners": "협력 기관 {count}곳 전체 보기"
     },
@@ -128,7 +127,6 @@
     },
     "mentors": {
       "title": "모든 단계에 멘토 {count}명이 함께합니다",
-      "faces": "멘토",
       "all": "멘토 전체 보기",
       "body": "카카오모빌리티, VC, 액셀러레이터, 교수진의 현직 전문가가 아이디어부터 투자와 해외 진출까지 함께합니다."
     },
@@ -139,14 +137,14 @@
     },
     "recruit": {
       "badge": {
-        "open": "모집 중",
-        "closed": "모집 마감"
+        "open": "모집 중"
       },
       "title": {
         "open": "지금 모집하고 있습니다",
-        "closed": "이번 모집은 마감되었습니다"
+        "closed": "다음 모집을 준비하고 있습니다"
       },
       "body": "창업팀, 1인 창업자, 팀이 없는 개인 모두 지원할 수 있습니다.",
+      "closedBody": "다음 기수 일정은 정해지면 지원 안내 페이지에 알립니다.",
       "who": "대상",
       "whoValue": "성균관대학교 학생. 타교생과 졸업생도 가입할 수 있습니다.",
       "period": "기간"
@@ -878,12 +876,12 @@
       "field": "분야",
       "cohort": "기수",
       "all": "전체",
-      "clear": "거르기 지우기"
+      "clear": "전체 보기"
     },
     "cohort": "{cohort}기",
     "total": "{count}개 팀",
     "empty": "아직 소개할 팀이 없습니다.",
-    "emptyFiltered": "조건에 맞는 팀이 없습니다.",
+    "emptyFiltered": "선택한 분야·기수에 해당하는 팀이 아직 없습니다.",
     "fields": {
       "ai-software": "AI·소프트웨어",
       "edutech": "에듀테크",
@@ -1020,7 +1018,7 @@
   "Program": {
     "eyebrow": "프로그램",
     "title": "캠퍼스에서 세계까지, 3단계로 성장합니다",
-    "lead": "VCC 강연, 전문 멘토단 1:1 멘토링, 동아리방이 모든 단계를 받칩니다.",
+    "lead": "어느 단계에 있든 VCC 강연, 전문 멘토단 1:1 멘토링, 동아리방을 함께 누립니다.",
     "tabs": "단계",
     "campus": {
       "body": "아이디어를 사업 아이템으로 구체화하고 실행할 팀을 꾸린 뒤, 작동하는 프로토타입(MVP)을 만듭니다."
@@ -1031,7 +1029,7 @@
     "global": {
       "body": "국내에서 검증한 모델과 투자금으로 해외 시장에 진출합니다."
     },
-    "lately": "이 단계의 최근 활동",
+    "lately": "최근 활동",
     "cta": "프로그램에 참여하고 싶다면"
   }
 }

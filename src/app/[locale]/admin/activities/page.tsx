@@ -48,7 +48,7 @@ export default async function AdminActivitiesPage({ params }: Props) {
                   href={`/admin/activities/${activity.id}`}
                   className="grid min-h-14 gap-x-6 gap-y-1 py-4 hover:bg-white/5 sm:grid-cols-[9rem_8rem_1fr]"
                 >
-                  <span className="font-mono text-sm text-white/60">
+                  <span className="text-sm text-white/60 tabular-nums">
                     {activity.date ? formatStampDate(activity.date, locale) : common('dateTbc')}
                   </span>
                   <span className="font-semibold break-keep">{activity.city_ko}</span>

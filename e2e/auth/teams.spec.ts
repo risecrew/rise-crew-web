@@ -74,8 +74,8 @@ test('the list shows published teams only, and the menu links to it', async ({ p
   await expect(page.getByRole('link', { name: new RegExp(`열린 팀 ${stamp}`) })).toBeVisible();
   await expect(page.getByRole('link', { name: new RegExp(`다른 팀 ${stamp}`) })).toBeVisible();
   await expect(page.getByText(`닫힌 팀 ${stamp}`)).toHaveCount(0);
-  // The phone menu is closed, so look in the footer, which has the same items on every screen.
-  await expect(page.locator('footer a[href="/ko/startups"]')).toHaveText('창업팀');
+  // The header's own menu is in the page on every screen (hidden on a phone until it opens).
+  await expect(page.locator('header a[href="/ko/startups"]').first()).toHaveText('창업팀');
 });
 
 test('a field filter narrows the list and stays in the address', async ({ page }) => {
@@ -107,8 +107,8 @@ test('a team row shows its cover when it has one, and none otherwise', async ({ 
 
 test('a filter nothing matches says so', async ({ page }) => {
   await page.goto('/ko/startups?cohort=9999&field=healthcare');
-  await expect(page.getByText('조건에 맞는 팀이 없습니다.')).toBeVisible();
-  await page.getByRole('link', { name: '거르기 지우기' }).click();
+  await expect(page.getByText('선택한 분야·기수에 해당하는 팀이 아직 없습니다.')).toBeVisible();
+  await page.getByRole('link', { name: '전체 보기' }).click();
   await expect(page).toHaveURL(/\/ko\/startups$/);
 });
 

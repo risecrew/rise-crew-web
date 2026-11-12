@@ -30,7 +30,7 @@ export async function Recent({
   return (
     <section aria-labelledby="recent-title" className="pb-[72px] text-white md:pb-24 xl:pb-[120px]">
       <div className="shell">
-        <div className="flex items-end justify-between gap-6">
+        <div className="flex items-center justify-between gap-6">
           <h2 id="recent-title" className="font-display text-headline break-keep">
             {t('title')}
           </h2>
@@ -38,6 +38,8 @@ export async function Recent({
         </div>
         {first ? (
           <ul className="section-gap grid gap-6 lg:grid-cols-2">
+            {/* The large card stretches to the height of the four beside it, so both columns end on
+                the same line. */}
             <li>
               <Card event={first} locale={locale} large />
             </li>
@@ -64,16 +66,13 @@ export async function Recent({
                   key={stamp.id}
                   className="flex flex-wrap items-center gap-x-4 gap-y-1 py-4 text-base"
                 >
-                  <span className="font-mono text-sm text-white/64">
+                  <span className="text-sm text-white/64 tabular-nums">
                     {stamp.date
                       ? formatDateRange(stamp.date, stamp.endDate, locale)
                       : common('dateTbc')}
                   </span>
                   <span className="font-semibold break-keep">{pick(stamp.title, locale)}</span>
                   <span className="text-sm text-white/64">{pick(stamp.city, locale)}</span>
-                  <span className="rounded-full border border-white/30 px-2.5 py-0.5 text-[13px] font-semibold">
-                    {common('upcoming')}
-                  </span>
                 </li>
               ))}
             </ul>
@@ -95,11 +94,11 @@ function Card({
   large?: boolean;
 }) {
   return (
-    <article>
+    <article className={cn(large && 'flex h-full flex-col')}>
       <div
         className={cn(
           'relative overflow-hidden rounded-xl bg-white/5',
-          large ? 'aspect-[16/10]' : 'aspect-[3/2]',
+          large ? 'aspect-[16/10] lg:aspect-auto lg:min-h-0 lg:flex-1' : 'aspect-[16/10]',
         )}
       >
         <Image

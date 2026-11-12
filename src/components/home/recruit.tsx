@@ -4,7 +4,6 @@ import type { Recruitment } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { Link } from '@/i18n/navigation';
 import { pick } from '@/lib/content';
-import { cn } from '@/lib/utils';
 
 // S6 (wireframe v1.1, §8): whether we are recruiting, who can apply, and the way to the join page.
 // A row with no value is left out.
@@ -30,22 +29,23 @@ export async function Recruit({
     <section aria-labelledby="recruit-title" className="bg-cobalt/25 section-y text-white">
       <div className="shell grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start">
         <div>
-          <p
-            className={cn(
-              'inline-flex rounded-full px-3 py-1 text-[13px] font-semibold',
-              open ? 'bg-lime text-cobalt' : 'bg-white/15 text-white',
-            )}
-          >
-            {open ? t('badge.open') : t('badge.closed')}
-          </p>
-          <h2
-            id="recruit-title"
-            className="mt-4 font-display text-headline text-balance break-keep"
-          >
+          {/* Open recruiting gets a lime mark; a closed one says so in the title alone. */}
+          {open ? (
+            <p className="mb-4 inline-flex rounded-full bg-lime px-3 py-1 text-[13px] font-semibold text-cobalt">
+              {t('badge.open')}
+            </p>
+          ) : null}
+          <h2 id="recruit-title" className="font-display text-headline text-balance break-keep">
             {open ? t('title.open') : t('title.closed')}
           </h2>
-          <p className="mt-4 text-lg break-keep text-white/80">{t('body')}</p>
-          {notice ? <p className="mt-3 text-base break-keep text-white/64">{notice}</p> : null}
+          {/* Open: who can apply. Closed: when the next round is announced, never "anyone can
+              apply" under a closed title. */}
+          <p className="mt-4 text-lg break-keep text-white/80">
+            {open ? t('body') : (notice ?? t('closedBody'))}
+          </p>
+          {open && notice ? (
+            <p className="mt-3 text-base break-keep text-white/64">{notice}</p>
+          ) : null}
           <div className="mt-8">
             <Link href="/join" className={PRIMARY}>
               {applyLabel}

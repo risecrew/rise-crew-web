@@ -35,7 +35,7 @@ export function PostList({ posts, slug }: { posts: ListedPost[]; slug: string })
           >
             <span className="min-w-0">
               <span className="flex flex-wrap items-center gap-3">
-                <time dateTime={post.created_at} className="font-mono text-sm text-white/60">
+                <time dateTime={post.created_at} className="text-sm text-white/60 tabular-nums">
                   {postDate(post.created_at, locale)}
                 </time>
                 <PostChips post={post} />

@@ -19,6 +19,21 @@ export function ArrowRightIcon({ className }: IconProps) {
   );
 }
 
+export function ArrowLeftIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={cn(base, className)}
+    >
+      <path d="M20 12H5M11 6l-6 6 6 6" />
+    </svg>
+  );
+}
+
 export function ArrowDownIcon({ className }: IconProps) {
   return (
     <svg

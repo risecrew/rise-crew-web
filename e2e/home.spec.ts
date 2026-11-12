@@ -9,7 +9,7 @@ test('the home opens on who we are, over a real photo that holds still', async (
   await expect(hero).toContainText('성균관대학교 앵커사업단 산하 글로벌 창업 동아리');
   await expect(page.locator('h1')).toHaveText(/캠퍼스에서 세계로,\s*실행하는 창업가를 키웁니다/);
   await expect(hero).toContainText('25개 창업팀');
-  await expect(hero.locator('img')).toHaveAttribute('alt', /RISE CREW 25 저지/);
+  await expect(hero.locator('img')).toHaveAttribute('alt', /주먹을 들어 올리고/);
   await expect(hero.locator('img')).toHaveAttribute('sizes', '100vw');
   // No scroll-held stage: the hero is one screen at most.
   const height = await hero.evaluate((el) => el.getBoundingClientRect().height);
@@ -85,8 +85,34 @@ test('the partnership block writes the address out once, with copy and mail', as
   await expect(page.getByText('risecrew4@gmail.com', { exact: true })).toHaveCount(1);
 });
 
-test('nothing on the home counts up, holds the scroll or overflows', async ({ page }) => {
+test('nothing on the home holds the scroll or overflows', async ({ page }) => {
   await page.goto('/ko');
-  await expect(page.locator('[data-count], [data-chapter], [data-gallery]')).toHaveCount(0);
+  await expect(page.locator('[data-chapter], [data-gallery]')).toHaveCount(0);
   await expectNoHorizontalScroll(page);
+});
+
+test('the numbers count up once as they scroll in, and a screen reader hears each once', async ({
+  page,
+}) => {
+  await page.goto('/ko');
+  const members = page
+    .locator('section[aria-labelledby="numbers-title"] dl > div', { hasText: '멤버' })
+    .locator('dd');
+  const digits = members.locator('[aria-hidden] > span').last();
+  // Below the fold, the number waits at zero.
+  await expect(digits).toHaveText('0+');
+  await members.scrollIntoViewIfNeeded();
+  await expect(digits).toHaveText('90+');
+  // The counting digits are hidden from screen readers; the final value is read once.
+  await expect(members.locator('.sr-only')).toHaveText('90+');
+});
+
+test('with reduced motion the numbers never count', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/ko');
+  const digits = page
+    .locator('section[aria-labelledby="numbers-title"] dl > div', { hasText: '멤버' })
+    .locator('dd [aria-hidden] > span')
+    .last();
+  await expect(digits).toHaveText('90+');
 });

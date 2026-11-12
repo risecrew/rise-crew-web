@@ -88,7 +88,7 @@ export function Gallery({
           }}
         >
           <div className="flex h-14 shrink-0 items-center justify-between px-4">
-            <p className="font-mono text-sm text-white/80" aria-live="polite">
+            <p className="text-sm text-white/80 tabular-nums" aria-live="polite">
               {index + 1} / {count}
             </p>
             <button

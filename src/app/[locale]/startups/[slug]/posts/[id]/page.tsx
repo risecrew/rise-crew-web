@@ -99,7 +99,7 @@ export default async function PostPage({ params }: Props) {
           {post.title}
         </h1>
         <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-white/60">
-          <time dateTime={post.created_at} className="font-mono">
+          <time dateTime={post.created_at} className="tabular-nums">
             {postDate(post.created_at, locale)}
           </time>
           {post.edited_at ? (

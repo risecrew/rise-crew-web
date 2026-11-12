@@ -47,7 +47,7 @@ export async function ActivityCard({ activity, locale, today }: Props) {
         </div>
       )}
       <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65">
-        <time dateTime={activity.date ?? undefined} className="font-mono">
+        <time dateTime={activity.date ?? undefined} className="tabular-nums">
           {activity.date
             ? formatDateRange(activity.date, activity.end_date ?? undefined, locale)
             : t('dateTbc')}
