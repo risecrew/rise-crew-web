@@ -9,8 +9,8 @@ const KR = L('한국', 'Korea');
 // The 25 partners (wireframe v1.1, §13): supporters, then universities, then companies, each in the
 // order the organizers listed them. The logo files a teammate gathered are in place, but
 // none is approved for showing yet, so the home's logo band stays hidden and the network page shows
-// the names. Four came from the partners' own sites (2026-11). TODO(운영진 확인): approval, and
-// logos for the ANCHOR Project Group and Kakao Mobility.
+// the names. Four came from the partners' own sites (2026-11). Kakao Mobility's is its CI from Kakao's own press
+// release. TODO(운영진 확인): approval, and the ANCHOR Project Group's logo.
 export const partners: Partner[] = [
   {
     id: 'anchor',
@@ -97,6 +97,7 @@ export const partners: Partner[] = [
     kind: 'company',
     name: L('카카오모빌리티', 'Kakao Mobility'),
     country: KR,
+    logo: '/images/partners/kakao-mobility.png',
     logoApproved: false,
   },
   {
