@@ -88,9 +88,9 @@
       "mentors": "멘토",
       "partners": "협력 기관",
       "unit": {
-        "people": "{value}<unit>명</unit>",
-        "teams": "{value}<unit>팀</unit>",
-        "places": "{value}<unit>곳</unit>"
+        "people": "<num>{value}</num><unit>명</unit>",
+        "teams": "<num>{value}</num><unit>팀</unit>",
+        "places": "<num>{value}</num><unit>곳</unit>"
       },
       "allPartners": "협력 기관 {count}곳 전체 보기"
     },

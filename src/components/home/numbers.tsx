@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 export type HomeNumber = { id: string; shown: React.ReactNode; label: string };
 
 // S2 (wireframe v1.1, §8): four numbers, one date for all of them, and the partners' logos. The
-// numbers are plain text, never counted up, so a screen reader reads each once.
+// numbers count up once as they scroll in (CountUp), and a screen reader reads each final value once.
 export async function Numbers({
   locale,
   numbers,

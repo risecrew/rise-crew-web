@@ -88,9 +88,9 @@
       "mentors": "Mentors",
       "partners": "Partners",
       "unit": {
-        "people": "{value}",
-        "teams": "{value}",
-        "places": "{value}"
+        "people": "<num>{value}</num>",
+        "teams": "<num>{value}</num>",
+        "places": "<num>{value}</num>"
       },
       "allPartners": "See all {count} partners"
     },

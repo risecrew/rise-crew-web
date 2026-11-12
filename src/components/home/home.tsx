@@ -5,6 +5,7 @@ import { isAuthEnabled } from '@/lib/auth/config';
 import { pick } from '@/lib/content';
 import { eventOf, recentEvents, upcomingEvents } from '@/lib/events';
 import { Contact } from './contact';
+import { CountUp } from './count-up';
 import { Hero } from './hero';
 import { Numbers } from './numbers';
 import { Recent } from './recent';
@@ -63,6 +64,7 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
           // The unit is smaller than the number, next to it.
           shown: t.rich(`numbers.unit.${n.kind}`, {
             value: n.value,
+            num: () => <CountUp value={n.value} />,
             unit: (chunks) => (
               <span className="ml-1 text-xl font-semibold text-lime">{chunks}</span>
             ),
