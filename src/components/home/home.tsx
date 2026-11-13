@@ -2,12 +2,13 @@ import { getTranslations } from 'next-intl/server';
 import type { Partner, Photo, Recruitment, Stamp, Stat } from '@/content/schema';
 import type { Locale } from '@/i18n/locales';
 import { isAuthEnabled } from '@/lib/auth/config';
-import { pick } from '@/lib/content';
+import { pick, shownLogo } from '@/lib/content';
 import { eventOf, recentEvents, upcomingEvents } from '@/lib/events';
 import { Contact } from './contact';
 import { CountUp } from './count-up';
 import { Hero } from './hero';
 import { Numbers } from './numbers';
+import { PartnerBand } from './partner-band';
 import { Recent } from './recent';
 import { Recruit } from './recruit';
 import { Stages, type StagePhoto } from './stages';
@@ -41,6 +42,11 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
   const open = recruitment.status === 'open';
   const applyLabel = open ? nav('apply') : nav('applyInfoLong');
   const members = value('members');
+  // Only partners with an approved logo file go on the band at the foot of the page.
+  const logos = partners.flatMap((p) => {
+    const logo = shownLogo(p);
+    return logo ? [{ id: p.id, name: pick(p.name, locale), logo }] : [];
+  });
 
   return (
     <>
@@ -52,7 +58,6 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
         applyLabel={applyLabel}
       />
       <Numbers
-        locale={locale}
         numbers={[
           { id: 'members', kind: 'people', value: members?.value ?? '' },
           { id: 'teams', kind: 'teams', value: teams },
@@ -92,6 +97,21 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
       />
       <Recruit locale={locale} recruitment={recruitment} applyLabel={applyLabel} />
       <Contact />
+      {logos.length > 0 ? (
+        <section aria-labelledby="partner-band-title" className="border-t border-white/10 py-12">
+          <h2
+            id="partner-band-title"
+            className="shell mb-6 text-[13px] font-semibold text-white/64"
+          >
+            {t('partners.title')}
+          </h2>
+          <PartnerBand
+            logos={logos}
+            pauseLabel={t('partners.pause')}
+            playLabel={t('partners.play')}
+          />
+        </section>
+      ) : null}
     </>
   );
 }

@@ -35,9 +35,6 @@ test('the numbers are plain text with one date for all of them', async ({ page }
     );
   }
   await expect(numbers).toContainText('2026.11 기준');
-  await expect(numbers.getByRole('img', { name: '성균관대학교 앵커사업단' })).toBeVisible();
-  // The band holds the first 12; the link leads to all 25.
-  await expect(numbers.locator('ul img')).toHaveCount(12);
   await expect(numbers.getByRole('link', { name: '협력 기관 25곳 전체 보기' })).toHaveAttribute(
     'href',
     '/ko/network#partners',
@@ -120,4 +117,31 @@ test('with reduced motion the numbers never count', async ({ page }) => {
     .locator('dd [aria-hidden] > span')
     .last();
   await expect(digits).toHaveText('90');
+});
+
+test('the partners drift at the foot of the page and stop on request', async ({ page }) => {
+  await page.goto('/ko');
+  const band = page.locator('section[aria-labelledby="partner-band-title"]');
+  // Drawn twice for a seamless loop; the second copy is hidden from screen readers.
+  await expect(band.getByRole('img')).toHaveCount(25);
+  await expect(band.locator('img')).toHaveCount(50);
+  await expect(band.getByRole('img', { name: '카카오모빌리티' })).toBeAttached();
+  const track = band.locator('[data-partner-track]');
+  const state = () => track.evaluate((el) => getComputedStyle(el).animationPlayState);
+  expect(await state()).toBe('running');
+  await band.getByRole('button', { name: '로고 흐름 멈추기' }).click();
+  expect(await state()).toBe('paused');
+  await band.getByRole('button', { name: '로고 흐름 재생' }).click();
+  expect(await state()).toBe('running');
+});
+
+test('with reduced motion the partners hold still, once, in a row to scroll', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/ko');
+  const band = page.locator('section[aria-labelledby="partner-band-title"]');
+  const track = band.locator('[data-partner-track]');
+  expect(await track.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+  await expect(band.locator('img:visible')).toHaveCount(25);
+  await expect(band.getByRole('button')).toBeHidden();
+  await expectNoHorizontalScroll(page);
 });
