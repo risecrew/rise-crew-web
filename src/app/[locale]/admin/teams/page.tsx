@@ -8,7 +8,6 @@ import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { requireRole } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import type { TeamField } from '@/lib/teams/fields';
 import { AccountLayout, accountMetadata } from '../../account-layout';
 
 type Props = { params: Promise<{ locale: string }> };
@@ -34,7 +33,7 @@ export default async function AdminTeamsPage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from('teams')
-    .select('id, name, field, cohort, is_published')
+    .select('id, name, cohort, is_published')
     .order('cohort', { ascending: false })
     .order('name');
   if (error) throw new Error(error.message);
@@ -64,7 +63,6 @@ export default async function AdminTeamsPage({ params }: Props) {
                       {team.name}
                     </span>
                     <span className="mt-1 block text-sm font-medium text-white/60">
-                      {teamT(`fields.${team.field as TeamField}`)} ·{' '}
                       {teamT('cohort', { cohort: team.cohort })}
                     </span>
                   </span>

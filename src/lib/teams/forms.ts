@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { TEAM_FIELDS } from './fields';
 
 const MB = 1024 * 1024;
 
@@ -71,7 +70,6 @@ export const postSchema = z.object({
 
 export const teamCreateSchema = z.object({
   name: requiredText(TEAM_LIMITS.name),
-  field: z.enum(TEAM_FIELDS, { error: 'invalid' }),
   cohort: z
     .string()
     .regex(/^[1-9]\d{0,3}$/, 'invalid')

@@ -49,7 +49,6 @@ test('an operator creates a team, which stays off the list until it is published
   await page.getByRole('link', { name: '팀 만들기' }).click();
 
   await page.getByLabel('팀 이름').fill(`새 팀 ${id}`);
-  await page.getByLabel('분야').selectOption('edutech');
   await page.getByLabel('기수').fill(String(cohort));
   await page.getByRole('button', { name: '만들기' }).click();
   await expect(page.getByRole('heading', { level: 1, name: `새 팀 ${id}` })).toBeVisible();

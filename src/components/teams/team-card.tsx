@@ -24,7 +24,7 @@ export function TeamCard({ team, logo }: { team: Team; logo: string | null }) {
             </span>
           ) : null}
           <span className="mt-2 block text-sm font-medium text-white/60">
-            {t(`fields.${team.field}`)} · {t('cohort', { cohort: team.cohort })}
+            {t('cohort', { cohort: team.cohort })}
           </span>
         </span>
         {team.cover ? (

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { TEAM_FIELDS, isTeamField } from '@/lib/teams/fields';
 import {
   TEAM_LIMITS,
   checkPhoto,
@@ -15,18 +14,6 @@ const TEAM = '7e590000-0000-4000-8000-000000000a01';
 const POST = '7e590000-0000-4000-8000-000000000d01';
 const FILE = '7e590000-0000-4000-8000-000000000010';
 const MB = 1024 * 1024;
-
-describe('team fields', () => {
-  it('knows the list', () => {
-    expect(TEAM_FIELDS).toContain('other');
-    expect(isTeamField('other')).toBe(true);
-    expect(isTeamField('zzz')).toBe(false);
-    expect(isTeamField(1)).toBe(false);
-  });
-  it('holds values the database constraint accepts', () => {
-    for (const field of TEAM_FIELDS) expect(field).toMatch(/^[a-z0-9-]+$/);
-  });
-});
 
 describe('TEAM_LIMITS', () => {
   it('holds the numbers from the spec', () => {
@@ -119,13 +106,15 @@ describe('postSchema', () => {
 });
 
 describe('teamCreateSchema and teamSettingsSchema', () => {
-  const ok = { name: '라이즈', field: 'other', cohort: '3' };
+  const ok = { name: '라이즈', cohort: '3' };
 
   it('accepts a good team and reads the cohort as a number', () => {
     expect(teamCreateSchema.parse(ok)).toEqual({ ...ok, cohort: 3 });
   });
-  it('refuses an unknown field, cohort 0 and a 51-character name', () => {
-    expect(teamCreateSchema.safeParse({ ...ok, field: 'zzz' }).success).toBe(false);
+  it('drops a field sent by an old form (teams have none any more)', () => {
+    expect(teamCreateSchema.parse({ ...ok, field: 'mobility' })).toEqual({ ...ok, cohort: 3 });
+  });
+  it('refuses cohort 0 and a 51-character name', () => {
     expect(teamCreateSchema.safeParse({ ...ok, cohort: '0' }).success).toBe(false);
     expect(teamCreateSchema.safeParse({ ...ok, cohort: 'abc' }).success).toBe(false);
     expect(teamCreateSchema.safeParse({ ...ok, name: '가'.repeat(51) }).success).toBe(false);

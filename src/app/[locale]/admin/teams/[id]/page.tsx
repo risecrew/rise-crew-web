@@ -42,7 +42,7 @@ export default async function AdminTeamPage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
   const { data: team, error } = await supabase
     .from('teams')
-    .select('id, slug, name, field, cohort, is_published')
+    .select('id, slug, name, cohort, is_published')
     .eq('id', id)
     .maybeSingle();
   if (error) throw new Error(error.message);

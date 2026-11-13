@@ -1,6 +1,4 @@
-import { isTeamField, type TeamField } from './fields';
-
-export type TeamsQuery = { field: TeamField | null; cohort: number | null; page: number };
+export type TeamsQuery = { cohort: number | null; page: number };
 
 type Params = Record<string, string | string[] | undefined>;
 
@@ -15,9 +13,7 @@ function positive(value: string | undefined): number | null {
 
 // Anything odd in the address is ignored, so a mistyped link still shows the list.
 export function parseTeamsQuery(params: Params): TeamsQuery {
-  const field = first(params.field);
   return {
-    field: isTeamField(field) ? field : null,
     cohort: positive(first(params.cohort)),
     page: positive(first(params.page)) ?? 1,
   };

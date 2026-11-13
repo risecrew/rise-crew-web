@@ -11,7 +11,6 @@ import { isAuthEnabled } from '@/lib/auth/config';
 import { atLeast } from '@/lib/auth/roles';
 import { getViewer } from '@/lib/auth/viewer';
 import { localizedAlternates } from '@/lib/metadata';
-import { TEAM_FIELDS } from '@/lib/teams/fields';
 import { listTeams, logoUrl, pageCount } from '@/lib/teams/queries';
 import { parseTeamsQuery, type TeamsQuery } from '@/lib/teams/query';
 import { cn } from '@/lib/utils';
@@ -40,7 +39,6 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
 function filterQuery(q: TeamsQuery, change: Partial<TeamsQuery>) {
   const next = { ...q, ...change };
   return {
-    ...(next.field ? { field: next.field } : {}),
     ...(next.cohort ? { cohort: next.cohort } : {}),
   };
 }
@@ -59,7 +57,7 @@ export default async function StartupsPage({ params, searchParams }: Props) {
 
   const q = parseTeamsQuery(await searchParams);
   const { teams, cohorts, total } = await listTeams(q);
-  const filtered = q.field !== null || q.cohort !== null;
+  const filtered = q.cohort !== null;
 
   return (
     <main id="main" className="bg-stage">
@@ -79,31 +77,6 @@ export default async function StartupsPage({ params, searchParams }: Props) {
       <section className="border-t border-white/10 bg-stage text-white">
         <div className="mx-auto max-w-7xl px-5 py-14 md:px-10 md:py-20">
           <nav aria-label={t('filters.label')} className="flex flex-col gap-5">
-            <div>
-              <p className="text-sm font-medium text-white/60">{t('filters.field')}</p>
-              <ul className="mt-2 flex flex-wrap gap-2">
-                <li>
-                  <Link
-                    href={{ pathname: '/startups', query: filterQuery(q, { field: null }) }}
-                    aria-current={q.field === null ? 'true' : undefined}
-                    className={cn(FILTER, q.field === null && FILTER_ON)}
-                  >
-                    {t('filters.all')}
-                  </Link>
-                </li>
-                {TEAM_FIELDS.map((field) => (
-                  <li key={field}>
-                    <Link
-                      href={{ pathname: '/startups', query: filterQuery(q, { field }) }}
-                      aria-current={q.field === field ? 'true' : undefined}
-                      className={cn(FILTER, q.field === field && FILTER_ON)}
-                    >
-                      {t(`fields.${field}`)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
             {cohorts.length > 0 ? (
               <div>
                 <p className="text-sm font-medium text-white/60">{t('filters.cohort')}</p>

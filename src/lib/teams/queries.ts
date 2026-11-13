@@ -6,14 +6,13 @@ import { getSupabasePublicConfig } from '@/lib/supabase/env';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { TeamLink, TeamPostVisibility } from './forms';
 import { TEAM_LIMITS } from './forms';
-import type { TeamField } from './fields';
 import type { TeamsQuery } from './query';
 
 // Every read goes through the visitor's own session, so the database's row level security decides
 // what comes back. Nothing here checks who may see what, and nothing here uses the secret key.
 
 const TEAM_COLUMNS =
-  'id, slug, name, field, cohort, tagline, intro, logo_path, cover_path, links, is_published';
+  'id, slug, name, cohort, tagline, intro, logo_path, cover_path, links, is_published';
 // author_id is left out on purpose: the database refuses to show it to anyone.
 const POST_COLUMNS =
   'id, team_id, title, body, visibility, photo_paths, hidden_at, created_at, edited_at';
@@ -22,7 +21,6 @@ export type Team = {
   id: string;
   slug: string;
   name: string;
-  field: TeamField;
   cohort: number;
   tagline: string;
   intro: string;
@@ -33,7 +31,7 @@ export type Team = {
 };
 export type TeamCard = Pick<
   Team,
-  'id' | 'slug' | 'name' | 'field' | 'cohort' | 'tagline' | 'logo_path' | 'cover_path'
+  'id' | 'slug' | 'name' | 'cohort' | 'tagline' | 'logo_path' | 'cover_path'
 > & { cover: string | null };
 
 export type Post = {
@@ -72,9 +70,8 @@ export async function listTeams(
 
   let query = supabase
     .from('teams')
-    .select('id, slug, name, field, cohort, tagline, logo_path, cover_path', { count: 'exact' })
+    .select('id, slug, name, cohort, tagline, logo_path, cover_path', { count: 'exact' })
     .eq('is_published', true);
-  if (q.field) query = query.eq('field', q.field);
   if (q.cohort) query = query.eq('cohort', q.cohort);
 
   const [list, cohortRows] = await Promise.all([

@@ -41,7 +41,6 @@ test.beforeAll(async () => {
     slug: SLUG,
     name: `열린 팀 ${stamp}`,
     cohort,
-    field: 'mobility',
     tagline: '이동을 다시 만들어요',
     intro: '우리 팀 소개입니다.',
     links: [{ kind: 'homepage', url: 'https://team.example.test/' }],
@@ -78,16 +77,13 @@ test('the list shows published teams only, and the menu links to it', async ({ p
   await expect(page.locator('header a[href="/ko/startups"]').first()).toHaveText('창업팀');
 });
 
-test('a field filter narrows the list and stays in the address', async ({ page }) => {
-  await page.goto(`/ko/startups?cohort=${cohort}`);
-  await page
-    .getByRole('navigation', { name: '거르기' })
-    .getByRole('link', { name: '모빌리티' })
-    .click();
-  await expect(page).toHaveURL(new RegExp(`field=mobility`));
-  await expect(page).toHaveURL(new RegExp(`cohort=${cohort}`));
+test('the list filters by cohort only, and an old field link is ignored', async ({ page }) => {
+  await page.goto(`/ko/startups?cohort=${cohort}&field=mobility`);
+  const filters = page.getByRole('navigation', { name: '거르기' });
+  await expect(filters).not.toContainText('분야');
+  await expect(filters).not.toContainText('모빌리티');
   await expect(page.getByRole('link', { name: new RegExp(`열린 팀 ${stamp}`) })).toBeVisible();
-  await expect(page.getByText(`다른 팀 ${stamp}`)).toHaveCount(0);
+  await expect(page.getByRole('link', { name: new RegExp(`다른 팀 ${stamp}`) })).toBeVisible();
 });
 
 test('nonsense in the address is ignored, not an error', async ({ request }) => {
@@ -106,8 +102,8 @@ test('a team row shows its cover when it has one, and none otherwise', async ({ 
 });
 
 test('a filter nothing matches says so', async ({ page }) => {
-  await page.goto('/ko/startups?cohort=9999&field=healthcare');
-  await expect(page.getByText('선택한 분야·기수에 해당하는 팀이 아직 없습니다.')).toBeVisible();
+  await page.goto('/ko/startups?cohort=9999');
+  await expect(page.getByText('선택한 기수에 해당하는 팀이 아직 없습니다.')).toBeVisible();
   await page.getByRole('link', { name: '전체 보기' }).click();
   await expect(page).toHaveURL(/\/ko\/startups$/);
 });

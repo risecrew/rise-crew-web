@@ -759,7 +759,6 @@
       "toPage": "팀 페이지 보기",
       "empty": "아직 만든 팀이 없어요.",
       "name": "팀 이름",
-      "field": "분야",
       "cohort": "기수",
       "published": "공개",
       "publishedHint": "켜면 창업팀 목록에 나와요.",
@@ -862,7 +861,6 @@
     "lead": "RISE CREW에서 활동 중인 창업팀입니다.",
     "filters": {
       "label": "거르기",
-      "field": "분야",
       "cohort": "기수",
       "all": "전체",
       "clear": "전체 보기"
@@ -870,19 +868,8 @@
     "cohort": "{cohort}기",
     "total": "{count}개 팀",
     "empty": "아직 소개할 팀이 없습니다.",
-    "emptyFiltered": "선택한 분야·기수에 해당하는 팀이 아직 없습니다.",
-    "fields": {
-      "ai-software": "AI·소프트웨어",
-      "edutech": "에듀테크",
-      "healthcare": "헬스케어",
-      "foodtech": "푸드테크",
-      "lifestyle": "라이프스타일",
-      "commerce-marketing": "커머스·마케팅",
-      "mobility": "모빌리티",
-      "other": "기타"
-    },
+    "emptyFiltered": "선택한 기수에 해당하는 팀이 아직 없습니다.",
     "facts": {
-      "field": "분야",
       "cohort": "기수",
       "links": "링크"
     },
