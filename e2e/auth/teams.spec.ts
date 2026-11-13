@@ -263,3 +263,15 @@ test('the account menu leads a member straight to their team; others get no such
   ).toBeVisible();
   await expect(otherHeader.getByRole('link', { name: /소속팀/ })).toHaveCount(0);
 });
+
+test('the list is one page, however many teams there are', async ({ page }) => {
+  // Eleven more teams in a cohort of their own: more than the ten a page used to hold.
+  const many = cohort + 1;
+  for (let i = 0; i < 11; i++) {
+    await createTeam({ slug: `many-${stamp}-${i}`, name: `많은 팀 ${stamp} ${i}`, cohort: many });
+  }
+  await page.goto(`/ko/startups?cohort=${many}&page=2`);
+  await expect(page.getByText('11개 팀')).toBeVisible();
+  await expect(page.getByRole('link', { name: new RegExp(`많은 팀 ${stamp}`) })).toHaveCount(11);
+  await expect(page.getByRole('navigation', { name: '쪽 이동' })).toHaveCount(0);
+});

@@ -955,7 +955,6 @@
       "coverHint": "Shown large at the top of the team page, to everyone. Large files are made smaller automatically. Without one, the photo from the latest public post appears.",
       "removeCover": "Remove the current cover photo"
     },
-    "emptyPage": "No teams on this page.",
     "lockedApplying": "{count, plural, one {# post is} other {# posts are}} for members. You can read them once your application is approved.",
     "metaTeamTitle": "{name} | RISE CREW Startups"
   },

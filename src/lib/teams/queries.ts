@@ -62,9 +62,10 @@ export function pageCount(total: number): number {
 }
 
 // The list is the public face of the teams, so a team's own members and operators see the same
-// list as everyone else: an unpublished team is reached by its address or the admin screen.
+// list as everyone else: an unpublished team is reached by its address or the admin screen. The
+// club has a few dozen teams, so they come as one list, not in pages.
 export async function listTeams(
-  q: TeamsQuery,
+  q: Pick<TeamsQuery, 'cohort'>,
 ): Promise<{ teams: TeamCard[]; cohorts: number[]; total: number }> {
   const supabase = await createSupabaseServerClient();
 
@@ -75,19 +76,16 @@ export async function listTeams(
   if (q.cohort) query = query.eq('cohort', q.cohort);
 
   const [list, cohortRows] = await Promise.all([
-    query
-      .order('cohort', { ascending: false })
-      .order('name')
-      .range(...pageRange(q.page)),
+    query.order('cohort', { ascending: false }).order('name'),
     supabase.from('teams').select('cohort').eq('is_published', true),
   ]);
   if (cohortRows.error) throw new Error(cohortRows.error.message);
-  if (list.error && list.error.code !== PAGE_OUT_OF_RANGE) throw new Error(list.error.message);
+  if (list.error) throw new Error(list.error.message);
 
   const cohorts = [...new Set((cohortRows.data ?? []).map((row) => row.cohort))].sort(
     (a, b) => b - a,
   );
-  const rows = list.error ? [] : (list.data as Omit<TeamCard, 'cover'>[]);
+  const rows = list.data as Omit<TeamCard, 'cover'>[];
   return {
     teams: await withCovers(rows),
     cohorts,
@@ -95,25 +93,38 @@ export async function listTeams(
   };
 }
 
-// The cover of each team in a list, by the same rule as a team's page. One query for the whole
-// list, newest first, keeping the first photo found for each team.
+// The cover of each team in a list, by the same rule as a team's page. The teams that chose no
+// cover are asked about in groups, newest post first, keeping the first photo found for each team:
+// the list is one page, and every id in one request would make its address too long.
+const COVER_GROUP = 100;
+
 async function withCovers(rows: Omit<TeamCard, 'cover'>[]): Promise<TeamCard[]> {
   const needing = rows.filter((team) => !team.cover_path).map((team) => team.id);
   const photoOf = new Map<string, string>();
   if (needing.length > 0) {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
-      .from('team_posts')
-      .select('team_id, photo_paths')
-      .in('team_id', needing)
-      .eq('visibility', 'public')
-      .is('hidden_at', null)
-      .not('photo_paths', 'eq', '{}')
-      .order('created_at', { ascending: false })
-      .limit(200);
-    if (error) throw new Error(error.message);
-    for (const post of data) {
-      if (!photoOf.has(post.team_id)) photoOf.set(post.team_id, post.photo_paths[0]);
+    const groups: string[][] = [];
+    for (let i = 0; i < needing.length; i += COVER_GROUP) {
+      groups.push(needing.slice(i, i + COVER_GROUP));
+    }
+    const results = await Promise.all(
+      groups.map((ids) =>
+        supabase
+          .from('team_posts')
+          .select('team_id, photo_paths')
+          .in('team_id', ids)
+          .eq('visibility', 'public')
+          .is('hidden_at', null)
+          .not('photo_paths', 'eq', '{}')
+          .order('created_at', { ascending: false })
+          .limit(200),
+      ),
+    );
+    for (const { data, error } of results) {
+      if (error) throw new Error(error.message);
+      for (const post of data) {
+        if (!photoOf.has(post.team_id)) photoOf.set(post.team_id, post.photo_paths[0]);
+      }
     }
   }
   const signed = await signPhotoPairs([...photoOf.values()]);

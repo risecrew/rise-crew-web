@@ -801,12 +801,10 @@ test('a page past the end says so and offers the way back', async ({ page }, tes
   await page.getByRole('link', { name: '첫 쪽으로' }).click();
   await expect(page.getByRole('link', { name: /있는 글/ })).toBeVisible();
 
+  // The team list is one page: an old page number opens the whole list.
   await page.goto('/ko/startups?page=99999');
-  await expect(page.getByText('이 쪽에는 팀이 없어요.')).toBeVisible();
-  await expect(page.getByRole('link', { name: '첫 쪽으로' })).toHaveAttribute(
-    'href',
-    '/ko/startups',
-  );
+  await expect(page.getByText(/\d+개 팀/)).toBeVisible();
+  await expect(page.getByRole('link', { name: '첫 쪽으로' })).toHaveCount(0);
 });
 
 test('two links to the same address both show', async ({ page, baseURL }, testInfo) => {
