@@ -363,3 +363,21 @@ test('an operator deletes a team, with its posts and files, and its members keep
     .eq('user_id', memberId);
   expect(memberships).toEqual([]);
 });
+
+test('on a short phone an operator can reach every menu item and the account links', async ({
+  page,
+  baseURL,
+}) => {
+  await page.setViewportSize({ width: 330, height: 575 });
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko');
+  await page.getByRole('button', { name: '메뉴 열기' }).click();
+  const sheet = page.getByRole('dialog');
+  // The menu and the account block scroll together, so the menu is never cut to a sliver.
+  for (const name of ['소개', '프로그램', '창업팀', '활동', '네트워크']) {
+    await expect(sheet.getByRole('navigation').getByRole('link', { name })).toBeInViewport();
+  }
+  const last = sheet.getByRole('button', { name: '로그아웃' });
+  await last.scrollIntoViewIfNeeded();
+  await expect(last).toBeInViewport();
+});

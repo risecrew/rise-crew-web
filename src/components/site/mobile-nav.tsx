@@ -84,32 +84,36 @@ export function MobileNav({
               <CloseIcon />
             </button>
           </div>
-          <nav aria-label={labels.menu} className="flex-1 overflow-y-auto px-5">
-            <ul>
-              {items.map((item) => {
-                const current = isCurrent(pathname, item.href);
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      aria-current={current ? 'page' : undefined}
-                      onClick={close}
-                      className={cn(
-                        'flex h-14 items-center border-l-2 pl-4 text-2xl font-semibold',
-                        current ? 'border-lime text-white' : 'border-transparent text-white/80',
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-          <div className="grid shrink-0 gap-4 border-t border-white/10 px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-            {apply}
-            <LocaleSwitch variant="sheet" />
-            {account}
+          {/* The menu and the block under it scroll together. With an operator's longer account
+              list, a phone has no room for both, and a separate scroll for the menu cut it off. */}
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+            <nav aria-label={labels.menu} className="px-5 pb-6">
+              <ul>
+                {items.map((item) => {
+                  const current = isCurrent(pathname, item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        aria-current={current ? 'page' : undefined}
+                        onClick={close}
+                        className={cn(
+                          'flex h-14 items-center border-l-2 pl-4 text-2xl font-semibold',
+                          current ? 'border-lime text-white' : 'border-transparent text-white/80',
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+            <div className="mt-auto grid gap-4 border-t border-white/10 px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+              {apply}
+              <LocaleSwitch variant="sheet" />
+              {account}
+            </div>
           </div>
         </div>
       </dialog>
