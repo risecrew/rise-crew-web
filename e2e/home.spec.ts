@@ -35,6 +35,9 @@ test('the numbers are plain text with one date for all of them', async ({ page }
     );
   }
   await expect(numbers).toContainText('2026.11 기준');
+  await expect(numbers.getByRole('img', { name: '성균관대학교 앵커사업단' })).toBeVisible();
+  // The band holds the first 12; the link leads to all 25.
+  await expect(numbers.locator('ul img')).toHaveCount(12);
   await expect(numbers.getByRole('link', { name: '협력 기관 25곳 전체 보기' })).toHaveAttribute(
     'href',
     '/ko/network#partners',

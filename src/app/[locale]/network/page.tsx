@@ -190,9 +190,13 @@ function PartnerTile({ partner, locale }: { partner: Partner; locale: Locale }) 
     <>
       {logo ? (
         // Logos are made for white paper, many in dark ink, so each sits on a light card.
-        <span className="flex h-16 w-full items-center justify-center rounded-lg bg-white px-4">
-          <img src={logo} alt={name} className="max-h-10 w-auto max-w-full object-contain" />
-        </span>
+        // The name stays written under it: some marks are a parent company's, and names are searchable.
+        <>
+          <span className="flex h-16 w-full items-center justify-center rounded-lg bg-white px-4">
+            <img src={logo} alt="" className="max-h-10 w-auto max-w-full object-contain" />
+          </span>
+          <span className="mt-3 text-sm font-semibold break-keep">{name}</span>
+        </>
       ) : (
         <span className="font-semibold break-keep">{name}</span>
       )}

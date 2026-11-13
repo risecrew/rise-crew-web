@@ -7,11 +7,10 @@ const L = (ko: string, en: string) => ({ ko, en });
 const KR = L('한국', 'Korea');
 
 // The 25 partners (wireframe v1.1, §13): supporters, then universities, then companies, each in the
-// order the organizers listed them. The logo files a teammate gathered are in place, but
-// none is approved for showing yet, so the home's logo band stays hidden and the network page shows
-// the names. Four came from the partners' own sites (2026-11). Kakao Mobility's is its CI from Kakao's own press
-// release. The ANCHOR Project Group's is the one
-// on its booth at the 2026 university-industry expo (uicexpo.org). TODO(운영진 확인): approval.
+// order the organizers listed them. The organizers approved every logo for showing (2026-11-13).
+// Most came from a teammate; four from the partners' own sites, Kakao Mobility's CI from Kakao's own
+// press release, and the ANCHOR Project Group's from its booth at the 2026 university-industry expo
+// (uicexpo.org).
 export const partners: Partner[] = [
   {
     id: 'anchor',
@@ -19,7 +18,7 @@ export const partners: Partner[] = [
     name: L('성균관대학교 앵커사업단', 'Seoul ANCHOR Project Group'),
     country: KR,
     logo: '/images/partners/anchor.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'seoul-anchor-center',
@@ -28,7 +27,7 @@ export const partners: Partner[] = [
     name: L('서울앵커센터', 'Seoul ANCHOR Center'),
     country: KR,
     logo: '/images/partners/seoul-anchor-center.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'ftu',
@@ -36,7 +35,7 @@ export const partners: Partner[] = [
     name: L('하노이외상대학교', 'Foreign Trade University (FTU)'),
     country: L('베트남', 'Vietnam'),
     logo: '/images/partners/ftu.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'hust',
@@ -44,7 +43,7 @@ export const partners: Partner[] = [
     name: L('하노이과학기술대학교', 'Hanoi University of Science and Technology (HUST)'),
     country: L('베트남', 'Vietnam'),
     logo: '/images/partners/hust.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'hznu',
@@ -52,7 +51,7 @@ export const partners: Partner[] = [
     name: L('항저우사범대학교', 'Hangzhou Normal University (HZNU)'),
     country: L('중국', 'China'),
     logo: '/images/partners/hznu.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'hosei',
@@ -60,7 +59,7 @@ export const partners: Partner[] = [
     name: L('호세이대학교', 'Hosei University'),
     country: L('일본', 'Japan'),
     logo: '/images/partners/hosei.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'monash-malaysia',
@@ -68,7 +67,7 @@ export const partners: Partner[] = [
     name: L('모나쉬대학교 말레이시아', 'Monash University Malaysia'),
     country: L('말레이시아', 'Malaysia'),
     logo: '/images/partners/monash-malaysia.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'smu',
@@ -76,7 +75,7 @@ export const partners: Partner[] = [
     name: L('싱가포르경영대학교', 'Singapore Management University (SMU)'),
     country: L('싱가포르', 'Singapore'),
     logo: '/images/partners/smu.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'toronto',
@@ -84,7 +83,7 @@ export const partners: Partner[] = [
     name: L('토론토대학교', 'University of Toronto'),
     country: L('캐나다', 'Canada'),
     logo: '/images/partners/toronto.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'yonsei',
@@ -92,7 +91,7 @@ export const partners: Partner[] = [
     name: L('연세대학교 창업지원단', 'Yonsei Enterprise Support Foundation'),
     country: KR,
     logo: '/images/partners/yonsei.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'kakao-mobility',
@@ -100,7 +99,7 @@ export const partners: Partner[] = [
     name: L('카카오모빌리티', 'Kakao Mobility'),
     country: KR,
     logo: '/images/partners/kakao-mobility.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'darae',
@@ -108,7 +107,7 @@ export const partners: Partner[] = [
     name: L('다래전략사업화센터', 'Darae Strategic Commercialization Center'),
     country: KR,
     logo: '/images/partners/darae.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'startup-alliance',
@@ -116,7 +115,7 @@ export const partners: Partner[] = [
     name: L('스타트업얼라이언스', 'Startup Alliance'),
     country: KR,
     logo: '/images/partners/startup-alliance.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'ourbox',
@@ -124,7 +123,7 @@ export const partners: Partner[] = [
     name: L('아워박스', 'Ourbox'),
     country: KR,
     logo: '/images/partners/ourbox.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'veron-global',
@@ -132,7 +131,7 @@ export const partners: Partner[] = [
     name: L('베론글로벌', 'Veron Global'),
     country: KR,
     logo: '/images/partners/veron-global.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'one-degree-labs',
@@ -140,7 +139,7 @@ export const partners: Partner[] = [
     name: L('원디그리랩스', 'One Degree Labs'),
     country: KR,
     logo: '/images/partners/one-degree-labs.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   // Offices in Songdo, Incheon and Delaware, USA (outsome.co).
   {
@@ -149,7 +148,7 @@ export const partners: Partner[] = [
     name: L('아웃썸', 'Outsome'),
     country: L('한국·미국', 'Korea and the US'),
     logo: '/images/partners/outsome.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'nextrans',
@@ -157,7 +156,7 @@ export const partners: Partner[] = [
     name: L('넥스트랜스', 'Nextrans'),
     country: KR,
     logo: '/images/partners/nextrans.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'simsan-ventures',
@@ -165,7 +164,7 @@ export const partners: Partner[] = [
     name: L('심산벤처스', 'Simsan Ventures'),
     country: KR,
     logo: '/images/partners/simsan-ventures.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'oracle-venture-investment',
@@ -173,7 +172,7 @@ export const partners: Partner[] = [
     name: L('오라클벤처투자', 'Oracle Venture Investment'),
     country: KR,
     logo: '/images/partners/oracle-venture-investment.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'lotte-ventures',
@@ -181,7 +180,7 @@ export const partners: Partner[] = [
     name: L('롯데벤처스', 'Lotte Ventures'),
     country: KR,
     logo: '/images/partners/lotte-ventures.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'daekyo-investment',
@@ -189,7 +188,7 @@ export const partners: Partner[] = [
     name: L('대교인베스트먼트', 'Daekyo Investment'),
     country: KR,
     logo: '/images/partners/daekyo-investment.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'kiwoom-investment',
@@ -197,7 +196,7 @@ export const partners: Partner[] = [
     name: L('키움인베스트먼트', 'Kiwoom Investment'),
     country: KR,
     logo: '/images/partners/kiwoom-investment.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'joongang-china-lab',
@@ -205,7 +204,7 @@ export const partners: Partner[] = [
     name: L('중앙일보 차이나랩', 'JoongAng Ilbo China Lab'),
     country: KR,
     logo: '/images/partners/joongang-china-lab.png',
-    logoApproved: false,
+    logoApproved: true,
   },
   {
     id: 'emc-global',
@@ -213,6 +212,6 @@ export const partners: Partner[] = [
     name: L('EMC 글로벌', 'EMC Global'),
     country: L('일본', 'Japan'),
     logo: '/images/partners/emc-global.svg',
-    logoApproved: false,
+    logoApproved: true,
   },
 ];

@@ -8,6 +8,9 @@ test('network lists the named mentors, 25 partners by group and the agreement', 
   await expect(page.getByText('Meet 19 featured mentors out of our 33.')).toBeVisible();
   const partners = page.locator('#partners');
   await expect(partners.locator('li')).toHaveCount(25);
+  // Every partner shows its logo, with its name still written under it.
+  await expect(partners.locator('li img')).toHaveCount(25);
+  await expect(partners).toContainText('Kakao Mobility');
   await expect(partners.getByRole('heading', { level: 3 })).toHaveText([
     'Supporters',
     'Universities',
