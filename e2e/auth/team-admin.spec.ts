@@ -388,8 +388,10 @@ test('the admin team list shows each team with its logo, or its initial', async 
 }, testInfo) => {
   const id = unique(testInfo);
   // The highest cohort, so both rows open the list however many test teams the local stack holds.
-  const withLogo = await createTeam({ slug: `logo-${id}`, name: `로고 팀 ${id}`, cohort: 9999 });
-  await createTeam({ slug: `plain-${id}`, name: `글자 팀 ${id}`, cohort: 9999 });
+  // Unpublished, so the public list's empty cohort 9999 stays empty for its own test.
+  const hidden = { cohort: 9999, is_published: false };
+  const withLogo = await createTeam({ slug: `logo-${id}`, name: `로고 팀 ${id}`, ...hidden });
+  await createTeam({ slug: `plain-${id}`, name: `글자 팀 ${id}`, ...hidden });
   const logo = `${withLogo}/${crypto.randomUUID()}.png`;
   const png = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
