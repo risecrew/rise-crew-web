@@ -200,7 +200,7 @@ test('the latest public photo opens the team page, and leaves when the post clos
   const { id, email, slug } = await teamWithMember(testInfo);
   const stranger = await browser.newContext();
   const visitor = await stranger.newPage();
-  const cover = visitor.locator('[data-team-cover] img[src*="team-post-photos"]');
+  const cover = visitor.locator('[data-team-cover] img[data-cover-photo][src*="team-post-photos"]');
 
   // Without a photo there is nothing behind the name.
   await visitor.goto(`/ko/startups/${slug}`);
@@ -231,7 +231,9 @@ test('the latest public photo opens the team page, and leaves when the post clos
   // A signed-in post is not a cover for anyone, members included.
   await page.goto(`/ko/startups/${slug}`);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.locator('[data-team-cover] img[src*="team-post-photos"]')).toHaveCount(0);
+  await expect(
+    page.locator('[data-team-cover] img[data-cover-photo][src*="team-post-photos"]'),
+  ).toHaveCount(0);
   await stranger.close();
 });
 
@@ -258,9 +260,20 @@ test('a chosen cover opens the team page ahead of any post photo, until it is re
   const stranger = await browser.newContext();
   const visitor = await stranger.newPage();
   await visitor.goto(`/ko/startups/${slug}`);
-  const chosen = visitor.locator('[data-team-cover] img[src*="team-covers"]');
+  const chosen = visitor.locator('[data-team-cover] img[data-cover-photo][src*="team-covers"]');
   await expect(chosen).toHaveCount(1);
-  await expect(visitor.locator('[data-team-cover] img[src*="team-post-photos"]')).toHaveCount(0);
+  // The cover is shown whole and never past its own size, over a blurred copy of itself.
+  await expect(chosen).toHaveJSProperty('complete', true);
+  const fit = await chosen.evaluate((img: HTMLImageElement) => ({
+    shown: img.getBoundingClientRect().width,
+    natural: img.naturalWidth,
+    objectFit: getComputedStyle(img).objectFit,
+  }));
+  expect(fit.objectFit).toBe('contain');
+  expect(fit.shown).toBeLessThanOrEqual(fit.natural + 1);
+  await expect(
+    visitor.locator('[data-team-cover] img[data-cover-photo][src*="team-post-photos"]'),
+  ).toHaveCount(0);
   expect((await visitor.request.get((await chosen.getAttribute('src'))!)).status()).toBe(200);
 
   async function coverFiles() {
@@ -284,7 +297,9 @@ test('a chosen cover opens the team page ahead of any post photo, until it is re
   await afterSave(page).toHaveURL(new RegExp(`/ko/startups/${slug}$`));
   await expect.poll(coverFiles).toBe(0);
   await visitor.goto(`/ko/startups/${slug}`);
-  await expect(visitor.locator('[data-team-cover] img[src*="team-post-photos"]')).toHaveCount(1);
+  await expect(
+    visitor.locator('[data-team-cover] img[data-cover-photo][src*="team-post-photos"]'),
+  ).toHaveCount(1);
   await stranger.close();
 });
 
