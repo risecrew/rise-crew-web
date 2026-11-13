@@ -119,7 +119,7 @@ test('with reduced motion the numbers never count', async ({ page }) => {
   await expect(digits).toHaveText('90');
 });
 
-test('the partners drift at the foot of the page and stop on request', async ({ page }) => {
+test('the partners drift at the foot of the page, in their own colours', async ({ page }) => {
   await page.goto('/ko');
   const band = page.locator('section[aria-labelledby="partner-band-title"]');
   // Drawn twice for a seamless loop; the second copy is hidden from screen readers.
@@ -127,12 +127,13 @@ test('the partners drift at the foot of the page and stop on request', async ({ 
   await expect(band.locator('img')).toHaveCount(50);
   await expect(band.getByRole('img', { name: '카카오모빌리티' })).toBeAttached();
   const track = band.locator('[data-partner-track]');
-  const state = () => track.evaluate((el) => getComputedStyle(el).animationPlayState);
-  expect(await state()).toBe('running');
-  await band.getByRole('button', { name: '로고 흐름 멈추기' }).click();
-  expect(await state()).toBe('paused');
-  await band.getByRole('button', { name: '로고 흐름 재생' }).click();
-  expect(await state()).toBe('running');
+  expect(await track.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe('running');
+  expect(
+    await band
+      .locator('img')
+      .first()
+      .evaluate((el) => getComputedStyle(el).filter),
+  ).toBe('none');
 });
 
 test('with reduced motion the partners hold still, once, in a row to scroll', async ({ page }) => {
@@ -142,6 +143,5 @@ test('with reduced motion the partners hold still, once, in a row to scroll', as
   const track = band.locator('[data-partner-track]');
   expect(await track.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
   await expect(band.locator('img:visible')).toHaveCount(25);
-  await expect(band.getByRole('button')).toBeHidden();
   await expectNoHorizontalScroll(page);
 });

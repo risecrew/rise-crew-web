@@ -105,11 +105,7 @@ export async function Home({ locale, stats, stamps, photos, partners, recruitmen
           >
             {t('partners.title')}
           </h2>
-          <PartnerBand
-            logos={logos}
-            pauseLabel={t('partners.pause')}
-            playLabel={t('partners.play')}
-          />
+          <PartnerBand logos={logos} />
         </section>
       ) : null}
     </>
