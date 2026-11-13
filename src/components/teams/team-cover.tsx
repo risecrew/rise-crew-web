@@ -5,12 +5,12 @@ import { cn } from '@/lib/utils';
 type Props = {
   name: string;
   tagline: string;
-  // The team's field and cohort, already in words.
+  // The team's cohort, already in words.
   facts: string;
   // The team's logo, when it has one.
   logo?: ReactNode;
-  // A photo from the team's latest public post. It fills the scene the way a real photo does on the
-  // rest of the site. Without one the cover stays short, so the intro and posts are near the top.
+  // The team's cover, or a photo from its latest public post. It is shown whole over a blurred copy
+  // of itself. Without one the cover stays short, so the intro and posts are near the top.
   photo: string | null;
   badge?: ReactNode;
   // What the visitor can do here, if anything.
@@ -30,7 +30,28 @@ export function TeamCover({ name, tagline, facts, logo, photo, badge, actions }:
     >
       {photo ? (
         <>
-          <Image src={photo} alt="" fill unoptimized priority className="-z-20 object-cover" />
+          {/* Covers come in any shape: a wide photo, a square logo, a small banner. Filling the
+              scene with the photo itself cropped and blew those up, so the whole photo is shown at
+              most at its own size, over a blurred, darker copy of itself that fills the rest. */}
+          <Image
+            src={photo}
+            alt=""
+            fill
+            unoptimized
+            aria-hidden
+            className="-z-30 scale-110 object-cover opacity-60 blur-2xl"
+          />
+          {/* A plain img so a small cover is never scaled past its own size. */}
+          <div className="absolute inset-0 -z-20 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photo}
+              alt=""
+              data-cover-photo
+              fetchPriority="high"
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
           <div
             aria-hidden
             className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(7_9_15/0.6)_0%,rgb(7_9_15/0.3)_28%,rgb(7_9_15/0.72)_58%,rgb(7_9_15/0.96)_100%)]"
