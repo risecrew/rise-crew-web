@@ -1,29 +1,23 @@
-/* eslint-disable @next/next/no-img-element */
 import { getTranslations } from 'next-intl/server';
 import { TextLink } from '@/components/site/text-link';
 import type { Partner } from '@/content/schema';
-import type { Locale } from '@/i18n/locales';
-import { pick } from '@/lib/content';
 import { cn } from '@/lib/utils';
 
 export type HomeNumber = { id: string; shown: React.ReactNode; label: string };
 
-// S2 (wireframe v1.1, §8): four numbers, one date for all of them, and the partners' logos. The
-// numbers count up once as they scroll in (CountUp), and a screen reader reads each final value once.
+// S2 (wireframe v1.1, §8): four numbers, one date for all of them, and the way to every partner
+// (their logos drift at the foot of the home). The numbers count up once as they scroll in
+// (CountUp), and a screen reader reads each final value once.
 export async function Numbers({
-  locale,
   numbers,
   asOf,
   partners,
 }: {
-  locale: Locale;
   numbers: HomeNumber[];
   asOf: string;
   partners: Partner[];
 }) {
   const t = await getTranslations('Home.numbers');
-  // Only partners with an approved logo file go on the band; names alone are for the network page.
-  const logos = partners.filter((p) => p.logo && p.logoApproved).slice(0, 12);
 
   return (
     // The numbers stand under the cobalt stage light, so they read as their own moment after the
@@ -57,19 +51,6 @@ export async function Numbers({
             </div>
           ))}
         </dl>
-        {logos.length > 0 ? (
-          <ul className="section-gap grid grid-cols-3 gap-6 md:grid-cols-6">
-            {logos.map((p) => (
-              <li key={p.id} className="flex h-16 items-center justify-center">
-                <img
-                  src={p.logo}
-                  alt={pick(p.name, locale)}
-                  className="h-10 w-auto opacity-80 grayscale transition-[filter,opacity] duration-200 hover:opacity-100 hover:grayscale-0"
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
         {/* The way to every partner on the left, the date the numbers hold for on the right. */}
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <TextLink href={{ pathname: '/network', hash: 'partners' }}>

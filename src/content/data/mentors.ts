@@ -182,7 +182,7 @@ export const mentors: Mentor[] = [
     id: 'bae-junhak',
     featured: false,
     name: L('배준학', 'Bae Junhak'),
-    org: L('오라클인베스트먼트', 'Oracle Investment'),
+    org: L('오라클벤처투자', 'Oracle Venture Investment'),
     role: L('대표 · 투자 유치, 투자 강의', 'CEO · Fundraising and investment lecturer'),
     expertise: [
       L('창업투자론', 'Startup investment'),

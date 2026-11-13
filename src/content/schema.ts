@@ -83,21 +83,17 @@ export const mentorSchema = z.object({
 });
 export type Mentor = z.infer<typeof mentorSchema>;
 
-export const partnerSchema = z
-  .object({
-    id,
-    name: localizedSchema,
-    kind: z.enum(['supporter', 'university', 'company']),
-    country: localizedSchema.optional(),
-    url: z.url().optional(),
-    logo: z.string().startsWith('/').optional(),
-    logoApproved: z.boolean(),
-  })
-  .superRefine((partner, ctx) => {
-    if (partner.logo && !partner.logoApproved) {
-      ctx.addIssue({ code: 'custom', path: ['logo'], message: 'logo needs approval' });
-    }
-  });
+export const partnerSchema = z.object({
+  id,
+  name: localizedSchema,
+  kind: z.enum(['supporter', 'university', 'company']),
+  country: localizedSchema.optional(),
+  url: z.url().optional(),
+  // The file can be in place before the organizers approve showing it; only an approved logo
+  // is shown (shownLogo in lib/content).
+  logo: z.string().startsWith('/images/partners/').optional(),
+  logoApproved: z.boolean(),
+});
 export type Partner = z.infer<typeof partnerSchema>;
 
 export const officerSchema = z

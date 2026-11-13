@@ -58,6 +58,15 @@
       transform: translateY(-4px) scale(0.98);
     }
   }
+
+  /* The partners' band at the foot of the home drifts by half its width, the length of one copy
+     of the list, at a constant reading pace. */
+  --animate-marquee: marquee 90s linear infinite;
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 html {

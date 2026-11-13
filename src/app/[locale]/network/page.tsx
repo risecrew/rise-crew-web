@@ -8,7 +8,7 @@ import { PageCover } from '@/components/site/page-cover';
 import type { Mentor, Partner } from '@/content/schema';
 import { asLocale } from '@/i18n/as-locale';
 import type { Locale } from '@/i18n/locales';
-import { getMentors, getPartners, getPress, getStats, pick } from '@/lib/content';
+import { getMentors, getPartners, getPress, getStats, pick, shownLogo } from '@/lib/content';
 import { formatStampDate } from '@/lib/format';
 import { localizedAlternates } from '@/lib/metadata';
 
@@ -185,10 +185,18 @@ function MentorCard({ mentor, locale }: { mentor: Mentor; locale: Locale }) {
 // A partner: its logo when one is approved, otherwise its name, and the country for a university.
 function PartnerTile({ partner, locale }: { partner: Partner; locale: Locale }) {
   const name = pick(partner.name, locale);
+  const logo = shownLogo(partner);
   const body = (
     <>
-      {partner.logo && partner.logoApproved ? (
-        <img src={partner.logo} alt={name} className="h-10 w-auto" />
+      {logo ? (
+        // Logos are made for white paper, many in dark ink, so each sits on a light card.
+        // The name stays written under it: some marks are a parent company's, and names are searchable.
+        <>
+          <span className="flex h-16 w-full items-center justify-center rounded-lg bg-white px-4">
+            <img src={logo} alt="" className="max-h-10 w-auto max-w-full object-contain" />
+          </span>
+          <span className="mt-3 text-sm font-semibold break-keep">{name}</span>
+        </>
       ) : (
         <span className="font-semibold break-keep">{name}</span>
       )}
