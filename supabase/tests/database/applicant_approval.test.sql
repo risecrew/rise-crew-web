@@ -32,8 +32,8 @@ update public.profiles
               '7e5f0000-0000-4000-8000-000000000003');
 alter table public.profiles enable trigger user;
 
-insert into public.teams (id, slug, name, field, cohort, is_published) values
-  ('7e5f0000-0000-4000-8000-000000000a01', 'pgtap-apply', '팀', 'other', 1, true);
+insert into public.teams (id, slug, name, cohort, is_published) values
+  ('7e5f0000-0000-4000-8000-000000000a01', 'pgtap-apply', '팀', 1, true);
 insert into public.team_posts (team_id, author_id, title, visibility) values
   ('7e5f0000-0000-4000-8000-000000000a01', '7e5f0000-0000-4000-8000-000000000002', '가입자 글', 'signed_in'),
   ('7e5f0000-0000-4000-8000-000000000a01', '7e5f0000-0000-4000-8000-000000000002', '공개 글', 'public');

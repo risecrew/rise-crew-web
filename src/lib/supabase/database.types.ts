@@ -250,7 +250,6 @@ export type Database = {
           cohort: number;
           cover_path: string | null;
           created_at: string;
-          field: string;
           id: string;
           intro: string;
           is_published: boolean;
@@ -266,7 +265,6 @@ export type Database = {
           cohort: number;
           cover_path?: string | null;
           created_at?: string;
-          field: string;
           id?: string;
           intro?: string;
           is_published?: boolean;
@@ -281,7 +279,6 @@ export type Database = {
           cohort?: number;
           cover_path?: string | null;
           created_at?: string;
-          field?: string;
           id?: string;
           intro?: string;
           is_published?: boolean;

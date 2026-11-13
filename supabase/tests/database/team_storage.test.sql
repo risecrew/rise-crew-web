@@ -80,10 +80,10 @@ update public.profiles
    set last_name = '시', first_name = '험', occupation = 'founder', onboarded_at = now()
  where email like 'pgtap-store-%';
 
-insert into public.teams (id, slug, name, field, cohort, is_published) values
-  ('7e5a0000-0000-4000-8000-000000000a01', 'pgtap-store-a', '팀 A', 'other', 1, true),
-  ('7e5a0000-0000-4000-8000-000000000b01', 'pgtap-store-b', '팀 B', 'other', 1, true),
-  ('7e5a0000-0000-4000-8000-000000000c01', 'pgtap-store-u', '팀 U', 'other', 1, false);
+insert into public.teams (id, slug, name, cohort, is_published) values
+  ('7e5a0000-0000-4000-8000-000000000a01', 'pgtap-store-a', '팀 A', 1, true),
+  ('7e5a0000-0000-4000-8000-000000000b01', 'pgtap-store-b', '팀 B', 1, true),
+  ('7e5a0000-0000-4000-8000-000000000c01', 'pgtap-store-u', '팀 U', 1, false);
 
 insert into public.team_members (team_id, user_id) values
   ('7e5a0000-0000-4000-8000-000000000a01', '7e5a0000-0000-4000-8000-000000000003'),

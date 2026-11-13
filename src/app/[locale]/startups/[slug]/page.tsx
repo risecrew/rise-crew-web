@@ -84,7 +84,7 @@ export default async function TeamPage({ params, searchParams }: Props) {
       <TeamCover
         name={team.name}
         tagline={team.tagline}
-        facts={`${t(`fields.${team.field}`)} · ${t('cohort', { cohort: team.cohort })}`}
+        facts={t('cohort', { cohort: team.cohort })}
         photo={cover}
         logo={
           team.logo_path ? (

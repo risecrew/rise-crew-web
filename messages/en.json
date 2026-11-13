@@ -759,7 +759,6 @@
       "toPage": "View team page",
       "empty": "No teams yet.",
       "name": "Team name",
-      "field": "Field",
       "cohort": "Cohort",
       "published": "Published",
       "publishedHint": "When on, the team appears on the startups list.",
@@ -862,7 +861,6 @@
     "lead": "The teams building something real at RISE CREW.",
     "filters": {
       "label": "Filter",
-      "field": "Field",
       "cohort": "Cohort",
       "all": "All",
       "clear": "Show all"
@@ -870,19 +868,8 @@
     "cohort": "Cohort {cohort}",
     "total": "{count, plural, one {# team} other {# teams}}",
     "empty": "No teams to show yet.",
-    "emptyFiltered": "No teams in this field or cohort yet.",
-    "fields": {
-      "ai-software": "AI & software",
-      "edutech": "Edtech",
-      "healthcare": "Healthcare",
-      "foodtech": "Food tech",
-      "lifestyle": "Lifestyle",
-      "commerce-marketing": "Commerce & marketing",
-      "mobility": "Mobility",
-      "other": "Other"
-    },
+    "emptyFiltered": "No teams in this cohort yet.",
     "facts": {
-      "field": "Field",
       "cohort": "Cohort",
       "links": "Links"
     },

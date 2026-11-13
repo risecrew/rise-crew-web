@@ -40,9 +40,9 @@ update public.user_roles set role = 'member'
 update public.user_roles set role = 'operator'
  where user_id = '7e5b0000-0000-4000-8000-000000000005';
 
-insert into public.teams (id, slug, name, field, cohort, is_published) values
-  ('7e5b0000-0000-4000-8000-000000000a01', 'pgtap-cover-a', '팀 A', 'other', 1, true),
-  ('7e5b0000-0000-4000-8000-000000000b01', 'pgtap-cover-b', '팀 B', 'other', 1, true);
+insert into public.teams (id, slug, name, cohort, is_published) values
+  ('7e5b0000-0000-4000-8000-000000000a01', 'pgtap-cover-a', '팀 A', 1, true),
+  ('7e5b0000-0000-4000-8000-000000000b01', 'pgtap-cover-b', '팀 B', 1, true);
 
 insert into public.team_members (team_id, user_id) values
   ('7e5b0000-0000-4000-8000-000000000a01', '7e5b0000-0000-4000-8000-000000000003');

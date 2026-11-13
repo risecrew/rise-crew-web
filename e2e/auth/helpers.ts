@@ -246,7 +246,6 @@ export async function createTeam(values: {
   slug: string;
   name: string;
   cohort: number;
-  field?: string;
   tagline?: string;
   intro?: string;
   links?: { kind: string; url: string }[];
@@ -255,7 +254,7 @@ export async function createTeam(values: {
   const operator = await clientSignedInAs(TEAM_OPERATOR);
   const { data, error } = await operator
     .from('teams')
-    .insert({ field: 'other', is_published: true, ...values })
+    .insert({ is_published: true, ...values })
     .select('id')
     .single();
   if (error) throw error;

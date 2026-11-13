@@ -57,7 +57,6 @@ async function begin(form: FormData) {
 function teamFields(form: FormData) {
   return {
     name: text(form, 'name'),
-    field: text(form, 'field'),
     cohort: text(form, 'cohort').trim(),
   };
 }

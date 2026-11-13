@@ -11,16 +11,13 @@ import {
   type TeamAdminState,
 } from '@/app/[locale]/admin/teams/actions';
 import { useCurrentLocale } from '@/i18n/use-current-locale';
-import { TEAM_FIELDS } from '@/lib/teams/fields';
 import { TEAM_LIMITS } from '@/lib/teams/forms';
-import { FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, SELECT, TEXT_BUTTON } from './form-parts';
-import { SelectChevron } from './select-chevron';
+import { FIELD, LABEL, MESSAGE, OUTLINE, PRIMARY, ROW, TEXT_BUTTON } from './form-parts';
 
 type Team = {
   id: string;
   slug: string;
   name: string;
-  field: string;
   cohort: number;
   is_published: boolean;
 };
@@ -33,12 +30,11 @@ function useErrorSentence() {
   };
 }
 
-// The name, field and cohort of a team: to create one, or, with the publish switch, to
+// The name and cohort of a team: to create one, or, with the publish switch, to
 // change one. React empties a form once its action has run, so the values are kept here and a
 // refusal leaves what was typed in place.
 export function TeamSettingsForm({ team }: { team?: Team }) {
   const t = useTranslations('Admin.teams');
-  const fieldNames = useTranslations('Teams.fields');
   const sentence = useErrorSentence();
   const locale = useCurrentLocale();
   const [state, action, pending] = useActionState<TeamAdminState, FormData>(
@@ -48,7 +44,6 @@ export function TeamSettingsForm({ team }: { team?: Team }) {
   const fields = state && !state.ok ? (state.fields ?? {}) : {};
   const formRef = useRef<HTMLFormElement>(null);
   const [name, setName] = useState(team?.name ?? '');
-  const [field, setField] = useState(team?.field ?? 'other');
   const [cohort, setCohort] = useState(team ? String(team.cohort) : '');
   const [published, setPublished] = useState(team?.is_published ?? false);
 
@@ -85,28 +80,7 @@ export function TeamSettingsForm({ team }: { team?: Team }) {
         {message('name') ? <p className={MESSAGE}>{message('name')}</p> : null}
       </div>
 
-      <div className={`${ROW} grid gap-5 sm:grid-cols-2`}>
-        <div>
-          <label htmlFor="team-field" className={LABEL}>
-            {t('field')}
-          </label>
-          <div className="relative mt-2">
-            <select
-              id="team-field"
-              name="field"
-              value={field}
-              onChange={(event) => setField(event.target.value)}
-              className={SELECT}
-            >
-              {TEAM_FIELDS.map((option) => (
-                <option key={option} value={option}>
-                  {fieldNames(option)}
-                </option>
-              ))}
-            </select>
-            <SelectChevron />
-          </div>
-        </div>
+      <div className={`${ROW} sm:max-w-xs`}>
         <div>
           <label htmlFor="team-cohort" className={LABEL}>
             {t('cohort')}

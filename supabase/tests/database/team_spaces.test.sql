@@ -87,10 +87,10 @@ update public.profiles
    set last_name = '시', first_name = '험', occupation = 'founder', onboarded_at = now()
  where email like 'pgtap-team-%' and email <> 'pgtap-team-unfinished@example.test';
 
-insert into public.teams (id, slug, name, field, cohort, tagline, intro, is_published) values
-  ('7e590000-0000-4000-8000-000000000a01', 'pgtap-a', '팀 A', 'other', 1, '한 줄', '소개', true),
-  ('7e590000-0000-4000-8000-000000000b01', 'pgtap-b', '팀 B', 'other', 2, '한 줄', '소개', true),
-  ('7e590000-0000-4000-8000-000000000c01', 'pgtap-u', '팀 U', 'other', 2, '한 줄', '소개', false);
+insert into public.teams (id, slug, name, cohort, tagline, intro, is_published) values
+  ('7e590000-0000-4000-8000-000000000a01', 'pgtap-a', '팀 A', 1, '한 줄', '소개', true),
+  ('7e590000-0000-4000-8000-000000000b01', 'pgtap-b', '팀 B', 2, '한 줄', '소개', true),
+  ('7e590000-0000-4000-8000-000000000c01', 'pgtap-u', '팀 U', 2, '한 줄', '소개', false);
 
 insert into public.team_members (team_id, user_id) values
   ('7e590000-0000-4000-8000-000000000a01', '7e590000-0000-4000-8000-000000000003'),
@@ -286,9 +286,7 @@ select throws_ok(
 select throws_ok(
   $$update public.teams set slug = 'x' where id = '7e590000-0000-4000-8000-000000000a01'$$,
   '42501', null, 'a team member cannot change the slug');
-select throws_ok(
-  $$update public.teams set field = 'x' where id = '7e590000-0000-4000-8000-000000000a01'$$,
-  '42501', null, 'a team member cannot change the field');
+select hasnt_column('public', 'teams', 'field', 'teams have no field any more');
 select throws_ok(
   $$update public.teams set cohort = 9 where id = '7e590000-0000-4000-8000-000000000a01'$$,
   '42501', null, 'a team member cannot change the cohort');
@@ -296,7 +294,7 @@ select throws_ok(
   $$update public.teams set is_published = false where id = '7e590000-0000-4000-8000-000000000a01'$$,
   '42501', null, 'a team member cannot change whether the team is published');
 select throws_ok(
-  $$insert into public.teams (slug, name, field, cohort) values ('pgtap-new', 'x', 'other', 1)$$,
+  $$insert into public.teams (slug, name, cohort) values ('pgtap-new', 'x', 1)$$,
   '42501', null, 'a team member cannot create a team');
 select throws_ok(
   $$insert into public.team_members (team_id, user_id)
@@ -443,24 +441,24 @@ select lives_ok(
 set local request.jwt.claims = '{"sub":"7e590000-0000-4000-8000-000000000005","role":"authenticated"}';
 
 select lives_ok(
-  $$insert into public.teams (slug, name, field, cohort) values ('pgtap-new', '새 팀', 'other', 3)$$,
+  $$insert into public.teams (slug, name, cohort) values ('pgtap-new', '새 팀', 3)$$,
   'an operator can create a team');
 select is(
   (select is_published from public.teams where slug = 'pgtap-new'),
   false, 'a new team starts unpublished');
 select throws_ok(
-  $$insert into public.teams (slug, name, field, cohort) values ('Has-Capitals', 'x', 'other', 1)$$,
+  $$insert into public.teams (slug, name, cohort) values ('Has-Capitals', 'x', 1)$$,
   '23514', null, 'a slug with capitals is refused');
 select throws_ok(
-  $$insert into public.teams (slug, name, field, cohort) values ('pgtap-new', 'x', 'other', 1)$$,
+  $$insert into public.teams (slug, name, cohort) values ('pgtap-new', 'x', 1)$$,
   '23505', null, 'a duplicate slug is refused');
 select throws_ok(
-  $$insert into public.teams (slug, name, field, cohort) values ('pgtap-zero', 'x', 'other', 0)$$,
+  $$insert into public.teams (slug, name, cohort) values ('pgtap-zero', 'x', 0)$$,
   '23514', null, 'cohort 0 is refused');
 select is(
-  public._t_rows($$update public.teams set is_published = true, name = '새 이름', slug = 'pgtap-new2', field = 'mobility', cohort = 4
+  public._t_rows($$update public.teams set is_published = true, name = '새 이름', slug = 'pgtap-new2', cohort = 4
      where slug = 'pgtap-new'$$),
-  1, 'an operator can change name, slug, field, cohort and publishing');
+  1, 'an operator can change name, slug, cohort and publishing');
 select is(
   public._t_rows($$update public.teams set intro = '운영진이 고친 소개'
      where id = '7e590000-0000-4000-8000-000000000a01'$$),

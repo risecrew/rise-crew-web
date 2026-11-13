@@ -35,8 +35,8 @@ update public.user_roles set role = 'operator'
 update public.user_roles set blocked_at = now()
  where user_id = '7e5e0000-0000-4000-8000-000000000003';
 
-insert into public.teams (id, slug, name, field, cohort, is_published) values
-  ('7e5e0000-0000-4000-8000-000000000a01', 'pgtap-teamdel', '지울 팀', 'other', 1, true);
+insert into public.teams (id, slug, name, cohort, is_published) values
+  ('7e5e0000-0000-4000-8000-000000000a01', 'pgtap-teamdel', '지울 팀', 1, true);
 insert into public.team_members (team_id, user_id) values
   ('7e5e0000-0000-4000-8000-000000000a01', '7e5e0000-0000-4000-8000-000000000001');
 insert into public.team_posts (team_id, author_id, title, visibility) values
