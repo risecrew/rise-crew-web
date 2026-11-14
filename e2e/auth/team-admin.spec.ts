@@ -381,3 +381,35 @@ test('on a short phone an operator can reach every menu item and the account lin
   await last.scrollIntoViewIfNeeded();
   await expect(last).toBeInViewport();
 });
+
+test('the admin team list shows each team with its logo, or its initial', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const id = unique(testInfo);
+  // The highest cohort, so both rows open the list however many test teams the local stack holds.
+  // Unpublished, so the public list's empty cohort 9999 stays empty for its own test.
+  const hidden = { cohort: 9999, is_published: false };
+  const withLogo = await createTeam({ slug: `logo-${id}`, name: `로고 팀 ${id}`, ...hidden });
+  await createTeam({ slug: `plain-${id}`, name: `글자 팀 ${id}`, ...hidden });
+  const logo = `${withLogo}/${crypto.randomUUID()}.png`;
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  const upload = await adminClient()
+    .storage.from('team-logos')
+    .upload(logo, png, { contentType: 'image/png' });
+  if (upload.error) throw upload.error;
+  const operator = await clientSignedInAs(OPERATOR);
+  const { error } = await operator.from('teams').update({ logo_path: logo }).eq('id', withLogo);
+  if (error) throw error;
+
+  await signIn(page, OPERATOR, baseURL!);
+  await page.goto('/ko/admin/teams');
+  const row = page.getByRole('link', { name: new RegExp(`로고 팀 ${id}`) });
+  await expect(row.locator(`img[src*="team-logos/${logo}"]`)).toHaveCount(1);
+  const plain = page.getByRole('link', { name: new RegExp(`글자 팀 ${id}`) });
+  await expect(plain.locator('img')).toHaveCount(0);
+  await expect(plain).toContainText('글');
+});

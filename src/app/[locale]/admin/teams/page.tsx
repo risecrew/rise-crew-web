@@ -3,11 +3,13 @@ import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CHIP } from '@/components/teams/post-list';
 import { PRIMARY, TEXT_BUTTON } from '@/components/teams/form-parts';
+import { TeamMark } from '@/components/teams/team-mark';
 import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
 import { isAuthEnabled } from '@/lib/auth/config';
 import { requireRole } from '@/lib/auth/viewer';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { logoUrl } from '@/lib/teams/queries';
 import { AccountLayout, accountMetadata } from '../../account-layout';
 
 type Props = { params: Promise<{ locale: string }> };
@@ -33,7 +35,7 @@ export default async function AdminTeamsPage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from('teams')
-    .select('id, name, cohort, is_published')
+    .select('id, name, cohort, logo_path, is_published')
     .order('cohort', { ascending: false })
     .order('name');
   if (error) throw new Error(error.message);
@@ -56,9 +58,16 @@ export default async function AdminTeamsPage({ params }: Props) {
               <li key={team.id} className="border-t border-white/15">
                 <Link
                   href={`/admin/teams/${team.id}`}
-                  className="group flex items-start justify-between gap-3 py-4 transition-colors duration-150 hover:bg-white/5"
+                  className="group flex items-center gap-4 py-4 transition-colors duration-150 hover:bg-white/5"
                 >
-                  <span className="min-w-0">
+                  {/* The team's logo beside its name, or its initial when it has none, as on the
+                      public list. */}
+                  <TeamMark
+                    name={team.name}
+                    url={logoUrl(team.logo_path)}
+                    className="size-12 text-xl"
+                  />
+                  <span className="min-w-0 flex-1">
                     <span className="block font-display text-2xl font-[850] wrap-anywhere break-keep group-hover:underline">
                       {team.name}
                     </span>
