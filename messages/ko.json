@@ -955,7 +955,6 @@
       "coverHint": "팀 페이지 맨 위에 크게 나오고, 모두에게 공개돼요. 큰 사진은 자동으로 줄여서 올려요. 올리지 않으면 최신 공개 글의 사진이 나와요.",
       "removeCover": "지금 표지 사진 빼기"
     },
-    "emptyPage": "이 쪽에는 팀이 없어요.",
     "lockedApplying": "가입자 전용 글이 {count}개 있어요. 가입이 승인되면 볼 수 있어요.",
     "metaTeamTitle": "{name} | RISE CREW 창업팀"
   },

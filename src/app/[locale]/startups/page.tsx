@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageCover } from '@/components/site/page-cover';
 import { PRIMARY, TEXT_BUTTON } from '@/components/teams/form-parts';
-import { Pager } from '@/components/teams/pager';
 import { TeamCard } from '@/components/teams/team-card';
 import { asLocale } from '@/i18n/as-locale';
 import { Link } from '@/i18n/navigation';
@@ -11,7 +10,7 @@ import { isAuthEnabled } from '@/lib/auth/config';
 import { atLeast } from '@/lib/auth/roles';
 import { getViewer } from '@/lib/auth/viewer';
 import { localizedAlternates } from '@/lib/metadata';
-import { listTeams, logoUrl, pageCount } from '@/lib/teams/queries';
+import { listTeams, logoUrl } from '@/lib/teams/queries';
 import { parseTeamsQuery, type TeamsQuery } from '@/lib/teams/query';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +34,7 @@ export async function generateMetadata({ params }: Pick<Props, 'params'>): Promi
   };
 }
 
-// The address of the list with some filters changed. Changing a filter goes back to the first page.
+// The address of the list with some filters changed. The list is one page, so only the cohort stays.
 function filterQuery(q: TeamsQuery, change: Partial<TeamsQuery>) {
   const next = { ...q, ...change };
   return {
@@ -119,17 +118,8 @@ export default async function StartupsPage({ params, searchParams }: Props) {
             </>
           ) : (
             <div className="mt-10 border-t border-white/15 pt-6">
-              <p className="text-lg text-white/85">
-                {t(q.page > 1 ? 'emptyPage' : filtered ? 'emptyFiltered' : 'empty')}
-              </p>
-              {q.page > 1 ? (
-                <Link
-                  href={{ pathname: '/startups', query: filterQuery(q, {}) }}
-                  className="mt-2 inline-flex min-h-11 items-center text-white underline underline-offset-4"
-                >
-                  {t('pager.first')}
-                </Link>
-              ) : filtered ? (
+              <p className="text-lg text-white/85">{t(filtered ? 'emptyFiltered' : 'empty')}</p>
+              {filtered ? (
                 <Link
                   href="/startups"
                   className="mt-2 inline-flex min-h-11 items-center text-white underline underline-offset-4"
@@ -139,15 +129,6 @@ export default async function StartupsPage({ params, searchParams }: Props) {
               ) : null}
             </div>
           )}
-
-          {teams.length > 0 ? (
-            <Pager
-              pathname="/startups"
-              query={filterQuery(q, {})}
-              page={q.page}
-              pages={pageCount(total)}
-            />
-          ) : null}
         </div>
       </section>
     </main>
